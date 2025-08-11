@@ -1,0 +1,74 @@
+.ai-helper {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 50;
+}
+.ai-helper .fab {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1e3a8a, #06b6d4);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+}
+.ai-helper .panel {
+  position: absolute;
+  bottom: 60px;
+  right: 0;
+  width: 320px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+}
+.ai-helper .header {
+  padding: 10px 12px;
+  font-weight: 600;
+  border-bottom: 1px solid #e5e7eb;
+}
+.ai-helper .body {
+  max-height: 280px;
+  overflow: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ai-helper .msg {
+  padding: 8px 10px;
+  border-radius: 10px;
+  max-width: 85%;
+}
+.ai-helper .msg.user {
+  background: #e0f2fe;
+  align-self: flex-end;
+}
+.ai-helper .msg.assistant {
+  background: #f3f4f6;
+  align-self: flex-start;
+}
+.ai-helper .input-row {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+  border-top: 1px solid #e5e7eb;
+}
+.ai-helper .input-row input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+.ai-helper .input-row button {
+  padding: 8px 12px;
+  border: none;
+  background: #111827;
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+}

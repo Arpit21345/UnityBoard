@@ -1,0 +1,6 @@
+.list { list-style:none; padding:0; margin:0; }
+.list li { padding:8px 0; }
+.list a { color:#111827; text-decoration:none; }
+.create-form { display:flex; gap:8px; margin:8px 0 16px; }
+.create-form input { padding:8px 10px; border:1px solid #d1d5db; border-radius:6px; }
+.create-form button { padding:8px 10px; background:#111827; color:#fff; border:none; border-radius:6px; cursor:pointer; }

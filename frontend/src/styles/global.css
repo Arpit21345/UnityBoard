@@ -1,0 +1,10 @@
+@import './reset.css';
+@import './tokens.css';
+@import './typography.css';
+@import './utilities.css';
+@import './components.css';
+
+/* Base scaffold */
+html, body, #root { height: 100%; }
+body { margin:0; font-family: var(--font-sans); color: var(--gray-900); background: var(--gray-50); }
+a { color: inherit; text-decoration: none; }

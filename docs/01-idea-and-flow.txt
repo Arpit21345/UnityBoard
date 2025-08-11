@@ -1,0 +1,114 @@
+Smart Collaborative Project Management Platform — Working Summary (v0)
+
+One-liner
+A MERN-based, AI-assisted collaborative platform for student teams and small startups to plan, track, discuss, and share resources for projects—optimized for local dev now and smooth cloud deployment later.
+
+Ground rules & constraints (from you)
+- Stack: MERN only (React + Node/Express + MongoDB). No TypeScript, no Next.js.
+- Styling: Custom CSS only (no Tailwind). Dark/Light mode supported via CSS variables.
+- AI: Use Cohere API (free-friendly) via backend proxy; optimize for low token usage.
+- Env-first: Configuration via .env files; no hardcoded secrets/URLs.
+- Goal: Runs locally now; deployable later (Render/Vercel/Netlify/Railway, etc.).
+
+Target users
+- University/capstone teams, early-stage startups, remote cohorts, hobbyist tech groups.
+
+Core features (as understood)
+1) Public Portal (Explore)
+   - Overview of features, guided tour, how-to-start, FAQ/help, links to Login/Register/Contact.
+2) Authentication
+   - Email/password register, login, logout. JWT-based sessions. (OAuth later if needed.)
+3) Home Dashboard (post-login)
+   - My projects, create/join project, recent activity.
+4) Inside a Project (modules)
+   - Project Dashboard: progress analytics, recent changes, member status.
+   - Task Management: CRUD, assign, prioritization/voting, AI task suggestions.
+   - Attendance Monitor: track logins/activity; export report.
+   - Learning Tracker: members log skills/knowledge gained per task.
+   - Smart Snippets: share/discuss short code/docs with votes.
+   - Solution Database: library of resolved issues, searchable/filterable with votes.
+   - Resource Vault: upload/manage files, notes, links.
+   - Discussion Room: real-time or near-real-time chat for project topics.
+5) AI Assistant (global within project)
+   - Task suggestions, summarization, quick Q&A, writing help, basic code review prompts.
+   - Backed by Cohere; low-capacity/cost-conscious usage patterns.
+6) Core UX
+   - Dark/Light mode toggle (and prefers-color-scheme), fully responsive.
+
+Key user flows (first pass)
+- Explore -> Login/Register -> Dashboard -> Create/Join Project -> Work inside modules.
+- AI assistant available in a collapsible panel or floating dock across project pages.
+- Attendance captured on login and optionally periodic activity (configurable).
+
+Technical approach
+Frontend (React + Vite, custom CSS)
+- Routing: React Router (Explore, Auth, Dashboard, Project/* modules).
+- State: Lightweight Context + hooks for MVP; can add Redux later if needed.
+- CSS organization: Per-component/page .css files (e.g., Login.jsx + Login.css).
+- Dark/Light: CSS variables on :root; toggle saved in localStorage; auto-detect OS.
+
+Backend (Node.js + Express)
+- REST API, JWT auth (httpOnly cookie or Authorization header; decide during build).
+- Rate limiting & input validation on public endpoints.
+- File uploads: local in dev; pluggable cloud provider later (e.g., Cloudinary/S3).
+- Discussion: start with REST + polling/long-poll; optionally add Socket.IO later.
+- Attendance: record events on login + optional heartbeat endpoint.
+
+Database (MongoDB/Atlas)
+- Collections (first draft; subject to refinement):
+  - users: name, email, passwordHash, avatar?, createdAt
+  - projects: name, description, createdBy, members[{ userId, role }], createdAt
+  - tasks: projectId, title, description, status, priority, assignees[], dueDate, votes[], activity[]
+  - attendance: projectId, userId, date/time, type(login|active), meta
+  - learningLogs: projectId, userId, taskId?, content, createdAt
+  - snippets: projectId, userId, type(code|doc), content, tags[], votes[], comments[]
+  - solutions: scope(global|project), title, description, links[], tags[], votes[], createdBy, projectId?
+  - resources: projectId, type(file|link|note), title, url/path, meta
+  - messages: projectId, userId, content, createdAt (for discussion room)
+  - activity: projectId, actorId, type, target, createdAt
+
+AI integration (Cohere)
+- Backend proxy endpoints: /api/ai/suggest-tasks, /api/ai/summarize, /api/ai/qna
+- Secrets: COHERE_API_KEY in backend .env only.
+- Token discipline: short prompts, leverage context trimming, streaming responses if feasible.
+
+High-level API surface (illustrative)
+- Auth: POST /api/auth/register, POST /api/auth/login, POST /api/auth/logout, GET /api/auth/me
+- Users: GET/PUT /api/users/:id (profile)
+- Projects: CRUD /api/projects, POST /api/projects/:id/invite, POST /api/projects/:id/join, GET /api/projects/:id/members
+- Tasks: CRUD /api/projects/:id/tasks, POST /tasks/:taskId/assign, POST /tasks/:taskId/vote
+- Attendance: POST /api/projects/:id/attendance, GET /api/projects/:id/attendance?range=..., GET /export
+- Learning: CRUD /api/projects/:id/learning
+- Snippets: CRUD /api/projects/:id/snippets, POST /snippets/:id/vote
+- Solutions: CRUD /api/solutions (global), GET /api/solutions/search?q=...
+- Resources: CRUD /api/projects/:id/resources (upload/list/delete)
+- Discussion: GET/POST /api/projects/:id/messages (Socket.IO later)
+- AI: POST /api/ai/suggest-tasks, POST /api/ai/summarize, POST /api/ai/qna
+
+Env variables (initial)
+Backend
+- PORT=5000
+- CLIENT_URL=http://localhost:5173
+- MONGO_URI=...  MONGO_DB_NAME=unityboard
+- JWT_SECRET=...
+- COHERE_API_KEY=...
+- FILE_STORAGE=local | cloud (future), CLOUD_PROVIDER_KEYS=...
+
+Frontend
+- VITE_API_URL=http://localhost:5000
+
+Deployment posture (later)
+- Keep secrets server-side; CORS allowed only to frontend origin.
+- Backend on Render/Railway/Fly (TBD), Frontend on Vercel/Netlify (TBD).
+- Health checks: /api/health; readiness on DB connect.
+- Build-time env for frontend; runtime env for backend.
+
+Assumptions to confirm/change
+- Roles: project owner + member (admin/editor/viewer granularity needed?).
+- Solution Database: global library with project linkage optional—correct?
+- Discussion: start REST-based; add websockets later—OK?
+- File storage: Cloud provider choice (Cloudinary/S3) for production.
+- OAuth providers (Google/GitHub) deferred for later.
+
+Your edits
+- Please edit this file to correct/extend anything. Once you confirm, I’ll lock the plan and start wiring routes, models, and pages accordingly.

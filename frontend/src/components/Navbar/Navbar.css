@@ -1,0 +1,11 @@
+.navbar { position: sticky; top:0; background:#ffffff; border-bottom:1px solid var(--gray-200); z-index:40 }
+.nav-inner { max-width: 1120px; margin: 0 auto; padding: 10px 16px; display:flex; align-items:center; gap:12px }
+.brand { display:flex; align-items:center; gap:8px; font-weight:700; color:#111827; text-decoration:none; }
+.brand-logo { width:28px; height:28px; display:block; }
+.spacer { flex: 1 1 auto; }
+.link { color:#111827; text-decoration:none; padding:8px 10px; border-radius:8px }
+.link:hover { background: var(--gray-100); }
+@media (max-width: 720px){
+	.nav-inner { padding: 10px 12px }
+	.hide-sm { display:none }
+}

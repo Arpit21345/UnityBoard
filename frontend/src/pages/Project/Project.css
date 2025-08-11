@@ -1,0 +1,11 @@
+.task-form { display:flex; gap:8px; margin:8px 0 16px; }
+.task-form input { padding:8px 10px; border:1px solid #d1d5db; border-radius:6px; }
+.task-form button { padding:8px 10px; background:#111827; color:#fff; border:none; border-radius:6px; cursor:pointer; }
+.res-actions { display:flex; gap:12px; align-items:center; margin:16px 0; }
+.res-item { display:flex; align-items:center; gap:8px; padding:6px 0; }
+.res-item .provider { color:#6b7280; font-size:12px; }
+.res-item .danger { margin-left:auto; background:#b91c1c; color:#fff; border:none; border-radius:6px; padding:6px 10px; cursor:pointer; }
+.dropzone { flex:1; min-height:60px; border:2px dashed #9ca3af; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#6b7280; }
+.dropzone.over { background:#f3f4f6; border-color:#111827; color:#111827; }
+/* layout */
+.project-grid{display:grid;grid-template-columns:2fr 1fr;gap:16px}

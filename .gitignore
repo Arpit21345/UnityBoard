@@ -1,0 +1,77 @@
+# Node
+node_modules/
+**/node_modules/
+
+# Env files
+.env
+.env.local
+.env.*.local
+**/.env
+**/.env.local
+**/.env.*.local
+backend/.env
+frontend/.env
+!backend/.env.example
+!frontend/.env.example
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# Builds
+build/
+dist/
+**/build/
+**/dist/
+
+# Misc
+.DS_Store
+.vscode/
+.tmp/
+
+# OS junk files
+Thumbs.db
+ehthumbs.db
+Icon?
+*.stackdump
+
+# IDEs
+.idea/
+.fleet/
+.history/
+*.swp
+*.swo
+
+# Testing / coverage
+coverage/
+.nyc_output/
+junit.xml
+
+# TypeScript (if added later)
+*.tsbuildinfo
+
+# Vite/React caches
+.cache/
+.vite/
+**/.vite/
+
+# Storybook/Playwright (if added later)
+storybook-static/
+playwright-report/
+test-results/
+
+# Build outputs (already covered, keep extras)
+out/
+**/.next/
+**/.nuxt/
+
+# Env backups
+*.env.local.backup
+*.env.backup
+
+# Uploads (keep folder, ignore contents)
+backend/uploads/
+!backend/uploads/.gitkeep
