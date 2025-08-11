@@ -1,10 +1,23 @@
 .ai-helper {
-  position: fixed;
-  right: 20px;
-  bottom: 20px;
-  z-index: 50;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+  overflow: visible;
+  z-index: 9999;
+  pointer-events: none;
+  /* Completely remove from layout flow */
+  display: contents;
 }
 .ai-helper .fab {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
   width: 48px;
   height: 48px;
   border-radius: 50%;
@@ -13,18 +26,30 @@
   border: none;
   cursor: pointer;
   font-weight: 700;
+  pointer-events: auto;
+  z-index: 10000;
+  margin: 0;
+  padding: 0;
+  /* Force it to not affect any layout */
+  transform: translateZ(0);
 }
 .ai-helper .panel {
-  position: absolute;
-  bottom: 60px;
-  right: 0;
-  width: 320px;
+  position: fixed;
+  right: 16px;
+  bottom: 72px;
+  width: min(92vw, 360px);
   background: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
   display: flex;
   flex-direction: column;
+  pointer-events: auto;
+  z-index: 10000;
+  margin: 0;
+  padding: 0;
+  /* Force it to not affect any layout */
+  transform: translateZ(0);
 }
 .ai-helper .header {
   padding: 10px 12px;
@@ -71,4 +96,32 @@
   color: #fff;
   border-radius: 8px;
   cursor: pointer;
+}
+
+/* Small screens: keep panel fully within viewport to avoid horizontal scroll */
+@media (max-width: 480px) {
+  .ai-helper .fab {
+    right: 12px;
+    bottom: 12px;
+  }
+  .ai-helper .panel {
+    width: calc(100vw - 24px);
+    right: 12px;
+    bottom: 72px;
+  }
+}
+
+/* Ensure no horizontal overflow ever occurs */
+@media (max-width: 360px) {
+  .ai-helper .fab {
+    right: 8px;
+    bottom: 8px;
+    width: 44px;
+    height: 44px;
+  }
+  .ai-helper .panel {
+    width: calc(100vw - 16px);
+    right: 8px;
+    bottom: 60px;
+  }
 }

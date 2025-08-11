@@ -192,77 +192,7 @@ export default function Explore() {
         </div>
       </section>
 
-      {/* Core Features Grid */}
-      <section className="core-features-section">
-        <div className="container">
-          <h3 className="section-title">Powerful features for modern teams</h3>
-          <div className="features-grid">
-            <div className="feature-card">
-              <div className="feature-card-header">
-                <div className="feature-icon">📊</div>
-                <div className="feature-card-info">
-                  <h4 className="feature-card-title">Smart Dashboard</h4>
-                  <p className="feature-card-subtitle">Real‑time project insights</p>
-                </div>
-              </div>
-              <img className="feature-card-image" src="/api/assets/smartdashboardcard.png" alt="Dashboard preview" onError={(e)=>{ e.currentTarget.src='/api/assets/attendeceMonitor.png'; }} />
-              <ul className="feature-card-list">
-                <li>Team performance</li>
-                <li>Project completion</li>
-                <li>Notifications</li>
-              </ul>
-            </div>
-            
-            <div className="feature-card">
-              <div className="feature-card-header">
-                <div className="feature-icon">🤖</div>
-                <div className="feature-card-info">
-                  <h4 className="feature-card-title">AI‑Powered Task Management</h4>
-                  <p className="feature-card-subtitle">Intelligent task allocation</p>
-                </div>
-              </div>
-              <img className="feature-card-image" src="/api/assets/aipoweredtask.png" alt="AI tasks" onError={(e)=>{ e.currentTarget.src='/api/assets/aipoweredtashmanageschedule.png'; }} />
-              <ul className="feature-card-list">
-                <li>Smart breakdowns</li>
-                <li>Skill‑based suggestions</li>
-                <li>Progress tracking</li>
-              </ul>
-            </div>
-
-            <div className="feature-card">
-              <div className="feature-card-header">
-                <div className="feature-icon">📒</div>
-                <div className="feature-card-info">
-                  <h4 className="feature-card-title">Learning Tracker</h4>
-                  <p className="feature-card-subtitle">Document your growth</p>
-                </div>
-              </div>
-              <img className="feature-card-image" src="/api/assets/learntrack.png" alt="Learning tracker" onError={(e)=>{ e.currentTarget.style.display='none'; }} />
-              <ul className="feature-card-list">
-                <li>Journals and timelines</li>
-                <li>Skill development</li>
-                <li>Portfolio ready exports</li>
-              </ul>
-            </div>
-
-            <div className="feature-card">
-              <div className="feature-card-header">
-                <div className="feature-icon">💡</div>
-                <div className="feature-card-info">
-                  <h4 className="feature-card-title">Smart Snippets</h4>
-                  <p className="feature-card-subtitle">Collaborative code sharing</p>
-                </div>
-              </div>
-              <img className="feature-card-image" src="/api/assets/snippets.png" alt="Smart snippets" onError={(e)=>{ e.currentTarget.style.display='none'; }} />
-              <ul className="feature-card-list">
-                <li>Syntax highlighting</li>
-                <li>Comments and threads</li>
-                <li>Collections and tags</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
+  {/** Core Features Grid removed per request **/}
 
       {/* Benefits Section - Image Left, Text Right */}
       <section className="benefits-section">

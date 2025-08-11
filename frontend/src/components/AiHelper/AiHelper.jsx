@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import './AiHelper.css';
 import { apiAiQnA } from '../../services/ai.js';
 import { useAiContext } from './AiContext.jsx';
@@ -33,8 +34,8 @@ export default function AiHelper() {
     setOpen(false);
   }, [location?.pathname]);
 
-  return (
-    <div className={`ai-helper ${open ? 'open' : ''}`}>
+  const content = (
+    <div className={`ai-helper ${open ? 'open' : ''}`} aria-live="polite">
       {open && (
         <div className="panel">
           <div className="header">UnityBoard Assistant</div>
@@ -53,4 +54,7 @@ export default function AiHelper() {
       <button className="fab" onClick={()=>setOpen(!open)}>{open ? '×' : 'AI'}</button>
     </div>
   );
+
+  // Render as overlay via portal to body to avoid affecting page layout
+  return createPortal(content, document.body);
 }
