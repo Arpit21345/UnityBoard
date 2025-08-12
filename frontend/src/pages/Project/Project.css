@@ -7,5 +7,19 @@
 .res-item .danger { margin-left:auto; background:#b91c1c; color:#fff; border:none; border-radius:6px; padding:6px 10px; cursor:pointer; }
 .dropzone { flex:1; min-height:60px; border:2px dashed #9ca3af; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#6b7280; }
 .dropzone.over { background:#f3f4f6; border-color:#111827; color:#111827; }
+.dropzone.over {
+	border-color: #3b82f6;
+	background: #f0f7ff;
+}
+
+/* Kanban */
+.kanban { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; align-items: start; }
+.kanban-col { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; min-height: 240px; display:flex; flex-direction:column; }
+.kanban-col-header { padding: 10px 12px; border-bottom: 1px solid #e5e7eb; font-weight: 600; }
+.kanban-col-body { padding: 10px; display:flex; flex-direction: column; gap: 8px; }
+.kanban-card { border: 1px solid #e5e7eb; border-radius: 6px; background: #fff; padding: 10px; cursor: grab; }
+.kanban-card:active { cursor: grabbing; }
+.kanban-card-title { font-weight: 600; margin-bottom: 4px; }
+.kanban-card-meta { color:#6b7280; }
 /* layout */
 .project-grid{display:grid;grid-template-columns:2fr 1fr;gap:16px}
