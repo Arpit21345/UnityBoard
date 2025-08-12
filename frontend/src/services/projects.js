@@ -47,6 +47,15 @@ export async function apiUpdateTask(taskId, updates) {
   return data.task;
 }
 
+export async function apiDeleteTask(taskId) {
+  const res = await fetch(`${API}/api/tasks/${taskId}`, { method: 'DELETE', headers: { ...authHeaders() } });
+  if (!res.ok) {
+    try { const data = await res.json(); throw new Error(data.error || 'Delete failed'); }
+    catch { throw new Error('Delete failed'); }
+  }
+  return true;
+}
+
 export async function apiListTaskComments(taskId) {
   const res = await fetch(`${API}/api/tasks/${taskId}/comments`, { headers: { ...authHeaders() } });
   const data = await res.json();

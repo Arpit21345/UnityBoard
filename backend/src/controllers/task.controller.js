@@ -4,11 +4,11 @@ import Project from '../models/Project.js';
 export async function createTask(req, res) {
   try {
     const { id } = req.params; // project id
-    const { title, description, priority, dueDate } = req.body;
+  const { title, description, priority, dueDate, assignees = [], labels = [] } = req.body;
     const project = await Project.findById(id);
     if (!project) return res.status(404).json({ ok: false, error: 'Project not found' });
     if (!project.members.some(m => String(m.user) === req.user.id)) return res.status(403).json({ ok: false, error: 'Forbidden' });
-    const task = await Task.create({ project: id, title, description, priority, dueDate });
+  const task = await Task.create({ project: id, title, description, priority, dueDate, assignees, labels });
     res.status(201).json({ ok: true, task });
   } catch (e) {
     res.status(500).json({ ok: false, error: 'Create failed' });
@@ -34,6 +34,23 @@ export async function updateTask(req, res) {
     res.json({ ok: true, task });
   } catch (e) {
     res.status(500).json({ ok: false, error: 'Update failed' });
+  }
+}
+
+export async function deleteTask(req, res) {
+  try {
+    const { taskId } = req.params;
+    const task = await Task.findById(taskId).select('project');
+    if (!task) return res.status(404).json({ ok: false, error: 'Not found' });
+    // Ensure requester is a project member
+    const project = await Project.findById(task.project).select('members');
+    if (!project) return res.status(404).json({ ok: false, error: 'Project not found' });
+    const isMember = project.members.some(m => String(m.user) === req.user.id);
+    if (!isMember) return res.status(403).json({ ok: false, error: 'Forbidden' });
+    await Task.deleteOne({ _id: taskId });
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: 'Delete failed' });
   }
 }
 
