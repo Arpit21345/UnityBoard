@@ -47,6 +47,20 @@ export async function apiUpdateTask(taskId, updates) {
   return data.task;
 }
 
+export async function apiListTaskComments(taskId) {
+  const res = await fetch(`${API}/api/tasks/${taskId}/comments`, { headers: { ...authHeaders() } });
+  const data = await res.json();
+  if (!res.ok || !data.ok) throw new Error(data.error || 'Fetch failed');
+  return data.comments;
+}
+
+export async function apiAddTaskComment(taskId, text) {
+  const res = await fetch(`${API}/api/tasks/${taskId}/comments`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...authHeaders() }, body: JSON.stringify({ text }) });
+  const data = await res.json();
+  if (!res.ok || !data.ok) throw new Error(data.error || 'Create failed');
+  return data.comment;
+}
+
 export async function apiListPublicProjects() {
   const res = await fetch(`${API}/api/explore/projects`);
   const data = await res.json();
@@ -59,4 +73,11 @@ export async function apiUpdateProject(id, updates) {
   const data = await res.json();
   if (!res.ok || !data.ok) throw new Error(data.error || 'Update failed');
   return data.project;
+}
+
+export async function apiListProjectMembers(id) {
+  const res = await fetch(`${API}/api/projects/${id}/members`, { headers: { ...authHeaders() } });
+  const data = await res.json();
+  if (!res.ok || !data.ok) throw new Error(data.error || 'Fetch failed');
+  return data.members;
 }

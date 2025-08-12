@@ -8,7 +8,12 @@ const taskSchema = new mongoose.Schema({
   priority: { type: String, enum: ['low', 'medium', 'high'], default: 'medium' },
   assignees: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   dueDate: { type: Date },
-  votes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
+  votes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  comments: [{
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    text: { type: String, required: true, trim: true },
+    createdAt: { type: Date, default: Date.now }
+  }]
 }, { timestamps: true });
 
 export default mongoose.models.Task || mongoose.model('Task', taskSchema);

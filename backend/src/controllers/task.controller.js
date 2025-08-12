@@ -36,3 +36,40 @@ export async function updateTask(req, res) {
     res.status(500).json({ ok: false, error: 'Update failed' });
   }
 }
+
+export async function listTaskComments(req, res) {
+  try {
+    const { taskId } = req.params;
+    const task = await Task.findById(taskId).select('comments project');
+    if (!task) return res.status(404).json({ ok: false, error: 'Not found' });
+    // Ensure requester is a project member
+    const project = await Project.findById(task.project).select('members');
+    if (!project) return res.status(404).json({ ok: false, error: 'Project not found' });
+    const isMember = project.members.some(m => String(m.user) === req.user.id);
+    if (!isMember) return res.status(403).json({ ok: false, error: 'Forbidden' });
+    const comments = (task.comments || []).sort((a,b)=>new Date(a.createdAt)-new Date(b.createdAt));
+    res.json({ ok: true, comments });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: 'Fetch failed' });
+  }
+}
+
+export async function addTaskComment(req, res) {
+  try {
+    const { taskId } = req.params;
+    const { text } = req.body || {};
+    if (!text || !String(text).trim()) return res.status(400).json({ ok: false, error: 'Text required' });
+    const task = await Task.findById(taskId).select('comments project');
+    if (!task) return res.status(404).json({ ok: false, error: 'Not found' });
+    const project = await Project.findById(task.project).select('members');
+    if (!project) return res.status(404).json({ ok: false, error: 'Project not found' });
+    const isMember = project.members.some(m => String(m.user) === req.user.id);
+    if (!isMember) return res.status(403).json({ ok: false, error: 'Forbidden' });
+    const comment = { user: req.user.id, text: String(text).trim(), createdAt: new Date() };
+    task.comments.push(comment);
+    await task.save();
+    res.status(201).json({ ok: true, comment });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: 'Create failed' });
+  }
+}

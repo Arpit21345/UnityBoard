@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import './Project.css';
 import { useParams } from 'react-router-dom';
-import { apiGetProject, apiListProjectTasks, apiCreateTask, apiUpdateTask, apiUpdateProject } from '../../services/projects.js';
+import { apiGetProject, apiListProjectTasks, apiCreateTask, apiUpdateTask, apiUpdateProject, apiListTaskComments, apiAddTaskComment } from '../../services/projects.js';
 import { apiListInvites, apiCreateInvite, apiToggleInvite } from '../../services/invites.js';
 import { apiMe } from '../../services/auth.js';
 import { apiListResources, apiUploadResourceFile, apiDeleteResource } from '../../services/resources.js';
@@ -9,6 +9,7 @@ import { useAiContext } from '../../components/AiHelper/AiContext.jsx';
 import AppLayout from '../../components/layout/AppLayout.jsx';
 import Topbar from '../../components/layout/Topbar.jsx';
 import ProjectSidebar from '../../components/layout/ProjectSidebar.jsx';
+import MemberPicker from '../../components/Members/MemberPicker.jsx';
 
 export default function Project() {
   const { id } = useParams();
@@ -158,22 +159,71 @@ export default function Project() {
         </form>
         <ul className="list">
           {tasks.map(t => (
-            <li key={t._id} style={{ display:'flex', alignItems:'center', gap:12, flexWrap:'wrap' }}>
-              <span style={{ flex:1, minWidth:200 }}>
-                {t.title}
-                {t.dueDate && <span style={{ marginLeft:8, color:'#6b7280', fontSize:12 }}>(due {new Date(t.dueDate).toLocaleDateString()})</span>}
-              </span>
-              <select value={t.status} onChange={(e)=>changeTaskStatus(t._id, e.target.value)}>
-                <option value="todo">Todo</option>
-                <option value="in-progress">In Progress</option>
-                <option value="done">Done</option>
-              </select>
-              {me && <button onClick={async ()=>{ const updated = await apiUpdateTask(t._id, { assignees: [me._id] }); setTasks(tasks.map(x=>x._id===t._id? updated : x)); }}>Assign me</button>}
-              <input type="date" value={t.dueDate ? new Date(t.dueDate).toISOString().slice(0,10) : ''} onChange={async (e)=>{ const updated = await apiUpdateTask(t._id, { dueDate: e.target.value }); setTasks(tasks.map(x=>x._id===t._id? updated : x)); }} />
+            <li key={t._id} style={{ display:'block' }}>
+              <div style={{ display:'flex', alignItems:'center', gap:12, flexWrap:'wrap' }}>
+                <span style={{ flex:1, minWidth:200 }}>
+                  {t.title}
+                  {t.dueDate && <span style={{ marginLeft:8, color:'#6b7280', fontSize:12 }}>(due {new Date(t.dueDate).toLocaleDateString()})</span>}
+                </span>
+                <select value={t.status} onChange={(e)=>changeTaskStatus(t._id, e.target.value)}>
+                  <option value="todo">Todo</option>
+                  <option value="in-progress">In Progress</option>
+                  <option value="done">Done</option>
+                </select>
+                {me && <button onClick={async ()=>{ const updated = await apiUpdateTask(t._id, { assignees: [me._id] }); setTasks(tasks.map(x=>x._id===t._id? updated : x)); }}>Assign me</button>}
+                <MemberPicker projectId={id} value={(t.assignees && t.assignees[0]) || ''} onChange={async (uid)=>{ const updated = await apiUpdateTask(t._id, { assignees: uid? [uid] : [] }); setTasks(tasks.map(x=>x._id===t._id? updated : x)); }} />
+                <input type="date" value={t.dueDate ? new Date(t.dueDate).toISOString().slice(0,10) : ''} onChange={async (e)=>{ const updated = await apiUpdateTask(t._id, { dueDate: e.target.value }); setTasks(tasks.map(x=>x._id===t._id? updated : x)); }} />
+              </div>
+              <TaskComments taskId={t._id} />
             </li>
           ))}
         </ul>
       </section>
+    );
+  }
+
+  function TaskComments({ taskId }) {
+    const [open, setOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [items, setItems] = useState([]);
+    const [text, setText] = useState('');
+
+    async function load() {
+      setLoading(true);
+      try {
+        const list = await apiListTaskComments(taskId);
+        setItems(list);
+      } catch (_) {}
+      setLoading(false);
+    }
+
+    async function add() {
+      if (!text.trim()) return;
+      const c = await apiAddTaskComment(taskId, text.trim());
+      setItems([...items, c]);
+      setText('');
+    }
+
+    return (
+      <div className="card p-3 mt-2">
+        <button className="link" onClick={async ()=>{ const next=!open; setOpen(next); if (next && items.length===0) await load(); }}>{open ? 'Hide' : 'Show'} comments</button>
+        {open && (
+          <div>
+            {loading ? <p className="small">Loading…</p> : (
+              <ul className="list" style={{ marginTop:8 }}>
+                {items.map((c, idx) => (
+                  <li key={idx} className="small">{new Date(c.createdAt).toLocaleString()} — {c.text}</li>
+                ))}
+                {items.length === 0 && <li className="small">No comments yet.</li>}
+              </ul>
+            )}
+            <div style={{ display:'flex', gap:8, marginTop:8 }}>
+              <input placeholder="Add a comment" value={text} onChange={e=>setText(e.target.value)} />
+              <button onClick={add}>Post</button>
+            </div>
+          </div>
+        )}
+      </div>
     );
   }
 

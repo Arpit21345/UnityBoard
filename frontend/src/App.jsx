@@ -10,11 +10,13 @@ import Project from './pages/Project/Project.jsx';
 import AiHelper from './components/AiHelper/AiHelper.jsx';
 import { AiContextProvider } from './components/AiHelper/AiContext.jsx';
 import InviteAccept from './pages/InviteAccept/InviteAccept.jsx';
+import { ToastProvider } from './components/Toast/ToastContext.jsx';
 
 export default function App() {
   return (
     <BrowserRouter>
       <AiContextProvider>
+        <ToastProvider>
         {
           // Public pages use Navbar; private pages use Topbar via AppLayout
         }
@@ -27,6 +29,7 @@ export default function App() {
           <Route path="/project/:id" element={<ProtectedRoute><Project /></ProtectedRoute>} />
         </Routes>
         <AiHelper />
+        </ToastProvider>
       </AiContextProvider>
     </BrowserRouter>
   );

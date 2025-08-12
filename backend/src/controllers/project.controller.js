@@ -76,3 +76,23 @@ export async function joinPublicProject(req, res) {
     res.status(500).json({ ok: false, error: 'Join failed' });
   }
 }
+
+export async function listProjectMembers(req, res) {
+  try {
+    const { id } = req.params;
+    let project = await Project.findById(id).populate('members.user', 'name email avatar');
+    if (!project) return res.status(404).json({ ok: false, error: 'Not found' });
+    const isMember = project.members.some(m => String(m.user?._id || m.user) === req.user.id);
+    if (!isMember) return res.status(403).json({ ok: false, error: 'Forbidden' });
+    const members = project.members.map(m => ({
+      user: m.user?._id || m.user,
+      name: m.user?.name || '',
+      email: m.user?.email || '',
+      avatar: m.user?.avatar || '',
+      role: m.role
+    }));
+    res.json({ ok: true, members });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: 'Fetch failed' });
+  }
+}

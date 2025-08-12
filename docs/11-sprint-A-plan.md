@@ -45,3 +45,36 @@ Acceptance
 Notes
 - Keep Explore unchanged (final).
 - Log issues in CHANGELOG and strike items as done.
+
+## Open Questions (answer inline below each item)
+
+Tasks
+- [ ] Statuses: keep enum ['todo','in-progress','done'] for Sprint A? Any rename (e.g., Backlog/In Progress/Review/Done) needed just in UI labels while keeping API values as-is?
+didnt understood well but sounds good positive 
+- [ ] Assignees: backend supports multiple assignees; for Sprint A UI, use single assignee picker or allow multi-select?
+- [ ] Priority: keep ['low','medium','high'] or add 'urgent'? positive 
+- [ ] Comments: okay to start with a simple per-task comments array (no threads, no edit/delete) and add activity later? thats too deep for me to understand 
+- [ ] DnD: lanes map directly to status values; confirm there’s no custom lane requirement in Sprint A. again same 
+
+Resources
+- [ ] File size limit for uploads (MB). We can enforce via backend and show a client-side cap. Provide a number.
+- [ ] Allowed types: images (png,jpg,svg), pdf, txt, zip? Anything to exclude explicitly? yes a size limit should be there as we will be using free tier cloudinary so user can see text of sixe limit per file 
+- [ ] Storage: default local now; okay to add Cloudinary toggle later (env-based) without UI switch in Sprint A? yup perfect local uploads now 
+- [ ] Metadata: is title optional (fallback to filename) acceptable for Sprint A? no idea
+
+Membership & Permissions
+- [ ] Members can invite if project setting allowInvites=true (owner-controlled at project creation). Confirm.
+- [ ] Viewer role: can see Explore + public projects, but must authenticate before “Join”. Private projects require invite. Confirm. ye perfect 
+
+AI Helper
+- [ ] Sprint A scope: enable suggest-tasks endpoint usage in the Task modal (optional button) with current project context. Good?  yes perfect 
+- [ ] Any wording/UX preference for the helper (e.g., “Ask AI”)? nah simple and related to current view only 
+
+UX Polishing
+- [ ] Navbar logo usage confirmed (logo-only in navbar; full wordmark in hero/auth screens). Any size constraints we should lock? nah current navbar is good 
+- [ ] Empty states: short friendly copy okay, or keep minimal placeholders for speed? whatever suits
+
+Out of Scope (confirm)
+- [ ] Real-time updates (websockets)
+- [ ] Advanced roles/permissions beyond owner/member/viewer
+- [ ] Resource folders (tags only for now) may be leter 
