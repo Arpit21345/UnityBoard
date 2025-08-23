@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
 import Navbar from './components/Navbar/Navbar.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import Explore from './pages/Explore/Explore.jsx';
@@ -11,26 +11,34 @@ import AiHelper from './components/AiHelper/AiHelper.jsx';
 import { AiContextProvider } from './components/AiHelper/AiContext.jsx';
 import InviteAccept from './pages/InviteAccept/InviteAccept.jsx';
 import { ToastProvider } from './components/Toast/ToastContext.jsx';
+import Profile from './pages/Profile/Profile.jsx';
+import PastProjects from './pages/PastProjects/PastProjects.jsx';
 
 export default function App() {
-  return (
-    <BrowserRouter>
-      <AiContextProvider>
-        <ToastProvider>
-        {
-          // Public pages use Navbar; private pages use Topbar via AppLayout
-        }
-        <Routes>
-          <Route path="/" element={<><Navbar /><Explore /></>} />
-          <Route path="/login" element={<><Navbar /><Login /></>} />
-          <Route path="/register" element={<><Navbar /><Register /></>} />
-          <Route path="/invite/:token" element={<><Navbar /><InviteAccept /></>} />
-          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/project/:id" element={<ProtectedRoute><Project /></ProtectedRoute>} />
-        </Routes>
+  const RootProviders = () => (
+    <AiContextProvider>
+      <ToastProvider>
+        <Outlet />
         <AiHelper />
-        </ToastProvider>
-      </AiContextProvider>
-    </BrowserRouter>
+      </ToastProvider>
+    </AiContextProvider>
   );
+
+  const router = createBrowserRouter([
+    {
+      element: <RootProviders />,
+      children: [
+        { path: '/', element: <><Navbar /><Explore /></> },
+        { path: '/login', element: <><Navbar /><Login /></> },
+        { path: '/register', element: <><Navbar /><Register /></> },
+        { path: '/invite/:token', element: <><Navbar /><InviteAccept /></> },
+        { path: '/dashboard', element: <ProtectedRoute><Dashboard /></ProtectedRoute> },
+        { path: '/project/:id', element: <ProtectedRoute><Project /></ProtectedRoute> },
+        { path: '/profile', element: <ProtectedRoute><Profile /></ProtectedRoute> },
+        { path: '/past-projects', element: <ProtectedRoute><PastProjects /></ProtectedRoute> },
+      ],
+    },
+  ]);
+
+  return <RouterProvider router={router} future={{ v7_startTransition: true, v7_relativeSplatPath: true }} />;
 }

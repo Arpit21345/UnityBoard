@@ -310,10 +310,21 @@ export default function Explore() {
                           <button
                             className="btn btn-project-join"
                             onClick={async () => {
-                              const token = localStorage.getItem('token');
-                              if (!token) { window.location.href = '/login'; return; }
-                              const joined = await apiJoinPublicProject(project._id);
-                              window.location.href = `/project/${joined._id}`;
+                              try {
+                                const token = localStorage.getItem('token');
+                                if (!token) { window.location.href = '/login'; return; }
+                                const joined = await apiJoinPublicProject(project._id);
+                                if (!joined || !joined._id) throw new Error('Join failed');
+                                window.location.href = `/project/${joined._id}`;
+                              } catch (e) {
+                                if (String(e?.message || '').toLowerCase().includes('unauthorized') || String(e?.message || '').toLowerCase().includes('invalid token')) {
+                                  // token expired or unauthorized
+                                  localStorage.removeItem('token');
+                                  window.location.href = '/login';
+                                } else {
+                                  alert('Could not join project. Please try again.');
+                                }
+                              }
                             }}
                           >
                             Join Project

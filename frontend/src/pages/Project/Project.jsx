@@ -17,6 +17,10 @@ import TasksPanel from './components/TasksPanel.jsx';
 import ResourcesPanel from './components/ResourcesPanel.jsx';
 import SettingsPanel from './components/SettingsPanel.jsx';
 import DashboardPanel from './components/DashboardPanel.jsx';
+import LearningPanel from './components/LearningPanel.jsx';
+import SnippetsPanel from './components/SnippetsPanel.jsx';
+import SolutionsPanel from './components/SolutionsPanel.jsx';
+import DiscussionPanel from './components/DiscussionPanel.jsx';
 
 export default function Project() {
   const { id } = useParams();
@@ -49,7 +53,12 @@ export default function Project() {
         setTasks(t); setTasksLoading(false);
         setResources(r); setResourcesLoading(false);
       } catch (e) {
-        notify('Failed to load project data', 'error');
+        const msg = e?.message || 'Failed to load project data';
+        if (/unauthorized|forbidden|not authorized|membership/i.test(msg)) {
+          notify('You do not have access to this project.', 'error');
+        } else {
+          notify(msg, 'error');
+        }
         setTasksLoading(false);
         setResourcesLoading(false);
       }
@@ -124,7 +133,18 @@ export default function Project() {
           {tab === 'settings' && (
             <SettingsPanel project={project} setProject={setProject} amPrivileged={amPrivileged} />
           )}
-          {/* TODO: learning, snippets, solutions, discussion tabs */}
+          {tab === 'learning' && (
+            <LearningPanel projectId={id} me={me} />
+          )}
+          {tab === 'snippets' && (
+            <SnippetsPanel projectId={id} me={me} />
+          )}
+          {tab === 'solutions' && (
+            <SolutionsPanel projectId={id} me={me} />
+          )}
+          {tab === 'discussion' && (
+            <DiscussionPanel projectId={id} me={me} amPrivileged={amPrivileged} project={project} />
+          )}
         </div>
       )}
       <Modal open={taskModal.open} title={taskModal.task? 'Edit Task' : 'New Task'} onClose={()=>setTaskModal({ open:false, task:null })}

@@ -5,7 +5,8 @@
   "type": "module",
   "main": "src/server.js",
   "scripts": {
-    "dev": "nodemon src/server.js",
+  "dev": "nodemon src/server.js",
+  "dev2": "set PORT=5002&& nodemon src/server.js",
     "start": "node src/server.js",
     "lint": "echo \"No linter configured yet\""
   },

@@ -1,4 +1,11 @@
 import Project from '../models/Project.js';
+import Task from '../models/Task.js';
+import Resource from '../models/Resource.js';
+import Learning from '../models/Learning.js';
+import Snippet from '../models/Snippet.js';
+import Solution from '../models/Solution.js';
+import Thread from '../models/Thread.js';
+import Message from '../models/Message.js';
 
 export async function createProject(req, res) {
   try {
@@ -13,7 +20,11 @@ export async function createProject(req, res) {
 
 export async function listMyProjects(req, res) {
   try {
-    const projects = await Project.find({ 'members.user': req.user.id }).sort({ createdAt: -1 });
+  const { status } = req.query;
+  const qry = { 'members.user': req.user.id };
+  if (status && ['active','archived'].includes(status)) qry.status = status;
+  else qry.status = 'active';
+  const projects = await Project.find(qry).sort({ createdAt: -1 });
     res.json({ ok: true, projects });
   } catch (e) {
     res.status(500).json({ ok: false, error: 'Fetch failed' });
@@ -35,7 +46,7 @@ export async function getProject(req, res) {
 export async function updateProjectSettings(req, res) {
   try {
     const { id } = req.params;
-    const { visibility, allowMemberInvites, name, description } = req.body || {};
+  const { visibility, allowMemberInvites, name, description, chatSingleRoom, status } = req.body || {};
     const project = await Project.findById(id);
     if (!project) return res.status(404).json({ ok: false, error: 'Not found' });
     const me = req.user.id;
@@ -45,6 +56,8 @@ export async function updateProjectSettings(req, res) {
     if (typeof allowMemberInvites === 'boolean') project.allowMemberInvites = allowMemberInvites;
     if (name) project.name = name;
     if (typeof description === 'string') project.description = description;
+  if (typeof chatSingleRoom === 'boolean') project.chatSingleRoom = chatSingleRoom;
+    if (status && ['active','archived'].includes(status)) project.status = status;
     await project.save();
     res.json({ ok: true, project });
   } catch (e) {
@@ -94,5 +107,33 @@ export async function listProjectMembers(req, res) {
     res.json({ ok: true, members });
   } catch (e) {
     res.status(500).json({ ok: false, error: 'Fetch failed' });
+  }
+}
+
+export async function deleteProject(req, res) {
+  try {
+    const { id } = req.params;
+    const project = await Project.findById(id);
+    if (!project) return res.status(404).json({ ok: false, error: 'Not found' });
+    const me = req.user.id;
+    const isOwner = project.members.some(m => String(m.user) === me && m.role === 'owner');
+    if (!isOwner) return res.status(403).json({ ok: false, error: 'Only owner can delete project' });
+
+    const threads = await Thread.find({ project: id }).select('_id');
+    const threadIds = threads.map(t => t._id);
+
+    await Promise.all([
+      Message.deleteMany({ thread: { $in: threadIds } }),
+      Thread.deleteMany({ project: id }),
+      Task.deleteMany({ project: id }),
+      Resource.deleteMany({ project: id }),
+      Learning.deleteMany({ project: id }),
+      Snippet.deleteMany({ project: id }),
+      Solution.deleteMany({ project: id }),
+    ]);
+    await Project.deleteOne({ _id: id });
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: 'Delete failed' });
   }
 }

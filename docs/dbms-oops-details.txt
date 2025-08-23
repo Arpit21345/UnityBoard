@@ -1,0 +1,115 @@
+# UnityBoard Project: DBMS & OOPs Implementation Details
+
+## 1. Database Models (DBMS)
+
+### Project
+- Fields: _id, name, description, members [user, role], visibility, allowMemberInvites
+- Relationships: Has many Tasks, Resources, Invites
+
+### Task
+- Fields: _id, projectId, title, description, status (todo/in-progress/done), priority (low/medium/high/urgent), dueDate, assignees [userId], labels [string], comments [Comment]
+- Relationships: Belongs to Project; Has many Comments
+
+### Comment
+- Fields: _id, taskId, userId, text, createdAt
+- Relationships: Belongs to Task
+
+### Resource
+- Fields: _id, projectId, name/title, url, provider (upload/external), mime, createdAt
+- Relationships: Belongs to Project
+
+### Invite
+- Fields: _id, projectId, code, token, enabled, usedCount, usageLimit, expiresAt
+- Relationships: Belongs to Project
+
+### User
+- Fields: _id, name, email, password (hashed), role
+- Relationships: Can be member of many Projects; can be assignee/commenter
+
+## 2. API Endpoints
+
+### Project APIs
+- GET /api/projects — List projects
+- POST /api/projects — Create project
+- GET /api/projects/:id — Get project details
+- PATCH /api/projects/:id — Update project
+- GET /api/projects/:id/members — List members
+
+### Task APIs
+- GET /api/projects/:id/tasks — List tasks for project
+- POST /api/projects/:id/tasks — Create task
+- PATCH /api/tasks/:taskId — Update task
+- DELETE /api/tasks/:taskId — Delete task
+- GET /api/tasks/:taskId/comments — List comments
+- POST /api/tasks/:taskId/comments — Add comment
+
+### Resource APIs
+- GET /api/projects/:id/resources — List resources
+- POST /api/projects/:id/resources — Upload file
+- POST /api/projects/:id/resources/link — Add external link
+- DELETE /api/projects/:id/resources/:resourceId — Delete resource
+
+### Invite APIs
+- GET /api/projects/:id/invites — List invites
+- POST /api/projects/:id/invites — Create invite
+- PATCH /api/invites/:inviteId — Toggle invite
+
+### Auth APIs
+- POST /api/auth/login — Login
+- POST /api/auth/register — Register
+- GET /api/auth/me — Get current user
+
+## 3. DBMS Concepts Used
+- Relational schema: Projects, Tasks, Resources, Invites, Users
+- Foreign keys: projectId, taskId, userId
+- Indexes: on _id, projectId, userId
+- CRUD operations: implemented for all major models
+- Joins: API responses often join related models (e.g., tasks with assignees)
+- Transactions: (future) for bulk updates, invite usage
+- Constraints: required fields, unique codes, role-based access
+- Aggregations: KPIs (total/completed/in-progress/pending tasks)
+
+## 4. OOPs Concepts in Codebase
+- Classes: Mongoose models (Project, Task, Resource, Invite, User)
+- Encapsulation: API services hide fetch logic; React components encapsulate UI logic
+- Inheritance: (future) base model for audit fields, role-based permissions
+- Polymorphism: Resource provider (upload/external) handled via type field
+- Abstraction: Service layer for API calls; reusable React components (TaskComments, LabelsEditor, PriorityBadge)
+- Composition: Project contains Tasks, Resources, Invites; Task contains Comments
+- Interfaces: (future) TypeScript interfaces for props/models
+- Static methods: Model-level queries (e.g., Project.findById)
+- Instance methods: (future) e.g., Task.addComment()
+
+## 5. How Things Are Linked
+- Project _id links to Tasks, Resources, Invites
+- Task _id links to Comments
+- User _id links to assignees, comments, members
+- Invite code/token links to Project
+- Resource provider/type determines handling (upload vs external)
+
+## 6. Features Completed (as of Aug 2025)
+- Project CRUD, member management, invites
+- Task CRUD, Kanban board, list view, filters, bulk ops, inline rename, priority, labels, comments
+- Resource upload/link, grid/list view, provider filter, filetype badges, delete
+- Auth: login/register/me
+- UI: modular panels, reusable components, localStorage persistence
+
+## 7. Features Planned/Future
+- Audit logs (created/updated by)
+- Role-based permissions (admin/owner/member)
+- Bulk resource actions
+- Advanced search/filter (multi-field)
+- Notifications (task assignment, comments)
+- TypeScript interfaces for all models/services
+- More OOPs: base model inheritance, instance methods
+- DBMS: transactions for bulk ops, invite usage
+- Analytics: activity logs, usage stats
+
+## 8. For Interview/AI Study
+- Each model and API is mapped above; if asked, you can show which are implemented and which are planned.
+- OOPs concepts are present in both backend (models/services) and frontend (React components/services).
+- DBMS concepts: schema, relations, CRUD, constraints, indexes, joins, aggregations, transactions (planned).
+- For any topic, you can point to the relevant model, API, or code file.
+
+---
+This file is structured for AI/mentor review: every DBMS/OOPs topic is mapped to your project, with status (done/planned) and links between models/APIs/components. Use this as a reference for interview prep or deeper study.

@@ -11,6 +11,8 @@ const projectSchema = new mongoose.Schema({
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   visibility: { type: String, enum: ['public', 'private'], default: 'private' },
   allowMemberInvites: { type: Boolean, default: false },
+  chatSingleRoom: { type: Boolean, default: false },
+  status: { type: String, enum: ['active', 'archived'], default: 'active' },
   members: { type: [memberSchema], default: [] }
 }, { timestamps: true });
 

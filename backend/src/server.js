@@ -15,6 +15,12 @@ import invitesRouter from './routes/invites.route.js';
 import exploreRouter from './routes/explore.route.js';
 import tasksRouter from './routes/tasks.route.js';
 import resourcesRouter from './routes/resources.route.js';
+import learningRouter from './routes/learning.route.js';
+import snippetsRouter from './routes/snippets.route.js';
+import solutionsRouter from './routes/solutions.route.js';
+import threadsRouter from './routes/threads.route.js';
+import dashboardRouter from './routes/dashboard.route.js';
+import usersRouter from './routes/users.route.js';
 
 dotenv.config();
 
@@ -59,6 +65,12 @@ app.use('/api/tasks', tasksRouter);
 app.use('/api/projects', resourcesRouter);
 app.use('/api', invitesRouter);
 app.use('/api/explore', exploreRouter);
+app.use('/api', learningRouter);
+app.use('/api', snippetsRouter);
+app.use('/api', solutionsRouter);
+app.use('/api', threadsRouter);
+app.use('/api', dashboardRouter);
+app.use('/api/users', usersRouter);
 
 app.get('/', (_req, res) => {
   res.json({ ok: true, service: 'UnityBoard API' });

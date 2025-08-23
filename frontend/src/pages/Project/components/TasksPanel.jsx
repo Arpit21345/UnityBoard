@@ -42,8 +42,13 @@ export default function TasksPanel({ projectId, me, tasks, setTasks, tasksLoadin
   async function saveRename(taskId) {
     const next = (editTitle || '').trim();
     if (!next) { notify('Title required', 'error'); return; }
-    try { const updated = await apiUpdateTask(taskId, { title: next }); setTasks(tasks.map(x=>x._id===taskId? updated : x)); notify('Task renamed','success'); cancelRename(); }
-    catch { notify('Rename failed','error'); }
+    try {
+      const updated = await apiUpdateTask(taskId, { title: next });
+      setTasks(tasks.map(x=>x._id===taskId? updated : x));
+      notify('Task renamed','success');
+      cancelRename();
+    }
+    catch (e) { notify(e?.message || 'Rename failed','error'); }
   }
 
   const [selectedTaskIds, setSelectedTaskIds] = useState([]);
@@ -57,13 +62,13 @@ export default function TasksPanel({ projectId, me, tasks, setTasks, tasksLoadin
       const updatedMap = new Map(updates.filter(Boolean).map(t => [t._id, t]));
       setTasks(tasks.map(t => updatedMap.get(t._id) || t));
       notify(`Updated ${updatedMap.size} task(s)`, 'success');
-    } catch { notify('Bulk update failed','error'); }
+    } catch (e) { notify(e?.message || 'Bulk update failed','error'); }
     finally { clearSelection(); }
   }
 
   async function changeTaskStatus(taskId, status) {
     try { const updated = await apiUpdateTask(taskId, { status }); setTasks(tasks.map(t=>t._id===taskId? updated : t)); }
-    catch { notify('Update status failed','error'); }
+    catch (e) { notify(e?.message || 'Update status failed','error'); }
   }
 
   const onDragStart = useCallback((e, taskId) => { e.dataTransfer.setData('text/plain', taskId); }, []);
@@ -99,17 +104,17 @@ export default function TasksPanel({ projectId, me, tasks, setTasks, tasksLoadin
                 )}
               </div>
               <div className="kanban-card-actions">
-                <select value={t.priority || 'medium'} onChange={async (e)=>{ const updated = await apiUpdateTask(t._id, { priority: e.target.value }); setTasks(tasks.map(x=>x._id===t._id? updated : x)); }}>
+                <select value={t.priority || 'medium'} onChange={async (e)=>{ try { const updated = await apiUpdateTask(t._id, { priority: e.target.value }); setTasks(tasks.map(x=>x._id===t._id? updated : x)); } catch (err) { notify(err?.message || 'Update failed','error'); } }}>
                   <option value="urgent">Urgent</option>
                   <option value="high">High</option>
                   <option value="medium">Medium</option>
                   <option value="low">Low</option>
                 </select>
-                <LabelsEditor collapsedByDefault task={t} onChange={async (labels)=>{ const updated = await apiUpdateTask(t._id, { labels }); setTasks(tasks.map(x=>x._id===t._id? updated : x)); }} />
-                {me && <button className="link" onClick={async ()=>{ try { const updated = await apiUpdateTask(t._id, { assignees: [me._id] }); setTasks(tasks.map(x=>x._id===t._id? updated : x)); notify('Assigned to you','success'); } catch(_) { notify('Assign failed','error'); } }}>Assign me</button>}
+                <LabelsEditor collapsedByDefault task={t} onChange={async (labels)=>{ try { const updated = await apiUpdateTask(t._id, { labels }); setTasks(tasks.map(x=>x._id===t._id? updated : x)); } catch (err) { notify(err?.message || 'Update failed','error'); } }} />
+                {me && <button className="link" onClick={async ()=>{ try { const updated = await apiUpdateTask(t._id, { assignees: [me._id] }); setTasks(tasks.map(x=>x._id===t._id? updated : x)); notify('Assigned to you','success'); } catch(e) { notify(e?.message || 'Assign failed','error'); } }}>Assign me</button>}
                 <button className="link" onClick={()=>startRenameTask(t)}>Rename</button>
                 <button className="link" onClick={()=> onOpenTaskModal(t)}>Edit</button>
-                <button className="link danger" onClick={async ()=>{ if(!confirm('Delete task?')) return; try{ await apiDeleteTask(t._id); setTasks(tasks.filter(x=>x._id!==t._id)); notify('Task deleted','success'); } catch(_) { notify('Delete failed','error'); } }}>Delete</button>
+                <button className="link danger" onClick={async ()=>{ if(!confirm('Delete task?')) return; try{ await apiDeleteTask(t._id); setTasks(tasks.filter(x=>x._id!==t._id)); notify('Task deleted','success'); } catch(e) { notify(e?.message || 'Delete failed','error'); } }}>Delete</button>
               </div>
             </div>
           ))}
@@ -214,18 +219,18 @@ export default function TasksPanel({ projectId, me, tasks, setTasks, tasksLoadin
                     <option value="in-progress">In Progress</option>
                     <option value="done">Done</option>
                   </select>
-                  <select value={t.priority || 'medium'} onChange={async (e)=>{ const updated = await apiUpdateTask(t._id, { priority: e.target.value }); setTasks(tasks.map(x=>x._id===t._id? updated : x)); }}>
+                  <select value={t.priority || 'medium'} onChange={async (e)=>{ try { const updated = await apiUpdateTask(t._id, { priority: e.target.value }); setTasks(tasks.map(x=>x._id===t._id? updated : x)); } catch (err) { notify(err?.message || 'Update failed','error'); } }}>
                     <option value="urgent">Urgent</option>
                     <option value="high">High</option>
                     <option value="medium">Medium</option>
                     <option value="low">Low</option>
                   </select>
-                  {me && <button onClick={async ()=>{ try { const updated = await apiUpdateTask(t._id, { assignees: [me._id] }); setTasks(tasks.map(x=>x._id===t._id? updated : x)); notify('Assigned to you','success'); } catch(_) { notify('Assign failed','error'); } }}>Assign me</button>}
-                  <MemberPicker projectId={projectId} value={(t.assignees && t.assignees[0]) || ''} onChange={async (uid)=>{ const updated = await apiUpdateTask(t._id, { assignees: uid? [uid] : [] }); setTasks(tasks.map(x=>x._id===t._id? updated : x)); }} />
-                  <input type="date" value={t.dueDate ? new Date(t.dueDate).toISOString().slice(0,10) : ''} onChange={async (e)=>{ const updated = await apiUpdateTask(t._id, { dueDate: e.target.value }); setTasks(tasks.map(x=>x._id===t._id? updated : x)); }} />
+                  {me && <button onClick={async ()=>{ try { const updated = await apiUpdateTask(t._id, { assignees: [me._id] }); setTasks(tasks.map(x=>x._id===t._id? updated : x)); notify('Assigned to you','success'); } catch(e) { notify(e?.message || 'Assign failed','error'); } }}>Assign me</button>}
+                  <MemberPicker projectId={projectId} value={(t.assignees && t.assignees[0]) || ''} onChange={async (uid)=>{ try { const updated = await apiUpdateTask(t._id, { assignees: uid? [uid] : [] }); setTasks(tasks.map(x=>x._id===t._id? updated : x)); } catch (err) { notify(err?.message || 'Update failed','error'); } }} />
+                  <input type="date" value={t.dueDate ? new Date(t.dueDate).toISOString().slice(0,10) : ''} onChange={async (e)=>{ try { const updated = await apiUpdateTask(t._id, { dueDate: e.target.value }); setTasks(tasks.map(x=>x._id===t._id? updated : x)); } catch (err) { notify(err?.message || 'Update failed','error'); } }} />
                   <button onClick={()=>startRenameTask(t)}>Rename</button>
                   <button onClick={()=> onOpenTaskModal(t)}>Edit</button>
-                  <button className="danger pill" onClick={async ()=>{ if(!confirm('Delete task?')) return; try{ await apiDeleteTask(t._id); setTasks(tasks.filter(x=>x._id!==t._id)); notify('Task deleted','success'); } catch(_) { notify('Delete failed','error'); } }}>Delete</button>
+                  <button className="danger pill" onClick={async ()=>{ if(!confirm('Delete task?')) return; try{ await apiDeleteTask(t._id); setTasks(tasks.filter(x=>x._id!==t._id)); notify('Task deleted','success'); } catch(e) { notify(e?.message || 'Delete failed','error'); } }}>Delete</button>
                 </div>
                 <TaskComments taskId={t._id} />
               </li>
