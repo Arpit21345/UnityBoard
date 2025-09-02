@@ -2,19 +2,6 @@
 
 Goal: Group chat scoped to a Project (no private DMs), with clear permissions for Owners/Admins vs Members.
 
-Decision (Aug 23, 2025)
-- Pause all Discussion work until after Sept 1 (credit renewal).
-- Re-scope to a simple, real-time group chat per project (Discord/WhatsApp style):
-	- One socket-backed room per project (no threads, no tags initially).
-	- Messages are broadcast to room members; basic history persisted.
-	- Owner/Admin minimal moderation (e.g., delete message) only if needed.
-- No coupling with other modules. Keep it isolated and simple.
-
-Current status
-- A basic HTTP-based threaded discussion exists with moderation (pin/lock) and soft-delete.
-- Single-room UI mode is available, but full real-time is not implemented.
-- Work is PAUSED; do not add more features until Sept 1.
-
 Scope
 - One shared Discussion space per project (multi-thread or single-room variant). No private messages.
 - Threads act like topics within the project chat. Messages belong to threads.
@@ -44,8 +31,7 @@ Backend Guardrails (implemented or planned)
 - Create thread: require owner/admin (implemented)
 - Update/delete thread: owner/admin or thread creator (implemented for update/delete)
 - Message post: any member (implemented)
-- Moderation: owner/admin can pin/unpin and lock/unlock threads (implemented)
-- Soft-delete messages by author or owner/admin; placeholder text served on fetch (implemented)
+- Future moderation: delete message by owner/admin; soft-delete flag
 
 UI Constraints
 - Hide “New Thread” button for non owner/admin users
@@ -58,22 +44,13 @@ Audit/Moderation (future)
 - Add soft deletion with reason and moderator id
 - Rate limit for messages
 
-Deferred plan (post–Sept 1)
-1) Replace HTTP polling with sockets
-	- Tech: Socket.io on server and client; one namespace/room per project ID
-	- Events: join/leave, message:new, message:delete (moderation), typing (optional)
-	- Persistence: Mongo collection for messages (projectId, userId, text, createdAt)
-2) Minimal UI
-	- Single pane chat (no threads). Input + scrollback + autoscroll
-	- Show member name and timestamp; own-message delete (optional)
-3) Permissions
-	- Join room: project members only; non-members blocked at server
-	- Moderation: owner/admin can delete messages (optional first pass)
-4) Delivery checklist
-	- Smoke test with 2 browsers; message fan-out; permission guards
-	- Basic rate limiting/flood control; pagination for history
-
-Backlog (nice-to-have, not in first socket cut)
-- Audit trail UI (reasons, moderator id)
-- Pin/lock equivalents (may be overkill for single-room)
-- Reactions/uploads
+Next Steps
+1) Enforce UI gating in DiscussionPanel for New/Edit/Delete thread actions
+2) Add optional pin/lock controls for owner/admin (backend + UI)
+3) Add moderation API to delete messages (owner/admin) and soft-delete model field
+4) Single-room mode toggle: when enabled, threads list collapses to a single default "General" thread per project (auto-created). Socket events used:
+	- join { projectId }
+	- message:new { threadId, item }
+	- message:deleted { threadId, item }
+	- thread:update { _id, pinned, locked, title, tags }
+	- thread:deleted { _id }

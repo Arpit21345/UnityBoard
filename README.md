@@ -67,3 +67,16 @@ projectUnityBoard/
 - Keep each page/component in its own folder with matching `.jsx` and `.css` files.
 - Use env variables only; avoid hardcoding URLs.
 - We will refine structure after you share detailed requirements.
+
+## Realtime chat (optional)
+- Backend env: `ENABLE_SOCKET=true`, ensure `CLIENT_URL=http://localhost:5173` is set.
+- Frontend env: `VITE_ENABLE_SOCKET=true` and `VITE_API_URL=http://localhost:5000`.
+- Start both with the usual commands:
+
+```powershell
+cd backend; npm run dev
+```
+
+```powershell
+cd frontend; npm run dev
+```

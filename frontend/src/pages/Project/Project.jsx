@@ -53,12 +53,7 @@ export default function Project() {
         setTasks(t); setTasksLoading(false);
         setResources(r); setResourcesLoading(false);
       } catch (e) {
-        const msg = e?.message || 'Failed to load project data';
-        if (/unauthorized|forbidden|not authorized|membership/i.test(msg)) {
-          notify('You do not have access to this project.', 'error');
-        } else {
-          notify(msg, 'error');
-        }
+        notify('Failed to load project data', 'error');
         setTasksLoading(false);
         setResourcesLoading(false);
       }
@@ -153,25 +148,39 @@ export default function Project() {
           <button className="btn btn-primary" onClick={(e)=>addTask(e)}>Save</button>
         </>}
       >
-        <div className="task-form">
-          <input autoFocus placeholder="Task title" value={newTask.title} onChange={e=>setNewTask({...newTask, title:e.target.value})} />
-          <input placeholder="Description" value={newTask.description} onChange={e=>setNewTask({...newTask, description:e.target.value})} />
-          <input type="date" value={newTask.dueDate} onChange={e=>setNewTask({...newTask, dueDate:e.target.value})} />
-          <select value={newTask.priority} onChange={e=>setNewTask({...newTask, priority:e.target.value})}>
-            <option value="urgent">Urgent</option>
-            <option value="high">High</option>
-            <option value="medium">Medium</option>
-            <option value="low">Low</option>
-          </select>
-        </div>
-        <div className="card p-3" style={{ marginTop:8 }}>
-          <div style={{ display:'flex', gap:12, alignItems:'center', flexWrap:'wrap' }}>
+        <div className="task-form task-modal">
+          <div>
+            <label className="small">Title</label>
+            <input autoFocus placeholder="Task title" value={newTask.title} onChange={e=>setNewTask({...newTask, title:e.target.value})} />
+          </div>
+          <div>
+            <label className="small">Description</label>
+            <input placeholder="Description" value={newTask.description} onChange={e=>setNewTask({...newTask, description:e.target.value})} />
+          </div>
+          <div className="form-row">
             <div>
-              <label className="small">Assignee</label>
+              <label className="small">Due Date</label>
+              <input type="date" value={newTask.dueDate} onChange={e=>setNewTask({...newTask, dueDate:e.target.value})} />
+            </div>
+            <div>
+              <label className="small">Priority</label>
+              <select value={newTask.priority} onChange={e=>setNewTask({...newTask, priority:e.target.value})}>
+                <option value="urgent">Urgent</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div className="task-form-secondary">
+          <div className="task-form-row">
+            <div className="assignee-section">
+              <label>Assignee</label>
               <MemberPicker projectId={id} value={modalAssignee} onChange={setModalAssignee} placeholder="Select member" />
             </div>
-            <div style={{ flex:1 }}>
-              <label className="small">Labels</label>
+            <div className="labels-section">
+              <label>Labels</label>
               <LabelsEditor task={{ labels: modalLabels }} onChange={setModalLabels} />
             </div>
           </div>

@@ -1,0 +1,280 @@
+/* Tasks - Align spacing and look with Learning & Snippets */
+
+.tasks-panel .filters-bar {
+  display: flex;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  background: #fff;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--sp-4);
+  flex-wrap: wrap;
+  box-shadow: var(--shadow-sm);
+}
+
+.tasks-panel .filters-bar label.small {
+  font-size: var(--text-sm);
+  color: var(--gray-600);
+  font-weight: 500;
+}
+
+.tasks-panel .filters-bar input,
+.tasks-panel .filters-bar select {
+  padding: 10px 12px;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-md);
+  background: #fff;
+  font-size: var(--text-md);
+  min-height: 40px;
+}
+
+.tasks-panel .filters-bar input:focus,
+.tasks-panel .filters-bar select:focus {
+  outline: none;
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px var(--primary-50);
+}
+
+/* Task-specific buttons (avoid global width issues) */
+.task-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  padding: 8px 12px;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-md);
+  background: #fff;
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+  line-height: 1;
+}
+
+.task-btn:hover {
+  background: var(--gray-50);
+  border-color: var(--gray-400);
+}
+
+.task-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  filter: saturate(0.8);
+}
+
+.task-btn-ghost {
+  background: transparent;
+  border-color: var(--gray-300);
+  color: var(--gray-700);
+}
+
+.task-btn-ghost:hover {
+  background: var(--gray-50);
+}
+
+.task-btn-primary {
+  background: var(--primary-600);
+  color: #fff;
+  border-color: var(--primary-700);
+}
+
+.task-btn-primary:hover {
+  background: var(--primary-700);
+  color: #fff;
+}
+
+.task-btn-danger {
+  background: #fee2e2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.task-btn-danger:hover {
+  background: #fecaca;
+  border-color: #fca5a5;
+}
+
+/* List row spacing and improved design */
+.tasks-list .task-row {
+  display: grid;
+  grid-template-columns: 24px 1fr auto auto auto auto auto auto auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  margin-bottom: 8px;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.tasks-list .task-row:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-color: #d1d5db;
+}
+
+.tasks-list .task-row-todo {
+  border-left: 4px solid #6b7280;
+}
+
+.tasks-list .task-row-in-progress {
+  background: #fffbeb;
+  border-left: 4px solid #f59e0b;
+}
+
+.tasks-list .task-row-done {
+  background: #f0fdf4;
+  border-left: 4px solid #10b981;
+}
+
+/* Task row controls styling */
+.tasks-list .task-row select {
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 12px;
+  min-height: 32px;
+  min-width: 100px;
+}
+
+.tasks-list .task-row input[type="date"] {
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 12px;
+  min-height: 32px;
+  min-width: 120px;
+}
+
+.tasks-list .task-row input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+}
+
+/* Task content area styling */
+.tasks-list .task-row .task-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.tasks-list .task-row .task-title {
+  font-weight: 600;
+  color: #111827;
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tasks-list .task-row .task-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.tasks-list .task-row .task-labels {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+/* Task row buttons */
+.tasks-list .task-row .task-btn {
+  padding: 4px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 11px;
+  min-height: 28px;
+  cursor: pointer;
+  color: #374151;
+  transition: all 0.15s ease;
+}
+
+.tasks-list .task-row .task-btn:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.tasks-list .task-row .task-btn-danger {
+  color: #dc2626;
+  border-color: #fecaca;
+  background: #fef2f2;
+}
+
+.tasks-list .task-row .task-btn-danger:hover {
+  background: #fee2e2;
+  border-color: #f87171;
+}
+
+/* Bulk actions bar styling */
+.tasks-list .bulk-actions {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.tasks-list .bulk-actions .task-btn {
+  padding: 6px 12px;
+  font-size: 12px;
+  min-height: 32px;
+}
+
+/* Empty state styling */
+.tasks-list .empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6b7280;
+  font-size: 14px;
+  background: #f9fafb;
+  border: 1px dashed #d1d5db;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+/* Kanban cards */
+.kanban-card {
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  background: #fff;
+  padding: var(--sp-3);
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.kanban-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--gray-300);
+}
+
+/* kanban-card-actions controls are styled in Project.css */
+
+/* Labels as colorful tags (light) */
+.chip {
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--gray-300);
+  background: #fff;
+  color: var(--gray-700);
+  font-size: var(--text-sm);
+}
+
+/* Section spacing */
+.tasks-panel .section-header {
+  margin-bottom: var(--sp-3);
+}

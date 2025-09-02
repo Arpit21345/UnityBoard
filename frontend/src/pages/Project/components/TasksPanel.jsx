@@ -5,6 +5,10 @@ import { apiUpdateTask, apiDeleteTask } from '../../../services/projects.js';
 import PriorityBadge from './PriorityBadge.jsx';
 import LabelsEditor from './LabelsEditor.jsx';
 import TaskComments from './TaskComments.jsx';
+import TasksFilters from './Tasks/TasksFilters.jsx';
+import TasksBoard from './Tasks/TasksBoard.jsx';
+import TasksList from './Tasks/TasksList.jsx';
+import './Tasks/Tasks.css';
 
 export default function TasksPanel({ projectId, me, tasks, setTasks, tasksLoading, onOpenTaskModal }) {
   const { notify } = useToast();
@@ -16,7 +20,6 @@ export default function TasksPanel({ projectId, me, tasks, setTasks, tasksLoadin
   const [priorityFilter, setPriorityFilter] = useState(()=>{ try { return localStorage.getItem(`proj:${projectId}:tasks:priority`) || 'all'; } catch { return 'all'; }});
   const [labelFilter, setLabelFilter] = useState(()=>{ try { return localStorage.getItem(`proj:${projectId}:tasks:label`) || 'all'; } catch { return 'all'; }});
   const [taskQuery, setTaskQuery] = useState(()=>{ try { return localStorage.getItem(`proj:${projectId}:tasks:q`) || ''; } catch { return ''; }});
-  const [dense, setDense] = useState(()=>{ try { return localStorage.getItem(`proj:${projectId}:tasks:dense`) === '1'; } catch { return false; }});
 
   // persist
   function persist(name, value) { try { localStorage.setItem(`proj:${projectId}:tasks:${name}`, value); } catch {} }
@@ -42,13 +45,8 @@ export default function TasksPanel({ projectId, me, tasks, setTasks, tasksLoadin
   async function saveRename(taskId) {
     const next = (editTitle || '').trim();
     if (!next) { notify('Title required', 'error'); return; }
-    try {
-      const updated = await apiUpdateTask(taskId, { title: next });
-      setTasks(tasks.map(x=>x._id===taskId? updated : x));
-      notify('Task renamed','success');
-      cancelRename();
-    }
-    catch (e) { notify(e?.message || 'Rename failed','error'); }
+    try { const updated = await apiUpdateTask(taskId, { title: next }); setTasks(tasks.map(x=>x._id===taskId? updated : x)); notify('Task renamed','success'); cancelRename(); }
+    catch { notify('Rename failed','error'); }
   }
 
   const [selectedTaskIds, setSelectedTaskIds] = useState([]);
@@ -62,188 +60,72 @@ export default function TasksPanel({ projectId, me, tasks, setTasks, tasksLoadin
       const updatedMap = new Map(updates.filter(Boolean).map(t => [t._id, t]));
       setTasks(tasks.map(t => updatedMap.get(t._id) || t));
       notify(`Updated ${updatedMap.size} task(s)`, 'success');
-    } catch (e) { notify(e?.message || 'Bulk update failed','error'); }
+    } catch { notify('Bulk update failed','error'); }
     finally { clearSelection(); }
   }
 
-  async function changeTaskStatus(taskId, status) {
-    try { const updated = await apiUpdateTask(taskId, { status }); setTasks(tasks.map(t=>t._id===taskId? updated : t)); }
-    catch (e) { notify(e?.message || 'Update status failed','error'); }
-  }
-
   const onDragStart = useCallback((e, taskId) => { e.dataTransfer.setData('text/plain', taskId); }, []);
-  const onDropTo = useCallback(async (e, status) => { e.preventDefault(); const taskId = e.dataTransfer.getData('text/plain'); if (!taskId) return; await changeTaskStatus(taskId, status); }, [changeTaskStatus]);
+  const onDropTo = useCallback(async (e, status) => { e.preventDefault(); const taskId = e.dataTransfer.getData('text/plain'); if (!taskId) return; try { const updated = await apiUpdateTask(taskId, { status }); setTasks(tasks.map(t=>t._id===taskId? updated : t)); } catch { notify('Update status failed','error'); } }, [setTasks]);
 
-  function BoardColumn({ title, status }) {
-    const [over, setOver] = useState(false);
-    const list = filteredTasks.filter(t => t.status === status);
-    return (
-      <div className={`kanban-col ${over ? 'drop-target' : ''}`}
-           onDragOver={(e)=>{ e.preventDefault(); setOver(true); }}
-           onDragLeave={()=>setOver(false)}
-           onDrop={(e)=>{ setOver(false); onDropTo(e, status); }}>
-        <div className="kanban-col-header">{title} <span className="small">({list.length})</span></div>
-        <div className="kanban-col-body">
-          {list.map(t => (
-            <div key={t._id} className="kanban-card" draggable={editingTaskId!==t._id} onDragStart={(e)=>onDragStart(e, t._id)}>
-              <div className="kanban-card-title" style={{ display:'flex', alignItems:'center', gap:8 }}>
-                <span className="drag-handle" aria-hidden>⋮⋮</span>
-                {editingTaskId === t._id ? (
-                  <input autoFocus value={editTitle} onChange={e=>setEditTitle(e.target.value)} onBlur={()=>saveRename(t._id)} onKeyDown={(e)=>{ if(e.key==='Enter'){ e.preventDefault(); saveRename(t._id); } if(e.key==='Escape'){ e.preventDefault(); cancelRename(); } }} />
-                ) : (
-                  t.title
-                )}
-              </div>
-              <div className="kanban-card-meta small" style={{ display:'flex', alignItems:'center', gap:8, flexWrap:'wrap' }}>
-                <PriorityBadge value={t.priority} />
-                {t.dueDate && <span>Due {new Date(t.dueDate).toLocaleDateString()}</span>}
-                {Array.isArray(t.labels) && t.labels.length>0 && (
-                  <span style={{ display:'inline-flex', gap:6, flexWrap:'wrap' }}>
-                    {t.labels.map((l,idx)=>(<span key={idx} className="chip" style={{ transform:'scale(0.95)' }}>{l}</span>))}
-                  </span>
-                )}
-              </div>
-              <div className="kanban-card-actions">
-                <select value={t.priority || 'medium'} onChange={async (e)=>{ try { const updated = await apiUpdateTask(t._id, { priority: e.target.value }); setTasks(tasks.map(x=>x._id===t._id? updated : x)); } catch (err) { notify(err?.message || 'Update failed','error'); } }}>
-                  <option value="urgent">Urgent</option>
-                  <option value="high">High</option>
-                  <option value="medium">Medium</option>
-                  <option value="low">Low</option>
-                </select>
-                <LabelsEditor collapsedByDefault task={t} onChange={async (labels)=>{ try { const updated = await apiUpdateTask(t._id, { labels }); setTasks(tasks.map(x=>x._id===t._id? updated : x)); } catch (err) { notify(err?.message || 'Update failed','error'); } }} />
-                {me && <button className="link" onClick={async ()=>{ try { const updated = await apiUpdateTask(t._id, { assignees: [me._id] }); setTasks(tasks.map(x=>x._id===t._id? updated : x)); notify('Assigned to you','success'); } catch(e) { notify(e?.message || 'Assign failed','error'); } }}>Assign me</button>}
-                <button className="link" onClick={()=>startRenameTask(t)}>Rename</button>
-                <button className="link" onClick={()=> onOpenTaskModal(t)}>Edit</button>
-                <button className="link danger" onClick={async ()=>{ if(!confirm('Delete task?')) return; try{ await apiDeleteTask(t._id); setTasks(tasks.filter(x=>x._id!==t._id)); notify('Task deleted','success'); } catch(e) { notify(e?.message || 'Delete failed','error'); } }}>Delete</button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
+  const labels = useMemo(() => Array.from(new Set((tasks||[]).flatMap(t => Array.isArray(t.labels) ? t.labels : []))), [tasks]);
 
   return (
-    <section className={`tasks-panel ${dense ? 'dense' : ''}`}>
-      <div className="filters-bar card">
-        <div>
-          <label className="small">View</label>
-          <div style={{ display:'flex', gap:6 }}>
-            <button type="button" className={taskView==='board'?'btn btn-primary':'btn'} onClick={()=>{ setTaskView('board'); persist('view','board'); }}>Board</button>
-            <button type="button" className={taskView==='list'?'btn btn-primary':'btn'} onClick={()=>{ setTaskView('list'); persist('view','list'); }}>List</button>
-          </div>
-        </div>
-        <div>
-          <label className="small">Status</label>
-          <select value={statusFilter} onChange={e=>{ setStatusFilter(e.target.value); persist('status', e.target.value); }}>
-            <option value="all">All</option>
-            <option value="todo">Todo</option>
-            <option value="in-progress">In Progress</option>
-            <option value="done">Done</option>
-          </select>
-        </div>
-        <div style={{ minWidth: 220 }}>
-          <label className="small">Search</label>
-          <input placeholder="Search title/description" value={taskQuery} onChange={e=>{ setTaskQuery(e.target.value); persist('q', e.target.value); }} />
-        </div>
-        <div>
-          <label className="small">Assignee</label>
-          <MemberPicker projectId={projectId} value={assigneeFilter} onChange={(v)=>{ setAssigneeFilter(v); persist('assignee', v||''); }} placeholder="All members" />
-        </div>
-        <div>
-          <label className="small">Priority</label>
-          <select value={priorityFilter} onChange={e=>{ setPriorityFilter(e.target.value); persist('priority', e.target.value); }}>
-            <option value="all">All</option>
-            <option value="urgent">Urgent</option>
-            <option value="high">High</option>
-            <option value="medium">Medium</option>
-            <option value="low">Low</option>
-          </select>
-        </div>
-        <div>
-          <label className="small">Label</label>
-          <select value={labelFilter} onChange={e=>{ setLabelFilter(e.target.value); persist('label', e.target.value); }}>
-            <option value="all">All</option>
-            {Array.from(new Set((tasks||[]).flatMap(t => Array.isArray(t.labels) ? t.labels : []))).map(l => (
-              <option key={l} value={l}>{l}</option>
-            ))}
-          </select>
-        </div>
-        <div style={{ marginLeft:'auto', display:'flex', gap:8, alignItems:'end' }}>
-          <div>
-            <label className="small">Density</label>
-            <div style={{ display:'flex', gap:6, alignItems:'center' }}>
-              <label className="switch small"><input type="checkbox" checked={dense} onChange={e=>{ setDense(e.target.checked); persist('dense', e.target.checked? '1':'0'); }} /><span>Compact</span></label>
-            </div>
-          </div>
-          <button type="button" className="btn" onClick={()=>{ setStatusFilter('all'); setAssigneeFilter(''); setPriorityFilter('all'); setTaskQuery(''); setLabelFilter('all'); persist('status','all'); persist('assignee',''); persist('priority','all'); persist('q',''); persist('label','all'); }}>Clear Filters</button>
-          <button type="button" className="btn btn-primary" onClick={()=> onOpenTaskModal(null)}>New Task</button>
-        </div>
-      </div>
+    <section className={`tasks-panel`}>
+      <TasksFilters
+        projectId={projectId}
+        taskView={taskView} setTaskView={(v)=>{ setTaskView(v); persist('view', v); }}
+        statusFilter={statusFilter} setStatusFilter={(v)=>{ setStatusFilter(v); persist('status', v); }}
+        assigneeFilter={assigneeFilter} setAssigneeFilter={(v)=>{ setAssigneeFilter(v||''); persist('assignee', v||''); }}
+        priorityFilter={priorityFilter} setPriorityFilter={(v)=>{ setPriorityFilter(v); persist('priority', v); }}
+        labelFilter={labelFilter} setLabelFilter={(v)=>{ setLabelFilter(v); persist('label', v); }}
+        taskQuery={taskQuery} setTaskQuery={(v)=>{ setTaskQuery(v); persist('q', v); }}
+        labels={labels}
+        onClear={()=>{ setStatusFilter('all'); setAssigneeFilter(''); setPriorityFilter('all'); setTaskQuery(''); setLabelFilter('all'); persist('status','all'); persist('assignee',''); persist('priority','all'); persist('q',''); persist('label','all'); }}
+        onNewTask={()=> onOpenTaskModal(null)}
+      />
 
       {tasksLoading ? (<p className="small">Loading tasks…</p>) : (taskView === 'list' ? (
-        <>
-          {selectedTaskIds.length > 0 && (
-            <div className="card p-2" style={{ display:'flex', gap:8, alignItems:'center', marginBottom:8 }}>
-              <span className="small">{selectedTaskIds.length} selected</span>
-              <button className="btn" onClick={selectAllFiltered}>Select all (filtered)</button>
-              <button className="btn" onClick={()=>bulkUpdateStatus('todo')}>Set Todo</button>
-              <button className="btn" onClick={()=>bulkUpdateStatus('in-progress')}>Set In Progress</button>
-              <button className="btn" onClick={()=>bulkUpdateStatus('done')}>Set Done</button>
-              <button className="btn" onClick={clearSelection}>Clear</button>
-            </div>
-          )}
-          <ul className="list tasks-list">
-            {filteredTasks.length === 0 && <li className="small">No tasks match filters.</li>}
-            {filteredTasks.map(t => (
-              <li key={t._id} style={{ display:'block' }}>
-                <div className="task-row">
-                  <input type="checkbox" checked={selectedTaskIds.includes(t._id)} onChange={()=>toggleSelect(t._id)} />
-                  <span style={{ flex:1, minWidth:200 }}>
-                    {editingTaskId === t._id ? (
-                      <input autoFocus value={editTitle} onChange={e=>setEditTitle(e.target.value)} onBlur={()=>saveRename(t._id)} onKeyDown={(e)=>{ if(e.key==='Enter'){ e.preventDefault(); saveRename(t._id); } if(e.key==='Escape'){ e.preventDefault(); cancelRename(); } }} />
-                    ) : (
-                      <>
-                        {t.title} <PriorityBadge value={t.priority} />
-                        {t.dueDate && <span style={{ marginLeft:8, color:'#6b7280', fontSize:12 }}>(due {new Date(t.dueDate).toLocaleDateString()})</span>}
-                        {Array.isArray(t.labels) && t.labels.length>0 && (
-                          <span className="small" style={{ marginLeft:8, display:'inline-flex', gap:6, flexWrap:'wrap' }}>
-                            {t.labels.map((l,idx)=>(<span key={idx} className="chip">{l}</span>))}
-                          </span>
-                        )}
-                      </>
-                    )}
-                  </span>
-                  <select value={t.status} onChange={(e)=>changeTaskStatus(t._id, e.target.value)}>
-                    <option value="todo">Todo</option>
-                    <option value="in-progress">In Progress</option>
-                    <option value="done">Done</option>
-                  </select>
-                  <select value={t.priority || 'medium'} onChange={async (e)=>{ try { const updated = await apiUpdateTask(t._id, { priority: e.target.value }); setTasks(tasks.map(x=>x._id===t._id? updated : x)); } catch (err) { notify(err?.message || 'Update failed','error'); } }}>
-                    <option value="urgent">Urgent</option>
-                    <option value="high">High</option>
-                    <option value="medium">Medium</option>
-                    <option value="low">Low</option>
-                  </select>
-                  {me && <button onClick={async ()=>{ try { const updated = await apiUpdateTask(t._id, { assignees: [me._id] }); setTasks(tasks.map(x=>x._id===t._id? updated : x)); notify('Assigned to you','success'); } catch(e) { notify(e?.message || 'Assign failed','error'); } }}>Assign me</button>}
-                  <MemberPicker projectId={projectId} value={(t.assignees && t.assignees[0]) || ''} onChange={async (uid)=>{ try { const updated = await apiUpdateTask(t._id, { assignees: uid? [uid] : [] }); setTasks(tasks.map(x=>x._id===t._id? updated : x)); } catch (err) { notify(err?.message || 'Update failed','error'); } }} />
-                  <input type="date" value={t.dueDate ? new Date(t.dueDate).toISOString().slice(0,10) : ''} onChange={async (e)=>{ try { const updated = await apiUpdateTask(t._id, { dueDate: e.target.value }); setTasks(tasks.map(x=>x._id===t._id? updated : x)); } catch (err) { notify(err?.message || 'Update failed','error'); } }} />
-                  <button onClick={()=>startRenameTask(t)}>Rename</button>
-                  <button onClick={()=> onOpenTaskModal(t)}>Edit</button>
-                  <button className="danger pill" onClick={async ()=>{ if(!confirm('Delete task?')) return; try{ await apiDeleteTask(t._id); setTasks(tasks.filter(x=>x._id!==t._id)); notify('Task deleted','success'); } catch(e) { notify(e?.message || 'Delete failed','error'); } }}>Delete</button>
-                </div>
-                <TaskComments taskId={t._id} />
-              </li>
-            ))}
-          </ul>
-        </>
+        <TasksList
+          projectId={projectId}
+          items={filteredTasks}
+          me={me}
+          selectedTaskIds={selectedTaskIds}
+          toggleSelect={toggleSelect}
+          clearSelection={clearSelection}
+          selectAllFiltered={selectAllFiltered}
+          onBulkUpdateStatus={bulkUpdateStatus}
+          editingTaskId={editingTaskId}
+          editTitle={editTitle}
+          setEditTitle={setEditTitle}
+          onStartRename={startRenameTask}
+          onSaveRename={saveRename}
+          onCancelRename={cancelRename}
+          onUpdateTask={async (id, patch)=>{
+            if (patch.__delete) { if(!confirm('Delete task?')) return; try{ await apiDeleteTask(id); setTasks(tasks.filter(x=>x._id!==id)); notify('Task deleted','success'); } catch(_) { notify('Delete failed','error'); } return; }
+            try { const updated = await apiUpdateTask(id, patch); setTasks(tasks.map(x=>x._id===id? updated : x)); }
+            catch { notify('Update failed','error'); }
+          }}
+          onOpenTaskModal={onOpenTaskModal}
+        />
       ) : (
-        <div className="kanban">
-          {filteredTasks.length === 0 && <p className="small" style={{padding:'8px 0'}}>No tasks match filters. Try clearing them or add a new task.</p>}
-          <BoardColumn title="Todo" status="todo" />
-          <BoardColumn title="In Progress" status="in-progress" />
-          <BoardColumn title="Done" status="done" />
-        </div>
+        <TasksBoard
+          items={filteredTasks}
+          me={me}
+          onDragStart={onDragStart}
+          onDropTo={onDropTo}
+          onStartRename={startRenameTask}
+          editingTaskId={editingTaskId}
+          editTitle={editTitle}
+          setEditTitle={setEditTitle}
+          onSaveRename={saveRename}
+          onCancelRename={cancelRename}
+          onUpdateTask={async (id, patch)=>{
+            if (patch.__delete) { if(!confirm('Delete task?')) return; try{ await apiDeleteTask(id); setTasks(tasks.filter(x=>x._id!==id)); notify('Task deleted','success'); } catch(_) { notify('Delete failed','error'); } return; }
+            try { const updated = await apiUpdateTask(id, patch); setTasks(tasks.map(x=>x._id===id? updated : x)); }
+            catch { notify('Update failed','error'); }
+          }}
+          onOpenTaskModal={onOpenTaskModal}
+        />
       ))}
     </section>
   );

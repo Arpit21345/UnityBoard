@@ -1,6 +1,7 @@
 import Thread from '../models/Thread.js';
 import Message from '../models/Message.js';
 import Project from '../models/Project.js';
+import { getIo } from '../socketHub.js';
 
 function isMember(project, userId){
   return project.members?.some(m => String(m.user) === String(userId));
@@ -12,18 +13,17 @@ function isOwnerOrAdmin(project, userId){
 export async function listThreads(req, res){
   try {
     const { id } = req.params; // project id
-    const project = await Project.findById(id).select('members chatSingleRoom name');
+    const project = await Project.findById(id).select('members chatSingleRoom');
     if (!project) return res.status(404).json({ ok:false, error:'Project not found' });
     if (!isMember(project, req.user.id)) return res.status(403).json({ ok:false, error:'Forbidden' });
     let items = await Thread.find({ project: id }).sort({ pinned: -1, lastActivityAt: -1, updatedAt: -1 });
+    // In single-room mode, ensure one default thread and return only it
     if (project.chatSingleRoom) {
-      if (!items.length) {
-        const title = `${project.name || 'Project'} Chat`;
-        const def = await Thread.create({ project: id, title, tags: ['general'], createdBy: req.user.id, pinned: true });
-        items = [def];
-      } else {
-        items = [items[0]];
+      let general = items.find(t => t.title === 'General');
+      if (!general) {
+        general = await Thread.create({ project: id, title: 'General', tags: [], createdBy: req.user.id, lastActivityAt: new Date() });
       }
+      items = [general];
     }
     res.json({ ok:true, items });
   } catch { res.status(500).json({ ok:false, error:'Fetch failed' }); }
@@ -34,9 +34,9 @@ export async function createThread(req, res){
     const { id } = req.params; // project id
     const { title, tags = [] } = req.body || {};
     if (!title) return res.status(400).json({ ok:false, error:'Title required' });
-    const project = await Project.findById(id).select('members chatSingleRoom');
+  const project = await Project.findById(id).select('members chatSingleRoom');
     if (!project) return res.status(404).json({ ok:false, error:'Project not found' });
-  if (project.chatSingleRoom) return res.status(400).json({ ok:false, error:'Single-room mode active' });
+  if (project.chatSingleRoom) return res.status(400).json({ ok:false, error:'Single-room mode: cannot create threads' });
   if (!isOwnerOrAdmin(project, req.user.id)) return res.status(403).json({ ok:false, error:'Only owner/admin can create threads' });
   const item = await Thread.create({ project: id, title, tags, createdBy: req.user.id, lastActivityAt: new Date() });
     res.status(201).json({ ok:true, item });
@@ -62,6 +62,11 @@ export async function updateThread(req, res){
   if (typeof updates.pinned === 'boolean') item.pinned = updates.pinned; // owner/admin only
   if (typeof updates.locked === 'boolean') item.locked = updates.locked; // owner/admin only
     await item.save();
+    // Broadcast moderation changes
+    try {
+      const io = getIo();
+      if (io) io.to(`project:${item.project}`).emit('thread:update', { _id: item._id, pinned: item.pinned, locked: item.locked, title: item.title, tags: item.tags });
+    } catch {}
     res.json({ ok:true, item });
   } catch { res.status(500).json({ ok:false, error:'Update failed' }); }
 }
@@ -76,6 +81,10 @@ export async function deleteThread(req, res){
   if (!(isOwnerOrAdmin(project, req.user.id) || String(item.createdBy) === String(req.user.id))) return res.status(403).json({ ok:false, error:'Forbidden' });
     await Message.deleteMany({ thread: threadId });
     await Thread.deleteOne({ _id: threadId });
+    try {
+      const io = getIo();
+      if (io) io.to(`project:${item.project}`).emit('thread:deleted', { _id: threadId });
+    } catch {}
     res.json({ ok:true });
   } catch { res.status(500).json({ ok:false, error:'Delete failed' }); }
 }
@@ -108,6 +117,11 @@ export async function createMessage(req, res){
     const msg = await Message.create({ thread: threadId, user: req.user.id, text });
     thread.lastActivityAt = new Date();
     await thread.save();
+    // Broadcast new message to project room
+    try {
+      const io = getIo();
+      if (io) io.to(`project:${thread.project}`).emit('message:new', { threadId, item: msg });
+    } catch {}
     res.status(201).json({ ok:true, item: msg });
   } catch { res.status(500).json({ ok:false, error:'Create failed' }); }
 }
@@ -129,6 +143,11 @@ export async function deleteMessage(req, res){
     msg.deletedBy = req.user.id;
     msg.deletedAt = new Date();
     await msg.save();
-    res.json({ ok:true, item: { _id: msg._id, thread: msg.thread, user: msg.user, text: '(message deleted)', createdAt: msg.createdAt, deleted: true } });
+    const payload = { _id: msg._id, thread: msg.thread, user: msg.user, text: '(message deleted)', createdAt: msg.createdAt, deleted: true };
+    try {
+      const io = getIo();
+      if (io) io.to(`project:${thread.project}`).emit('message:deleted', { threadId, item: payload });
+    } catch {}
+    res.json({ ok:true, item: payload });
   } catch { res.status(500).json({ ok:false, error:'Delete failed' }); }
 }

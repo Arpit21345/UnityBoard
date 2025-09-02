@@ -1,0 +1,402 @@
+/* Smart Snippets - Professional styling matching design system */
+
+/* Main Section */
+.snippets-section {
+  max-width: 100%;
+}
+
+/* Space between header (with New button) and the next block */
+.snippets-section .section-header {
+  margin-bottom: var(--sp-3);
+}
+
+/* Toolbar */
+.snippets-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  background: #fff;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--sp-4);
+  flex-wrap: wrap;
+  box-shadow: var(--shadow-sm);
+}
+
+.snippets-toolbar input {
+  min-width: 220px;
+  padding: 8px 12px;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-md);
+  font-size: var(--text-md);
+  background: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.snippets-toolbar input:focus {
+  outline: none;
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px var(--primary-50);
+}
+
+.snippets-toolbar select {
+  padding: 8px 12px;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-md);
+  background: #fff;
+  font-size: var(--text-md);
+  min-width: 120px;
+  cursor: pointer;
+}
+
+.snippets-toolbar select:focus {
+  outline: none;
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px var(--primary-50);
+}
+
+/* Tags filter section */
+.snippets-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Sort controls section */
+.snippets-sort {
+  margin-left: auto;
+  display: flex;
+  gap: var(--sp-2);
+  align-items: center;
+}
+
+.snippets-toolbar label {
+  font-size: var(--text-sm);
+  color: var(--gray-600);
+  font-weight: 500;
+}
+
+/* Chip styles for tags */
+.chip {
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--gray-300);
+  background: #fff;
+  color: var(--gray-700);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: var(--text-sm);
+}
+
+.chip:hover {
+  border-color: var(--primary-400);
+  background: var(--primary-50);
+}
+
+.chip-active {
+  background: var(--primary-500);
+  color: #fff;
+  border-color: var(--primary-500);
+}
+
+.chip.small {
+  font-size: var(--text-xs);
+  padding: 2px 6px;
+}
+
+/* Bulk actions bar */
+.snippets-bulkbar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  background: var(--primary-50);
+  border: 1px solid var(--primary-200);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.snippets-bulkbar .small {
+  color: var(--primary-700);
+  font-weight: 500;
+  margin-right: var(--sp-2);
+}
+
+/* Snippets List */
+.snippets-list {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+/* Snippet Cards */
+.snippet-card {
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-4);
+  background: #fff;
+  transition: box-shadow 0.2s, border-color 0.2s;
+  box-shadow: var(--shadow-sm);
+}
+
+.snippet-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--gray-300);
+}
+
+.snippet-card-head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-2);
+  flex-wrap: wrap;
+}
+
+.snippet-card-head input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary-500);
+  cursor: pointer;
+}
+
+.snippet-title {
+  margin: 0;
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: var(--gray-900);
+  line-height: 1.4;
+}
+
+.snippet-desc {
+  color: var(--gray-600);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  margin-top: var(--sp-2);
+}
+
+.snippet-tags {
+  display: flex;
+  gap: 6px;
+  margin-top: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.snippet-code-container {
+  margin-top: var(--sp-3);
+  background: var(--gray-900);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--gray-700);
+  position: relative;
+}
+
+.snippet-code {
+  color: #e6edf3;
+  padding: var(--sp-3);
+  overflow: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  margin: 0;
+  max-height: 300px;
+}
+
+.snippet-lang-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.snippet-lang-label {
+  font-size: var(--text-xs);
+  color: var(--gray-600);
+  font-weight: 500;
+}
+
+.snippet-lang-select {
+  min-width: 120px;
+  padding: 4px 8px;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+.snippet-lang-select:focus {
+  outline: none;
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 2px var(--primary-50);
+}
+
+/* Empty states */
+.snippets-empty {
+  padding: var(--sp-8) var(--sp-4);
+  color: var(--gray-600);
+  text-align: center;
+  border: 1px dashed var(--gray-300);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-md);
+}
+
+/* Helper classes */
+.grow {
+  flex: 1;
+}
+
+.small {
+  font-size: var(--text-sm);
+  color: var(--gray-600);
+}
+
+/* Button styles - now imported from global-buttons.css */
+/* These styles can be removed once we've confirmed the global styles work correctly */
+
+.btn-icon {
+  display: inline-block;
+  margin-right: 4px;
+  font-size: 14px;
+}
+
+/* Modal styles */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 50;
+}
+
+.modal {
+  background: #fff;
+  width: min(900px, 96vw);
+  max-height: 90vh;
+  overflow: auto;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+}
+
+.modal-header {
+  padding: var(--sp-4);
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-weight: 600;
+  color: var(--gray-900);
+  font-size: var(--text-lg);
+}
+
+.modal-footer {
+  padding: var(--sp-4);
+  border-top: 1px solid var(--gray-200);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-3);
+}
+
+.modal-body {
+  padding: var(--sp-4);
+}
+
+/* Snippet Form */
+.snippet-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.snippet-form .form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: var(--sp-3);
+}
+
+.snippet-form .form-row.two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-4);
+}
+
+.snippet-form label {
+  font-size: var(--text-sm);
+  color: var(--gray-700);
+  font-weight: 500;
+}
+
+.snippet-form input,
+.snippet-form textarea,
+.snippet-form select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-md);
+  font-size: var(--text-md);
+  background: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.snippet-form textarea {
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+}
+
+.snippet-form textarea[placeholder="Paste code here"] {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: var(--text-sm);
+}
+
+.snippet-form input:focus,
+.snippet-form textarea:focus,
+.snippet-form select:focus {
+  outline: none;
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px var(--primary-50);
+}
+
+.hint {
+  font-size: var(--text-sm);
+  color: var(--gray-500);
+  margin-top: 4px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .snippets-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--sp-3);
+  }
+  
+  .snippets-toolbar input,
+  .snippets-toolbar select {
+    min-width: auto;
+    width: 100%;
+  }
+  
+  .snippets-sort {
+    margin-left: 0;
+    justify-content: flex-start;
+    width: 100%;
+  }
+  
+  .snippet-card-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .snippet-card-head .grow {
+    display: none;
+  }
+  
+  .snippet-form .form-row.two {
+    grid-template-columns: 1fr;
+  }
+}

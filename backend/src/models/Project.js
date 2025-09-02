@@ -11,9 +11,11 @@ const projectSchema = new mongoose.Schema({
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   visibility: { type: String, enum: ['public', 'private'], default: 'private' },
   allowMemberInvites: { type: Boolean, default: false },
-  chatSingleRoom: { type: Boolean, default: false },
+  members: { type: [memberSchema], default: [] },
+  // archived projects are hidden from active lists
   status: { type: String, enum: ['active', 'archived'], default: 'active' },
-  members: { type: [memberSchema], default: [] }
+  // when true, Discussion operates as a single-room; threads list should be limited
+  chatSingleRoom: { type: Boolean, default: false }
 }, { timestamps: true });
 
 export default mongoose.models.Project || mongoose.model('Project', projectSchema);

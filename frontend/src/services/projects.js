@@ -5,9 +5,8 @@ function authHeaders() {
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
-export async function apiListProjects(status = 'active') {
-  const qs = status ? `?status=${encodeURIComponent(status)}` : '';
-  const res = await fetch(`${API}/api/projects${qs}`, { headers: { ...authHeaders() } });
+export async function apiListProjects() {
+  const res = await fetch(`${API}/api/projects`, { headers: { ...authHeaders() } });
   const data = await res.json();
   if (!res.ok || !data.ok) throw new Error(data.error || 'Fetch failed');
   return data.projects;
@@ -84,32 +83,10 @@ export async function apiUpdateProject(id, updates) {
   if (!res.ok || !data.ok) throw new Error(data.error || 'Update failed');
   return data.project;
 }
-export async function apiArchiveProject(id) {
-  return apiUpdateProject(id, { status: 'archived' });
-}
-export async function apiUnarchiveProject(id) {
-  return apiUpdateProject(id, { status: 'active' });
-}
 
 export async function apiListProjectMembers(id) {
   const res = await fetch(`${API}/api/projects/${id}/members`, { headers: { ...authHeaders() } });
   const data = await res.json();
   if (!res.ok || !data.ok) throw new Error(data.error || 'Fetch failed');
   return data.members;
-}
-
-export async function apiGetProjectStats(id) {
-  const res = await fetch(`${API}/api/projects/${id}/stats`, { headers: { ...authHeaders() } });
-  const data = await res.json();
-  if (!res.ok || !data.ok) throw new Error(data.error || 'Fetch failed');
-  return data.stats;
-}
-
-export async function apiDeleteProject(id) {
-  const res = await fetch(`${API}/api/projects/${id}`, { method: 'DELETE', headers: { ...authHeaders() } });
-  if (!res.ok) {
-    try { const data = await res.json(); throw new Error(data.error || 'Delete failed'); }
-    catch { throw new Error('Delete failed'); }
-  }
-  return true;
 }

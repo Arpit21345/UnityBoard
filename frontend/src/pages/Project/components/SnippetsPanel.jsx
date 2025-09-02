@@ -1,7 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { apiListSnippets, apiCreateSnippet, apiUpdateSnippet, apiDeleteSnippet } from '../../../services/snippets.js';
 import { useToast } from '../../../components/Toast/ToastContext.jsx';
-import Modal from '../../../components/Modal/Modal.jsx';
+import SnippetsFilters from './Snippets/SnippetsFilters.jsx';
+import SnippetsList from './Snippets/SnippetsList.jsx';
+import SnippetsFormModal from './Snippets/SnippetsFormModal.jsx';
+import './Snippets/Snippets.css';
 
 const LANGS = ['plaintext','javascript','typescript','python','java','csharp','cpp','go','rust','sql','bash','json','yaml','html','css'];
 
@@ -12,8 +15,10 @@ export default function SnippetsPanel({ projectId, me }) {
   const [query, setQuery] = useState(localStorage.getItem(`snip.q.${projectId}`) || '');
   const [lang, setLang] = useState(localStorage.getItem(`snip.lang.${projectId}`) || 'all');
   const [tagsFilter, setTagsFilter] = useState(() => { try { return JSON.parse(localStorage.getItem(`snip.tags.${projectId}`) || '[]'); } catch { return []; } });
-  const [modal, setModal] = useState({ open:false, item:null, codeOpen:false });
-  const [form, setForm] = useState({ title:'', language:'plaintext', tagsDraft:'', notes:'', code:'' });
+  const [modal, setModal] = useState({ open:false, item:null });
+  const [sortKey, setSortKey] = useState(localStorage.getItem(`snip.sortKey.${projectId}`) || 'updatedAt');
+  const [sortDir, setSortDir] = useState(localStorage.getItem(`snip.sortDir.${projectId}`) || 'desc');
+  const [selectedIds, setSelectedIds] = useState([]);
 
   useEffect(() => { (async()=>{
     try { const res = await apiListSnippets(projectId); if (res.ok) setItems(res.items||[]); else notify('Failed to load snippets','error'); }
@@ -24,8 +29,13 @@ export default function SnippetsPanel({ projectId, me }) {
   useEffect(() => { localStorage.setItem(`snip.q.${projectId}`, query); }, [projectId, query]);
   useEffect(() => { localStorage.setItem(`snip.lang.${projectId}`, lang); }, [projectId, lang]);
   useEffect(() => { localStorage.setItem(`snip.tags.${projectId}`, JSON.stringify(tagsFilter)); }, [projectId, tagsFilter]);
+  useEffect(() => { localStorage.setItem(`snip.sortKey.${projectId}`, sortKey); }, [projectId, sortKey]);
+  useEffect(() => { localStorage.setItem(`snip.sortDir.${projectId}`, sortDir); }, [projectId, sortDir]);
 
   const allTags = useMemo(() => Array.from(new Set(items.flatMap(i => i.tags || []))).slice(0, 50), [items]);
+  const hasActiveFilters = useMemo(() => {
+    return (query?.trim()?.length || 0) > 0 || lang !== 'all' || (tagsFilter?.length || 0) > 0;
+  }, [query, lang, tagsFilter]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -41,12 +51,26 @@ export default function SnippetsPanel({ projectId, me }) {
     });
   }, [items, query, lang, tagsFilter]);
 
-  function openNew(){ setForm({ title:'', language:'plaintext', tagsDraft:'', notes:'', code:'' }); setModal({ open:true, item:null, codeOpen:true }); }
-  function openEdit(item){ setForm({ title:item.title||'', language:item.language||'plaintext', tagsDraft:(item.tags||[]).join(', '), notes:item.notes||'', code:item.code||'' }); setModal({ open:true, item, codeOpen:true }); }
+  const itemsSorted = useMemo(() => {
+    const arr = [...filtered];
+    const key = sortKey;
+    const dir = sortDir === 'asc' ? 1 : -1;
+    arr.sort((a,b) => {
+      let va, vb;
+      if (key === 'title') { va = (a.title||'').toLowerCase(); vb = (b.title||'').toLowerCase(); }
+      else if (key === 'language') { va = (a.language||'').toLowerCase(); vb = (b.language||'').toLowerCase(); }
+      else { va = new Date(a.updatedAt||a.createdAt||0).getTime(); vb = new Date(b.updatedAt||b.createdAt||0).getTime(); }
+      if (va < vb) return -1 * dir; if (va > vb) return 1 * dir; return 0;
+    });
+    return arr;
+  }, [filtered, sortKey, sortDir]);
+
+  function openNew(){ setModal({ open:true, item:null }); }
+  function openEdit(item){ setModal({ open:true, item }); }
   function parseTags(s){ return (s||'').split(',').map(x=>x.trim()).filter(Boolean).slice(0,15); }
 
-  async function save(){
-    const payload = { title: form.title?.trim(), language: form.language||'plaintext', tags: parseTags(form.tagsDraft), notes: form.notes||'', code: form.code||'' };
+  async function save(form){
+    const payload = { title: form.title?.trim(), language: form.language||'plaintext', tags: form.tags||[], notes: form.description||form.notes||'', code: form.code||'' };
     if (!payload.title) { notify('Title is required','warning'); return; }
     try {
       if (modal.item){
@@ -58,80 +82,107 @@ export default function SnippetsPanel({ projectId, me }) {
         if (res.ok) { setItems([res.item, ...items]); notify('Created','success'); }
         else notify(res.error||'Create failed','error');
       }
-      setModal({ open:false, item:null, codeOpen:false });
+      setModal({ open:false, item:null });
     } catch { notify(modal.item?'Update failed':'Create failed','error'); }
   }
 
   async function del(item){ if (!confirm('Delete this snippet?')) return; try { const res = await apiDeleteSnippet(item._id); if (res.ok) { setItems(items.filter(i=>i._id!==item._id)); notify('Deleted','success'); } else notify(res.error||'Delete failed','error'); } catch { notify('Delete failed','error'); } }
   async function copyCode(snippet){ try { await navigator.clipboard.writeText(snippet.code||''); notify('Copied code','success'); } catch { notify('Copy failed','error'); } }
 
+  // selection / bulk actions
+  const toggleSelect = (id) => setSelectedIds(prev => prev.includes(id) ? prev.filter(x=>x!==id) : [...prev, id]);
+  const clearSelection = () => setSelectedIds([]);
+  const selectAllFiltered = () => setSelectedIds(itemsSorted.map(i=>i._id));
+  useEffect(() => { setSelectedIds(prev => prev.filter(id => itemsSorted.some(i => i._id === id))); }, [itemsSorted]);
+  async function bulkDelete(){
+    if (!selectedIds.length) return;
+    if (!confirm(`Delete ${selectedIds.length} snippet(s)?`)) return;
+    const ids = [...selectedIds];
+    try {
+      await Promise.all(ids.map(id => apiDeleteSnippet(id).catch(()=>null)));
+      setItems(items.filter(i => !ids.includes(i._id)));
+      notify('Deleted selected','success');
+    } catch { notify('Bulk delete failed','error'); }
+    finally { clearSelection(); }
+  }
+
+  async function quickChangeLanguage(item, next){
+    if ((item.language||'plaintext') === next) return;
+    try { const res = await apiUpdateSnippet(item._id, { language: next }); if (res.ok) setItems(items.map(i=>i._id===res.item._id?res.item:i)); else notify(res.error||'Update failed','error'); }
+    catch { notify('Update failed','error'); }
+  }
+
   return (
-    <section>
+    <section className="snippets-section">
       <div className="section-header">
         <h3>Smart Snippets</h3>
         <div className="actions"><button className="btn btn-primary" onClick={openNew}>New</button></div>
       </div>
 
-      <div className="filters" style={{ display:'flex', gap:8, flexWrap:'wrap', alignItems:'center', marginBottom:12 }}>
-        <input placeholder="Search" value={query} onChange={e=>setQuery(e.target.value)} style={{ minWidth:220 }} />
-        <select value={lang} onChange={e=>setLang(e.target.value)}>
-          <option value="all">All languages</option>
-          {LANGS.map(l => <option key={l} value={l}>{l}</option>)}
-        </select>
-        <div style={{ display:'flex', gap:6, flexWrap:'wrap', alignItems:'center' }}>
-          {allTags.map(t => (
-            <button key={t} className={`chip ${tagsFilter.includes(t)?'chip-active':''}`} onClick={()=> setTagsFilter(v => v.includes(t) ? v.filter(x=>x!==t) : [...v, t])}>{t}</button>
-          ))}
-        </div>
-      </div>
+      <SnippetsFilters
+        query={query}
+        lang={lang}
+        langs={LANGS}
+        tagsAll={allTags}
+        tagsSelected={tagsFilter}
+        sortKey={sortKey}
+        sortDir={sortDir}
+        hasActiveFilters={hasActiveFilters}
+        onQueryChange={setQuery}
+        onLangChange={setLang}
+        onToggleTag={(t)=> setTagsFilter(v => v.includes(t) ? v.filter(x=>x!==t) : [...v, t])}
+        onSortKeyChange={setSortKey}
+        onSortDirToggle={()=> setSortDir(d=> d==='asc'?'desc':'asc')}
+        onClearFilters={()=> { setQuery(''); setLang('all'); setTagsFilter([]); }}
+        autoFocus
+      />
 
-      {loading ? <p>Loading…</p> : (
-        filtered.length ? (
-          <div className="card-list">
-            {filtered.map(item => (
-              <div key={item._id} className="card">
-                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', gap:8 }}>
-                  <div>
-                    <div className="title-row" style={{ gap:8, display:'flex', alignItems:'center', flexWrap:'wrap' }}>
-                      <strong>{item.title}</strong>
-                      <span className="badge">{item.language||'plaintext'}</span>
-                      {(item.tags||[]).length>0 && (
-                        <span className="small" style={{ opacity:0.8 }}>{item.tags.join(', ')}</span>
-                      )}
-                    </div>
-                    {item.notes && <p className="small" style={{ margin:'4px 0 0 0' }}>{item.notes}</p>}
-                  </div>
-                  <div className="row-actions" style={{ display:'flex', gap:6 }}>
-                    <button className="btn" onClick={()=>copyCode(item)}>Copy</button>
-                    <button className="btn" onClick={()=>openEdit(item)}>Edit</button>
-                    <button className="btn btn-ghost" onClick={()=>del(item)}>Delete</button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : <p className="muted">No snippets match your filters.</p>
+      {selectedIds.length > 0 && (
+        <div className="snippets-bulkbar">
+          <span className="small">{selectedIds.length} selected</span>
+          <button className="btn" onClick={selectAllFiltered}>Select all (filtered)</button>
+          <button className="btn btn-danger" onClick={bulkDelete}>Delete</button>
+          <button className="btn" onClick={clearSelection}>Clear</button>
+        </div>
       )}
 
-      <Modal open={modal.open} title={modal.item? 'Edit Snippet' : 'New Snippet'} onClose={()=>setModal({ open:false, item:null, codeOpen:false })}
-        footer={<>
-          <button className="btn" onClick={()=>setModal({ open:false, item:null, codeOpen:false })}>Cancel</button>
-          <button className="btn btn-primary" onClick={save}>Save</button>
-        </>}>
-        <div className="form-grid">
-          <input autoFocus placeholder="Title" value={form.title} onChange={e=>setForm({ ...form, title:e.target.value })} />
-          <div style={{ display:'flex', gap:8, alignItems:'center', flexWrap:'wrap' }}>
-            <label className="small">Language</label>
-            <select value={form.language} onChange={e=>setForm({ ...form, language:e.target.value })}>
-              {LANGS.map(l => <option key={l} value={l}>{l}</option>)}
-            </select>
-            <label className="small">Tags</label>
-            <input placeholder="comma separated" value={form.tagsDraft} onChange={e=>setForm({ ...form, tagsDraft:e.target.value })} style={{ minWidth:220 }} />
-          </div>
-          <textarea placeholder="Notes" value={form.notes} onChange={e=>setForm({ ...form, notes:e.target.value })} rows={2} />
-          <textarea placeholder="Code" value={form.code} onChange={e=>setForm({ ...form, code:e.target.value })} rows={10} style={{ fontFamily:'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace' }} />
-        </div>
-      </Modal>
+      {loading ? <p>Loading…</p> : (
+        itemsSorted.length ? (
+          <SnippetsList
+            items={itemsSorted}
+            selection={new Set(selectedIds)}
+            onToggleSelect={toggleSelect}
+            onEdit={openEdit}
+            onDelete={del}
+            onQuickLanguage={quickChangeLanguage}
+            onCopy={copyCode}
+          />
+        ) : (
+          hasActiveFilters ? (
+            <div className="card p-3">
+              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:12, flexWrap:'wrap' }}>
+                <div>
+                  <h4 style={{ margin:'0 0 4px 0' }}>No results</h4>
+                  <p className="small" style={{ margin:0 }}>Try adjusting or clearing your filters.</p>
+                </div>
+                <button className="btn" onClick={()=>{ setQuery(''); setLang('all'); setTagsFilter([]); }}>Clear filters</button>
+              </div>
+            </div>
+          ) : (
+            <div className="card p-4" style={{ textAlign:'center' }}>
+              <p className="muted" style={{ margin:'0 0 8px 0' }}>No snippets yet.</p>
+              <button className="btn btn-primary" onClick={openNew}>Create your first snippet</button>
+            </div>
+          )
+        )
+      )}
+
+      <SnippetsFormModal
+        open={modal.open}
+        initial={modal.item ? { title: modal.item.title||'', description: modal.item.notes||'', language: modal.item.language||'plaintext', code: modal.item.code||'', tags: modal.item.tags||[] } : null}
+        onClose={()=> setModal({ open:false, item:null })}
+        onSave={save}
+      />
     </section>
   );
 }

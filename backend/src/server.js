@@ -1,4 +1,5 @@
 import express from 'express';
+import http from 'http';
 import path from 'path';
 import cors from 'cors';
 import morgan from 'morgan';
@@ -6,6 +7,7 @@ import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import env from './config/env.js';
 import rateLimiter from './middleware/rateLimit.js';
+import jwt from 'jsonwebtoken';
 import healthRouter from './routes/health.route.js';
 import authRouter from './routes/auth.route.js';
 import uploadsRouter from './routes/uploads.route.js';
@@ -19,12 +21,13 @@ import learningRouter from './routes/learning.route.js';
 import snippetsRouter from './routes/snippets.route.js';
 import solutionsRouter from './routes/solutions.route.js';
 import threadsRouter from './routes/threads.route.js';
-import dashboardRouter from './routes/dashboard.route.js';
-import usersRouter from './routes/users.route.js';
+import Project from './models/Project.js';
+import { setIo } from './socketHub.js';
 
 dotenv.config();
 
 const app = express();
+const server = http.createServer(app);
 const PORT = env.port;
 
 // Middlewares
@@ -69,8 +72,6 @@ app.use('/api', learningRouter);
 app.use('/api', snippetsRouter);
 app.use('/api', solutionsRouter);
 app.use('/api', threadsRouter);
-app.use('/api', dashboardRouter);
-app.use('/api/users', usersRouter);
 
 app.get('/', (_req, res) => {
   res.json({ ok: true, service: 'UnityBoard API' });
@@ -81,5 +82,44 @@ app.get('/', (_req, res) => {
   if (env.mongoUri) {
     await connectDB(env.mongoUri);
   }
-  app.listen(PORT, () => console.log(`API running on http://localhost:${PORT}`));
+  // Setup Socket.IO (optional)
+  if (env.enableSocket) {
+    const { Server } = await import('socket.io');
+    const io = new Server(server, {
+      cors: {
+        origin: (origin, cb) => (isAllowedOrigin(origin) ? cb(null, true) : cb(new Error('CORS: origin not allowed'), false)),
+        credentials: true
+      }
+    });
+    setIo(io);
+
+    io.use((socket, next) => {
+      try {
+        const token = socket.handshake.auth?.token || socket.handshake.headers?.authorization?.replace('Bearer ', '') || '';
+        if (!token) return next(new Error('Unauthorized'));
+        const payload = jwt.verify(token, env.jwtSecret);
+        socket.user = { id: payload.sub || payload.id || payload._id };
+        next();
+      } catch {
+        next(new Error('Unauthorized'));
+      }
+    });
+
+    io.on('connection', (socket) => {
+      socket.on('join', async ({ projectId }) => {
+        try {
+          if (!projectId) return;
+          const project = await Project.findById(projectId).select('members');
+          if (!project) return;
+          const isMember = project.members?.some(m => String(m.user) === String(socket.user.id));
+          if (!isMember) return;
+          socket.join(`project:${projectId}`);
+        } catch {
+          // ignore
+        }
+      });
+    });
+    console.log('Socket.IO enabled');
+  }
+  server.listen(PORT, () => console.log(`API running on http://localhost:${PORT}`));
 })();

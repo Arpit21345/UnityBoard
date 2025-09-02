@@ -1,0 +1,402 @@
+/* Learning Tracker - Professional styling matching design system */
+
+/* Main Section */
+.learning-section {
+  max-width: 100%;
+}
+
+/* space between header (with New button) and the next block */
+.learning-section .section-header {
+  margin-bottom: var(--sp-3);
+}
+
+/* Toolbar */
+.learning-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  background: #fff;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--sp-4);
+  flex-wrap: wrap;
+  box-shadow: var(--shadow-sm);
+}
+
+.learning-toolbar input {
+  min-width: 220px;
+  padding: 8px 12px;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-md);
+  font-size: var(--text-md);
+  background: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.learning-toolbar input:focus {
+  outline: none;
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px var(--primary-50);
+}
+
+.learning-toolbar select {
+  padding: 8px 12px;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-md);
+  background: #fff;
+  font-size: var(--text-md);
+  min-width: 120px;
+  cursor: pointer;
+}
+
+.learning-toolbar select:focus {
+  outline: none;
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px var(--primary-50);
+}
+
+/* Tags filter section */
+.learning-toolbar > div:first-of-type {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Sort controls section */
+.learning-toolbar > div:last-child {
+  margin-left: auto;
+  display: flex;
+  gap: var(--sp-2);
+  align-items: center;
+}
+
+.learning-toolbar label {
+  font-size: var(--text-sm);
+  color: var(--gray-600);
+  font-weight: 500;
+}
+
+/* Chip styles for tags */
+.learning-toolbar .chip {
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid var(--gray-300);
+  background: #fff;
+  color: var(--gray-700);
+}
+
+.learning-toolbar .chip:hover {
+  border-color: var(--primary-400);
+  background: var(--primary-50);
+}
+
+.learning-toolbar .chip-active {
+  background: var(--primary-500);
+  color: #fff;
+  border-color: var(--primary-500);
+}
+
+/* Bulk actions bar */
+.learning-bulkbar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  background: var(--primary-50);
+  border: 1px solid var(--primary-200);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.learning-bulkbar .small {
+  color: var(--primary-700);
+  font-weight: 500;
+  margin-right: var(--sp-2);
+}
+
+/* Learning Cards */
+.learning-card {
+  margin-bottom: var(--sp-3);
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.learning-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--gray-300);
+}
+
+.learning-card-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--sp-4);
+  padding: var(--sp-4);
+}
+
+.learning-card-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.learning-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-2);
+  flex-wrap: wrap;
+}
+
+.learning-title-row input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary-500);
+  cursor: pointer;
+}
+
+.learning-title-row strong {
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: var(--gray-900);
+  line-height: 1.4;
+}
+
+.learning-description {
+  color: var(--gray-600);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  margin: var(--sp-2) 0 0 0;
+}
+
+.learning-tags {
+  margin-top: var(--sp-2);
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.learning-materials {
+  margin-top: var(--sp-2);
+}
+
+.learning-materials-label {
+  font-size: var(--text-sm);
+  color: var(--gray-600);
+  font-weight: 500;
+}
+
+.learning-materials a {
+  font-size: var(--text-sm);
+  color: var(--primary-600);
+  text-decoration: none;
+  margin-right: var(--sp-2);
+  transition: color 0.2s;
+}
+
+.learning-materials a:hover {
+  color: var(--primary-700);
+  text-decoration: underline;
+}
+
+/* Actions */
+.learning-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-shrink: 0;
+}
+
+.learning-actions select {
+  padding: 4px 8px;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  font-size: var(--text-sm);
+  min-width: auto;
+  cursor: pointer;
+}
+
+.learning-actions .btn {
+  font-size: var(--text-sm);
+  padding: 6px 12px;
+  height: auto;
+}
+
+/* Status badges enhancement */
+.badge-todo {
+  background: var(--gray-100);
+  color: var(--gray-700);
+}
+
+.badge-in-progress {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.badge-done {
+  background: #dcfce7;
+  color: #166534;
+}
+
+/* Empty states */
+.learning-empty-state {
+  text-align: center;
+  padding: var(--sp-8) var(--sp-4);
+}
+
+.learning-empty-state h4 {
+  margin: 0 0 var(--sp-2) 0;
+  color: var(--gray-900);
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+.learning-empty-state p {
+  margin: 0 0 var(--sp-4) 0;
+  color: var(--gray-600);
+  font-size: var(--text-md);
+}
+
+.learning-no-results {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.learning-no-results-content h4 {
+  margin: 0 0 var(--sp-1) 0;
+  color: var(--gray-900);
+  font-size: var(--text-md);
+  font-weight: 600;
+}
+
+.learning-no-results-content p {
+  margin: 0;
+  color: var(--gray-600);
+  font-size: var(--text-sm);
+}
+
+/* Button enhancements - inheriting from global-buttons.css */
+.learning-toolbar .btn {
+  font-size: var(--text-sm);
+  padding: 8px 12px;
+}
+
+.learning-bulkbar .btn {
+  font-size: var(--text-sm);
+  padding: 6px 10px;
+}
+
+/* Learning Form Modal */
+.learning-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.learning-form input,
+.learning-form textarea,
+.learning-form select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-md);
+  font-size: var(--text-md);
+  background: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.learning-form input:focus,
+.learning-form textarea:focus,
+.learning-form select:focus {
+  outline: none;
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px var(--primary-50);
+}
+
+.learning-form textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.learning-form-row {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.learning-form-row label {
+  font-size: var(--text-sm);
+  color: var(--gray-700);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.learning-form-row select,
+.learning-form-row input[type="date"] {
+  width: auto;
+  min-width: 120px;
+}
+
+.learning-form-help {
+  font-size: var(--text-sm);
+  color: var(--gray-500);
+  margin-top: 4px;
+}
+
+/* Form field groups */
+.learning-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.learning-form-field label {
+  font-size: var(--text-sm);
+  color: var(--gray-700);
+  font-weight: 500;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .learning-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--sp-3);
+  }
+  
+  .learning-toolbar > div:last-child {
+    margin-left: 0;
+    justify-content: flex-start;
+  }
+  
+  .learning-toolbar input,
+  .learning-toolbar select {
+    min-width: auto;
+    width: 100%;
+  }
+  
+  .learning-card-content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--sp-3);
+  }
+  
+  .learning-actions {
+    justify-content: flex-end;
+  }
+  
+  .learning-no-results {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .learning-bulkbar {
+    justify-content: center;
+  }
+}

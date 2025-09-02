@@ -1,0 +1,84 @@
+/* Global button styling for consistency across the application */
+
+.btn {
+  padding: 8px 12px;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-md);
+  background: #fff;
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn:hover {
+  background: var(--gray-50);
+  border-color: var(--gray-400);
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: transparent;
+}
+
+.btn-ghost:hover {
+  background: var(--gray-100);
+}
+
+.btn-danger {
+  background: #fee2e2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.btn-danger:hover {
+  background: #fecaca;
+  border-color: #fca5a5;
+  color: #b91c1c; /* Ensure text color remains visible */
+}
+
+.btn-primary {
+  background: var(--primary-600);
+  color: white;
+  border-color: var(--primary-700);
+}
+
+.btn-primary:hover {
+  background: var(--primary-700);
+  color: white; /* Ensure text remains white on hover */
+}
+
+.btn-icon {
+  display: inline-block;
+  margin-right: 4px;
+  font-size: 14px;
+}
+
+/* Button sizes */
+.btn-sm {
+  padding: 4px 8px;
+  font-size: var(--text-xs);
+}
+
+.btn-lg {
+  padding: 10px 16px;
+  font-size: var(--text-md);
+}
+
+/* Disabled state */
+.btn:disabled,
+.btn.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn:disabled:hover,
+.btn.disabled:hover {
+  background: inherit;
+  border-color: inherit;
+}
+
+/* Group of buttons */
+.btn-group {
+  display: flex;
+  gap: var(--sp-2);
+}

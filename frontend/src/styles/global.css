@@ -3,6 +3,8 @@
 @import './typography.css';
 @import './utilities.css';
 @import './components.css';
+@import './global-buttons.css';
+@import './global-tags.css';
 
 /* Base scaffold */
 html, body, #root {

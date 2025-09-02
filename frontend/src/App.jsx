@@ -11,8 +11,6 @@ import AiHelper from './components/AiHelper/AiHelper.jsx';
 import { AiContextProvider } from './components/AiHelper/AiContext.jsx';
 import InviteAccept from './pages/InviteAccept/InviteAccept.jsx';
 import { ToastProvider } from './components/Toast/ToastContext.jsx';
-import Profile from './pages/Profile/Profile.jsx';
-import PastProjects from './pages/PastProjects/PastProjects.jsx';
 
 export default function App() {
   const RootProviders = () => (
@@ -34,8 +32,6 @@ export default function App() {
         { path: '/invite/:token', element: <><Navbar /><InviteAccept /></> },
         { path: '/dashboard', element: <ProtectedRoute><Dashboard /></ProtectedRoute> },
         { path: '/project/:id', element: <ProtectedRoute><Project /></ProtectedRoute> },
-        { path: '/profile', element: <ProtectedRoute><Profile /></ProtectedRoute> },
-        { path: '/past-projects', element: <ProtectedRoute><PastProjects /></ProtectedRoute> },
       ],
     },
   ]);

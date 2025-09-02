@@ -47,7 +47,7 @@ export default function ResourcesPanel({ projectId, resources, setResources, res
         const res = await apiUploadResourceFile(projectId, file);
         uploaded.push(res);
         done += 1; setUploadProgress(Math.round((done / files.length) * 100));
-  } catch (e) { notify(e?.message ? `${file.name}: ${e.message}` : `Upload failed: ${file.name}`, 'error'); }
+      } catch { notify(`Upload failed: ${file.name}`, 'error'); }
     }
     if (uploaded.length) { setResources([...uploaded, ...resources]); notify(`Uploaded ${uploaded.length} file(s)`, 'success'); }
     setUploading(false);
@@ -55,7 +55,7 @@ export default function ResourcesPanel({ projectId, resources, setResources, res
 
   async function onFileInput(e) { await handleFiles(e.target.files); e.target.value = ''; }
   async function onDrop(e) { e.preventDefault(); setDragOver(false); await handleFiles(e.dataTransfer.files); }
-  async function removeResource(resourceId) { try { await apiDeleteResource(projectId, resourceId); setResources(resources.filter(r => r._id !== resourceId)); notify('Resource deleted', 'success'); } catch (e) { notify(e?.message || 'Delete failed', 'error'); } }
+  async function removeResource(resourceId) { try { await apiDeleteResource(projectId, resourceId); setResources(resources.filter(r => r._id !== resourceId)); notify('Resource deleted', 'success'); } catch { notify('Delete failed', 'error'); } }
 
   function renderFavicon(linkUrl) {
     try { const u = new URL(linkUrl); const ico = `${u.origin}/favicon.ico`; return <img src={ico} alt="" width={16} height={16} style={{ opacity:0.8 }} onError={(e)=>{ e.currentTarget.style.display='none'; }} />; }
@@ -131,7 +131,7 @@ export default function ResourcesPanel({ projectId, resources, setResources, res
       <div className="link-adder">
         <input placeholder="Link title (optional)" value={linkForm.title} onChange={e=>setLinkForm({...linkForm, title:e.target.value})} />
         <input placeholder="https://example.com" value={linkForm.url} onChange={e=>setLinkForm({...linkForm, url:e.target.value})} />
-  <button className="btn" onClick={async ()=>{ try { if(!linkForm.url) return; let url = linkForm.url.trim(); if (!/^https?:\/\//i.test(url)) url = `https://${url}`; const r = await apiCreateResourceLink(projectId, { title: linkForm.title, url }); setResources([r, ...resources]); setLinkForm({ title:'', url:'' }); notify('Link added','success'); } catch(e) { notify(e?.message || 'Link add failed','error'); } }}>Add link</button>
+        <button className="btn" onClick={async ()=>{ try { if(!linkForm.url) return; let url = linkForm.url.trim(); if (!/^https?:\/\//i.test(url)) url = `https://${url}`; const r = await apiCreateResourceLink(projectId, { title: linkForm.title, url }); setResources([r, ...resources]); setLinkForm({ title:'', url:'' }); notify('Link added','success'); } catch(_) { notify('Link add failed','error'); } }}>Add link</button>
       </div>
       {resourcesLoading ? <p className="small">Loading resources…</p> : null}
       {!resourcesLoading && itemsSorted.length === 0 && (

@@ -1,7 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { apiListLearning, apiCreateLearning, apiUpdateLearning, apiDeleteLearning } from '../../../services/learning.js';
 import { useToast } from '../../../components/Toast/ToastContext.jsx';
-import Modal from '../../../components/Modal/Modal.jsx';
+import LearningFilters from './Learning/LearningFilters.jsx';
+import LearningList from './Learning/LearningList.jsx';
+import LearningFormModal from './Learning/LearningFormModal.jsx';
+import './Learning/Learning.css';
 
 export default function LearningPanel({ projectId, me }) {
   const { notify } = useToast();
@@ -14,6 +17,9 @@ export default function LearningPanel({ projectId, me }) {
   });
   const [modal, setModal] = useState({ open:false, item:null });
   const [form, setForm] = useState({ title:'', description:'', status:'todo', dueDate:'', tagsDraft:'', materialsDraft:'' });
+  const [sortKey, setSortKey] = useState(localStorage.getItem(`learn.sortKey.${projectId}`) || 'updatedAt');
+  const [sortDir, setSortDir] = useState(localStorage.getItem(`learn.sortDir.${projectId}`) || 'desc');
+  const [selectedIds, setSelectedIds] = useState([]);
 
   useEffect(() => {
     (async () => {
@@ -30,8 +36,13 @@ export default function LearningPanel({ projectId, me }) {
   useEffect(() => { localStorage.setItem(`learn.q.${projectId}`, query); }, [projectId, query]);
   useEffect(() => { localStorage.setItem(`learn.status.${projectId}`, status); }, [projectId, status]);
   useEffect(() => { localStorage.setItem(`learn.tags.${projectId}`, JSON.stringify(tagsFilter)); }, [projectId, tagsFilter]);
+  useEffect(() => { localStorage.setItem(`learn.sortKey.${projectId}`, sortKey); }, [projectId, sortKey]);
+  useEffect(() => { localStorage.setItem(`learn.sortDir.${projectId}`, sortDir); }, [projectId, sortDir]);
 
   const allTags = useMemo(() => Array.from(new Set(items.flatMap(i => i.tags || []))).slice(0, 50), [items]);
+  const hasActiveFilters = useMemo(() => {
+    return (query?.trim()?.length || 0) > 0 || status !== 'all' || (tagsFilter?.length || 0) > 0;
+  }, [query, status, tagsFilter]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -46,6 +57,20 @@ export default function LearningPanel({ projectId, me }) {
       );
     });
   }, [items, query, status, tagsFilter]);
+
+  const itemsSorted = useMemo(() => {
+    const arr = [...filtered];
+    const key = sortKey;
+    const dir = sortDir === 'asc' ? 1 : -1;
+    arr.sort((a,b) => {
+      let va, vb;
+      if (key === 'title') { va = (a.title||'').toLowerCase(); vb = (b.title||'').toLowerCase(); }
+      else if (key === 'dueDate') { va = a.dueDate ? new Date(a.dueDate).getTime() : 0; vb = b.dueDate ? new Date(b.dueDate).getTime() : 0; }
+      else { va = new Date(a.updatedAt||a.createdAt||0).getTime(); vb = new Date(b.updatedAt||b.createdAt||0).getTime(); }
+      if (va < vb) return -1 * dir; if (va > vb) return 1 * dir; return 0;
+    });
+    return arr;
+  }, [filtered, sortKey, sortDir]);
 
   function openNew() {
     setForm({ title:'', description:'', status:'todo', dueDate:'', tagsDraft:'', materialsDraft:'' });
@@ -73,7 +98,11 @@ export default function LearningPanel({ projectId, me }) {
       status: form.status||'todo',
       dueDate: form.dueDate || undefined,
       tags: parseCsv(form.tagsDraft),
-      materials: parseCsv(form.materialsDraft)
+      materials: parseCsv(form.materialsDraft).map(m => {
+        if (/^https?:\/\//i.test(m)) return m;
+        if (/^[a-z]+:/.test(m)) return m; // other schemes
+        return m.includes('.') ? `https://${m}` : m;
+      })
     };
     if (!payload.title) { notify('Title is required', 'warning'); return; }
     try {
@@ -104,94 +133,125 @@ export default function LearningPanel({ projectId, me }) {
     } catch { notify('Delete failed', 'error'); }
   }
 
+  // Bulk actions
+  const toggleSelect = (id) => setSelectedIds(prev => prev.includes(id) ? prev.filter(x=>x!==id) : [...prev, id]);
+  const clearSelection = () => setSelectedIds([]);
+  const selectAllFiltered = () => setSelectedIds(itemsSorted.map(i=>i._id));
+  async function bulkUpdateStatus(nextStatus){
+    if (!selectedIds.length) return;
+    try {
+      const updates = await Promise.all(selectedIds.map(id => apiUpdateLearning(id, { status: nextStatus }).then(r => r.ok ? r.item : null).catch(() => null)));
+      const map = new Map(updates.filter(Boolean).map(i => [i._id, i]));
+      setItems(items.map(x => map.get(x._id) || x));
+      notify(`Updated ${map.size} item(s)`, 'success');
+    } catch (e) { notify(e?.message || 'Bulk update failed', 'error'); }
+    finally { clearSelection(); }
+  }
+  // Keep selection in sync with visible/known items
+  useEffect(() => {
+    setSelectedIds(prev => prev.filter(id => itemsSorted.some(i => i._id === id)));
+  }, [itemsSorted]);
+
+  async function quickChangeStatus(item, nextStatus){
+    if (item.status === nextStatus) return;
+    try {
+      const res = await apiUpdateLearning(item._id, { status: nextStatus });
+      if (res.ok) {
+        setItems(items.map(i => i._id === res.item._id ? res.item : i));
+      } else notify(res.error || 'Update failed', 'error');
+    } catch { notify('Update failed', 'error'); }
+  }
+
+  function clearAllFilters(){
+    setQuery('');
+    setStatus('all');
+    setTagsFilter([]);
+  }
+
   return (
-    <section>
+    <section className="learning-section">
       <div className="section-header">
         <h3>Learning Tracker</h3>
-        <div className="actions">
-          <button className="btn btn-primary" onClick={openNew}>New</button>
-        </div>
+        <div className="actions"><button className="btn btn-primary" onClick={openNew}>New</button></div>
       </div>
 
-      <div className="filters" style={{ display:'flex', gap:8, flexWrap:'wrap', alignItems:'center', marginBottom:12 }}>
-        <input placeholder="Search" value={query} onChange={e=>setQuery(e.target.value)} style={{ minWidth:220 }} />
-        <select value={status} onChange={e=>setStatus(e.target.value)}>
-          <option value="all">All</option>
-          <option value="todo">Todo</option>
-          <option value="in-progress">In progress</option>
-          <option value="done">Done</option>
-        </select>
-        <div style={{ display:'flex', gap:6, flexWrap:'wrap', alignItems:'center' }}>
-          {allTags.map(t => (
-            <button key={t} className={`chip ${tagsFilter.includes(t)?'chip-active':''}`} onClick={()=> setTagsFilter(v => v.includes(t) ? v.filter(x=>x!==t) : [...v, t])}>{t}</button>
-          ))}
-        </div>
-      </div>
+      <LearningFilters
+        query={query}
+        status={status}
+        tagsAll={allTags}
+        tagsSelected={tagsFilter}
+        sortKey={sortKey}
+        sortDir={sortDir}
+        hasActiveFilters={hasActiveFilters}
+        onQueryChange={setQuery}
+        onStatusChange={setStatus}
+        onToggleTag={(t)=> setTagsFilter(v => v.includes(t) ? v.filter(x=>x!==t) : [...v, t])}
+        onSortKeyChange={setSortKey}
+        onSortDirToggle={()=> setSortDir(d => d==='asc' ? 'desc' : 'asc')}
+        onClearFilters={clearAllFilters}
+  autoFocus
+      />
 
-      {loading ? <p>Loading…</p> : (
-        filtered.length ? (
-          <div className="card-list">
-            {filtered.map(item => (
-              <div key={item._id} className="card">
-                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', gap:8 }}>
-                  <div>
-                    <div className="title-row">
-                      <strong>{item.title}</strong>
-                      <span className={`badge badge-${item.status.replace('in-','in-')}`}>{item.status}</span>
-                      {item.dueDate && <span className="badge">Due {new Date(item.dueDate).toLocaleDateString()}</span>}
-                    </div>
-                    {item.description && <p className="small" style={{ margin:'4px 0 0 0' }}>{item.description}</p>}
-                    {(item.tags||[]).length>0 && (
-                      <div style={{ marginTop:6, display:'flex', gap:6, flexWrap:'wrap' }}>
-                        {item.tags.map((t,idx)=>(<span key={idx} className="chip small">{t}</span>))}
-                      </div>
-                    )}
-                    {(item.materials||[]).length>0 && (
-                      <div style={{ marginTop:6 }}>
-                        <span className="small">Materials: </span>
-                        {item.materials.map((m,idx)=>(
-                          <a key={idx} href={m} target="_blank" rel="noreferrer" className="small" style={{ marginRight:8 }}>{m}</a>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  <div className="row-actions" style={{ display:'flex', gap:6 }}>
-                    <button className="btn" onClick={()=>openEdit(item)}>Edit</button>
-                    <button className="btn btn-ghost" onClick={()=>del(item)}>Delete</button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : <p className="muted">No learning items match your filters.</p>
+      {selectedIds.length > 0 && (
+        <div className="learning-bulkbar card p-2">
+          <span className="small">{selectedIds.length} selected</span>
+          <button className="btn" onClick={selectAllFiltered}>Select all (filtered)</button>
+          <button className="btn" onClick={()=>bulkUpdateStatus('todo')}>Set Todo</button>
+          <button className="btn" onClick={()=>bulkUpdateStatus('in-progress')}>Set In progress</button>
+          <button className="btn" onClick={()=>bulkUpdateStatus('done')}>Set Done</button>
+          <button className="btn btn-ghost" onClick={async ()=>{
+            if (!confirm(`Delete ${selectedIds.length} item(s)?`)) return;
+            const ids = [...selectedIds];
+            try {
+              await Promise.all(ids.map(id => apiDeleteLearning(id).catch(()=>null)));
+              setItems(items.filter(i => !ids.includes(i._id)));
+              notify('Deleted selected', 'success');
+            } catch { notify('Bulk delete failed', 'error'); }
+            finally { clearSelection(); }
+          }}>Delete</button>
+          <button className="btn" onClick={clearSelection}>Clear</button>
+        </div>
       )}
 
-      <Modal
+      {loading ? <p>Loading…</p> : (
+        itemsSorted.length === 0 ? (
+          hasActiveFilters ? (
+            <div className="card">
+              <div className="learning-no-results p-4">
+                <div className="learning-no-results-content">
+                  <h4>No results found</h4>
+                  <p>Try adjusting or clearing your search filters.</p>
+                </div>
+                <button className="btn" onClick={clearAllFilters}>Clear Filters</button>
+              </div>
+            </div>
+          ) : (
+            <div className="card learning-empty-state">
+              <h4>Start Your Learning Journey</h4>
+              <p>No learning items yet. Create your first item to begin tracking your learning goals and resources.</p>
+              <button className="btn btn-primary" onClick={openNew}>Create First Item</button>
+            </div>
+          )
+        ) : (
+          <LearningList
+            items={itemsSorted}
+            selectedIds={selectedIds}
+            onToggleSelect={toggleSelect}
+            onEdit={openEdit}
+            onDelete={del}
+            onChangeStatus={quickChangeStatus}
+          />
+        )
+      )}
+
+      <LearningFormModal
         open={modal.open}
-        title={modal.item ? 'Edit Learning' : 'New Learning'}
+        item={modal.item}
+        form={form}
+        setForm={setForm}
         onClose={()=> setModal({ open:false, item:null })}
-        footer={<>
-          <button className="btn" onClick={()=> setModal({ open:false, item:null })}>Cancel</button>
-          <button className="btn btn-primary" onClick={save}>Save</button>
-        </>}
-      >
-        <div className="form-grid">
-          <input autoFocus placeholder="Title" value={form.title} onChange={e=>setForm({ ...form, title:e.target.value })} />
-          <textarea placeholder="Description" value={form.description} onChange={e=>setForm({ ...form, description:e.target.value })} rows={3} />
-          <div style={{ display:'flex', gap:8, flexWrap:'wrap', alignItems:'center' }}>
-            <label className="small">Status</label>
-            <select value={form.status} onChange={e=>setForm({ ...form, status:e.target.value })}>
-              <option value="todo">Todo</option>
-              <option value="in-progress">In progress</option>
-              <option value="done">Done</option>
-            </select>
-            <label className="small">Due</label>
-            <input type="date" value={form.dueDate} onChange={e=>setForm({ ...form, dueDate:e.target.value })} />
-          </div>
-          <input placeholder="Tags (comma separated)" value={form.tagsDraft} onChange={e=>setForm({ ...form, tagsDraft:e.target.value })} />
-          <textarea placeholder="Materials links (comma separated URLs)" value={form.materialsDraft} onChange={e=>setForm({ ...form, materialsDraft:e.target.value })} rows={2} />
-        </div>
-      </Modal>
+        onSave={save}
+      />
     </section>
   );
 }
