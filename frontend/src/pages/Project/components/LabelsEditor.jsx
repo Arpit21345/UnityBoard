@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './LabelsEditor.css';
 
 export default function LabelsEditor({ task, onChange, collapsedByDefault = false }) {
   const [draft, setDraft] = useState('');

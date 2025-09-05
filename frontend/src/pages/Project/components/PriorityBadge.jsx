@@ -1,4 +1,5 @@
 import React from 'react';
+import './PriorityBadge.css';
 
 export default function PriorityBadge({ value }) {
   const v = (value || 'medium');

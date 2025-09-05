@@ -1,4 +1,12 @@
 import Project from '../models/Project.js';
+import Task from '../models/Task.js';
+import Snippet from '../models/Snippet.js';
+import Solution from '../models/Solution.js';
+import Resource from '../models/Resource.js';
+import Thread from '../models/Thread.js';
+import Message from '../models/Message.js';
+import Learning from '../models/Learning.js';
+import Invitation from '../models/Invitation.js';
 
 export async function createProject(req, res) {
   try {
@@ -94,5 +102,77 @@ export async function listProjectMembers(req, res) {
     res.json({ ok: true, members });
   } catch (e) {
     res.status(500).json({ ok: false, error: 'Fetch failed' });
+  }
+}
+
+export async function updateMemberRole(req, res) {
+  try {
+    const { id, userId } = req.params;
+    const { role } = req.body || {};
+    if (!['admin', 'member'].includes(role)) return res.status(400).json({ ok: false, error: 'Invalid role' });
+    const project = await Project.findById(id).populate('members.user', 'name email avatar');
+    if (!project) return res.status(404).json({ ok: false, error: 'Not found' });
+    // Only owners can change member roles
+    const meIsOwner = project.members.some(m => String(m.user?._id || m.user) === req.user.id && m.role === 'owner');
+    if (!meIsOwner) return res.status(403).json({ ok: false, error: 'Forbidden' });
+    const mIdx = project.members.findIndex(m => String(m.user?._id || m.user) === String(userId));
+    if (mIdx === -1) return res.status(404).json({ ok: false, error: 'Member not found' });
+    if (project.members[mIdx].role === 'owner') return res.status(400).json({ ok: false, error: 'Cannot modify owner role' });
+    project.members[mIdx].role = role;
+    await project.save();
+    const updated = project.members.map(m => ({
+      user: m.user?._id || m.user,
+      name: m.user?.name || '',
+      email: m.user?.email || '',
+      avatar: m.user?.avatar || '',
+      role: m.role
+    }));
+    res.json({ ok: true, members: updated });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: 'Update failed' });
+  }
+}
+
+export async function removeMember(req, res) {
+  try {
+    const { id, userId } = req.params;
+    const project = await Project.findById(id);
+    if (!project) return res.status(404).json({ ok: false, error: 'Not found' });
+    // Only owners can remove members
+    const meIsOwner = project.members.some(m => String(m.user) === req.user.id && m.role === 'owner');
+    if (!meIsOwner) return res.status(403).json({ ok: false, error: 'Forbidden' });
+    const mIdx = project.members.findIndex(m => String(m.user) === String(userId));
+    if (mIdx === -1) return res.status(404).json({ ok: false, error: 'Member not found' });
+    if (project.members[mIdx].role === 'owner') return res.status(400).json({ ok: false, error: 'Cannot remove an owner' });
+    project.members.splice(mIdx, 1);
+    await project.save();
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: 'Remove failed' });
+  }
+}
+
+export async function deleteProject(req, res) {
+  try {
+    const { id } = req.params;
+    const project = await Project.findById(id).select('members');
+    if (!project) return res.status(404).json({ ok: false, error: 'Not found' });
+    const meIsOwner = project.members.some(m => String(m.user) === req.user.id && m.role === 'owner');
+    if (!meIsOwner) return res.status(403).json({ ok: false, error: 'Forbidden' });
+    // Cascade delete related documents
+    await Promise.all([
+      Task.deleteMany({ project: id }),
+      Snippet.deleteMany({ project: id }),
+      Solution.deleteMany({ project: id }),
+      Resource.deleteMany({ project: id }),
+      Thread.deleteMany({ project: id }),
+      Message.deleteMany({ project: id }),
+      Learning.deleteMany({ project: id }),
+      Invitation.deleteMany({ project: id })
+    ]);
+    await Project.findByIdAndDelete(id);
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: 'Delete failed' });
   }
 }

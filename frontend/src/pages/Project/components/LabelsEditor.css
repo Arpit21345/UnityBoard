@@ -1,0 +1,9 @@
+/* Scoped styles for LabelsEditor component */
+.labels-editor { display:flex; flex-direction:column; gap:8px; }
+.labels-chips { display:flex; gap:8px; flex-wrap:wrap; margin-bottom: 4px; }
+.labels-editor .chip { display:inline-flex; align-items:center; gap:6px; font-size:13px; padding:5px 10px; border:1px solid #e5e7eb; border-radius:999px; background:#f9fafb; }
+.labels-editor .chip .chip-x { border:none; background:transparent; cursor:pointer; font-size:14px; line-height:1; padding:0; color:#6b7280; }
+.labels-add { display:flex; gap:8px; }
+.kanban-card .labels-add input { min-width: 160px; max-width: 240px; }
+.kanban-card .labels-add .btn, .kanban-card .labels-add button { padding:6px 10px; border:1px solid #e5e7eb; background:#fff; border-radius:10px; cursor:pointer; }
+.kanban-card .labels-add .btn:hover, .kanban-card .labels-add button:hover { background:#f9fafb; }

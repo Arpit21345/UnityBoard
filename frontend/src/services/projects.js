@@ -90,3 +90,32 @@ export async function apiListProjectMembers(id) {
   if (!res.ok || !data.ok) throw new Error(data.error || 'Fetch failed');
   return data.members;
 }
+
+export async function apiUpdateMemberRole(projectId, userId, role) {
+  const res = await fetch(`${API}/api/projects/${projectId}/members/${userId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify({ role })
+  });
+  const data = await res.json();
+  if (!res.ok || !data.ok) throw new Error(data.error || 'Update failed');
+  return data.members; // returns full members
+}
+
+export async function apiRemoveMember(projectId, userId) {
+  const res = await fetch(`${API}/api/projects/${projectId}/members/${userId}`, { method: 'DELETE', headers: { ...authHeaders() } });
+  if (!res.ok) {
+    try { const data = await res.json(); throw new Error(data.error || 'Remove failed'); }
+    catch { throw new Error('Remove failed'); }
+  }
+  return true;
+}
+
+export async function apiDeleteProject(projectId) {
+  const res = await fetch(`${API}/api/projects/${projectId}`, { method: 'DELETE', headers: { ...authHeaders() } });
+  if (!res.ok) {
+    try { const data = await res.json(); throw new Error(data.error || 'Delete failed'); }
+    catch { throw new Error('Delete failed'); }
+  }
+  return true;
+}

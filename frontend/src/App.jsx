@@ -7,6 +7,7 @@ import Login from './pages/Login/Login.jsx';
 import Register from './pages/Register/Register.jsx';
 import Dashboard from './pages/Dashboard/Dashboard.jsx';
 import Project from './pages/Project/Project.jsx';
+import PastProjects from './pages/PastProjects/PastProjects.jsx';
 import AiHelper from './components/AiHelper/AiHelper.jsx';
 import { AiContextProvider } from './components/AiHelper/AiContext.jsx';
 import InviteAccept from './pages/InviteAccept/InviteAccept.jsx';
@@ -31,6 +32,7 @@ export default function App() {
         { path: '/register', element: <><Navbar /><Register /></> },
         { path: '/invite/:token', element: <><Navbar /><InviteAccept /></> },
         { path: '/dashboard', element: <ProtectedRoute><Dashboard /></ProtectedRoute> },
+  { path: '/past-projects', element: <ProtectedRoute><PastProjects /></ProtectedRoute> },
         { path: '/project/:id', element: <ProtectedRoute><Project /></ProtectedRoute> },
       ],
     },

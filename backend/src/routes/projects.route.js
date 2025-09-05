@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import auth from '../middleware/auth.js';
-import { createProject, listMyProjects, getProject, updateProjectSettings, listProjectMembers } from '../controllers/project.controller.js';
+import { createProject, listMyProjects, getProject, updateProjectSettings, listProjectMembers, updateMemberRole, removeMember, deleteProject } from '../controllers/project.controller.js';
 import { createTask, listTasks } from '../controllers/task.controller.js';
 
 const router = Router();
@@ -13,5 +13,8 @@ router.patch('/:id', updateProjectSettings);
 router.get('/:id/tasks', listTasks);
 router.post('/:id/tasks', createTask);
 router.get('/:id/members', listProjectMembers);
+router.patch('/:id/members/:userId', updateMemberRole);
+router.delete('/:id/members/:userId', removeMember);
+router.delete('/:id', deleteProject);
 
 export default router;

@@ -14,17 +14,18 @@ import Modal from '../../components/Modal/Modal.jsx';
 import LabelsEditor from './components/LabelsEditor.jsx';
 import TaskComments from './components/TaskComments.jsx';
 import TasksPanel from './components/TasksPanel.jsx';
-import ResourcesPanel from './components/ResourcesPanel.jsx';
+import ResourcesPanel from './components/Resources/ResourcesPanel.jsx';
 import SettingsPanel from './components/SettingsPanel.jsx';
 import DashboardPanel from './components/DashboardPanel.jsx';
 import LearningPanel from './components/LearningPanel.jsx';
 import SnippetsPanel from './components/SnippetsPanel.jsx';
-import SolutionsPanel from './components/SolutionsPanel.jsx';
+import SolutionsPanel from './components/Solutions/SolutionsPanel.jsx';
 import DiscussionPanel from './components/DiscussionPanel.jsx';
 
 export default function Project() {
   const { id } = useParams();
   const [project, setProject] = useState(null);
+  const [error, setError] = useState(null);
   const { setCtx } = useAiContext();
   const [me, setMe] = useState(null);
   const [tasks, setTasks] = useState([]);
@@ -42,6 +43,7 @@ export default function Project() {
   useEffect(() => {
     (async () => {
       try {
+        setError(null);
         const user = await apiMe();
         setMe(user);
         const p = await apiGetProject(id);
@@ -54,11 +56,36 @@ export default function Project() {
         setResources(r); setResourcesLoading(false);
       } catch (e) {
         notify('Failed to load project data', 'error');
+        setError(e?.message || 'Failed to load project data');
         setTasksLoading(false);
         setResourcesLoading(false);
       }
     })();
   }, [id]);
+
+  async function retryLoad() {
+    try {
+      setError(null);
+      setProject(null);
+      setTasksLoading(true);
+      setResourcesLoading(true);
+      const user = await apiMe();
+      setMe(user);
+      const p = await apiGetProject(id);
+      setProject(p);
+      const [t, r] = await Promise.all([
+        apiListProjectTasks(id).catch(() => []),
+        apiListResources(id).catch(() => [])
+      ]);
+      setTasks(t); setTasksLoading(false);
+      setResources(r); setResourcesLoading(false);
+    } catch (e) {
+      notify('Failed to load project data', 'error');
+      setError(e?.message || 'Failed to load project data');
+      setTasksLoading(false);
+      setResourcesLoading(false);
+    }
+  }
 
   useEffect(() => {
     if (project) {
@@ -96,14 +123,23 @@ export default function Project() {
     }
   }
   const amPrivileged = project && me && project.members?.some(m => m.user === me._id && (m.role === 'owner' || m.role === 'admin'));
+  const amOwner = project && me && project.members?.some(m => m.user === me._id && m.role === 'owner');
 
   return (
     <AppLayout
       sidebar={<ProjectSidebar active={tab} onChange={setTab} title={project?.name} subtitle={project?.description} />}
       topbar={<Topbar />}
     >
-      {!project ? (
+      {!project && !error ? (
         <p>Loading...</p>
+      ) : error ? (
+        <div className="card p-3">
+          <h4 style={{marginTop:0}}>Couldn’t load project</h4>
+          <p className="small" style={{marginTop:4}}>{error}</p>
+          <div style={{marginTop:8}}>
+            <button className="btn" onClick={retryLoad}>Retry</button>
+          </div>
+        </div>
       ) : (
         <div className="container">
           {tab === 'dashboard' && <DashboardPanel project={project} tasks={tasks} />}
@@ -126,7 +162,7 @@ export default function Project() {
             />
           )}
           {tab === 'settings' && (
-            <SettingsPanel project={project} setProject={setProject} amPrivileged={amPrivileged} />
+            <SettingsPanel project={project} setProject={setProject} amPrivileged={amPrivileged} amOwner={amOwner} />
           )}
           {tab === 'learning' && (
             <LearningPanel projectId={id} me={me} />

@@ -16,13 +16,13 @@ export async function listSolutions(req, res) {
 export async function createSolution(req, res) {
   try {
     const { id } = req.params;
-    const { title, problemUrl = '', category = '', difficulty = '', approach = '', code = '', language = 'plaintext', tags = [] } = req.body || {};
+  const { title, problemUrl = '', category = '', difficulty = '', approach = '', code = '', language = 'plaintext', tags = [], timeComplexity = '', spaceComplexity = '', references = [], related = [] } = req.body || {};
     if (!title) return res.status(400).json({ ok: false, error: 'Title required' });
     const project = await Project.findById(id).select('members');
     if (!project) return res.status(404).json({ ok: false, error: 'Project not found' });
     const isMember = project.members.some(m => String(m.user) === req.user.id);
     if (!isMember) return res.status(403).json({ ok: false, error: 'Forbidden' });
-    const item = await Solution.create({ project: id, title, problemUrl, category, difficulty, approach, code, language, tags, createdBy: req.user.id });
+  const item = await Solution.create({ project: id, title, problemUrl, category, difficulty, approach, code, language, tags, timeComplexity, spaceComplexity, references, related, createdBy: req.user.id });
     res.status(201).json({ ok: true, item });
   } catch (e) { res.status(500).json({ ok: false, error: 'Create failed' }); }
 }

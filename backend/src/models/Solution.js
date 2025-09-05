@@ -11,6 +11,11 @@ const SolutionSchema = new mongoose.Schema({
   language: { type: String, default: 'plaintext' },
   tags: { type: [String], default: [] },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  // Optional theory/metadata
+  timeComplexity: { type: String, default: '' },
+  spaceComplexity: { type: String, default: '' },
+  references: { type: [String], default: [] },
+  related: { type: [String], default: [] },
 }, { timestamps: true });
 
 export default mongoose.model('Solution', SolutionSchema);
