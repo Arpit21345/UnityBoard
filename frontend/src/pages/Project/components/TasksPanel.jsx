@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useCallback } from 'react';
+import Spinner from '../../../components/ui/Spinner.jsx';
 import MemberPicker from '../../../components/Members/MemberPicker.jsx';
 import { useToast } from '../../../components/Toast/ToastContext.jsx';
 import { apiUpdateTask, apiDeleteTask } from '../../../services/projects.js';
@@ -84,7 +85,7 @@ export default function TasksPanel({ projectId, me, tasks, setTasks, tasksLoadin
         onNewTask={()=> onOpenTaskModal(null)}
       />
 
-      {tasksLoading ? (<p className="small">Loading tasks…</p>) : (taskView === 'list' ? (
+  {tasksLoading ? (<Spinner size={22} />) : (taskView === 'list' ? (
         <TasksList
           projectId={projectId}
           items={filteredTasks}

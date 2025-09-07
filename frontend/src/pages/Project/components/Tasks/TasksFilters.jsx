@@ -1,5 +1,6 @@
 import React from 'react';
 import MemberPicker from '../../../../components/Members/MemberPicker.jsx';
+import LabelFilter from './LabelFilter.jsx';
 
 export default function TasksFilters({
   projectId,
@@ -49,13 +50,7 @@ export default function TasksFilters({
           <option value="low">Low</option>
         </select>
       </div>
-      <div>
-        <label className="small">Label</label>
-        <select value={labelFilter} onChange={e=> setLabelFilter(e.target.value)}>
-          <option value="all">All</option>
-          {labels.map(l => <option key={l} value={l}>{l}</option>)}
-        </select>
-      </div>
+  <LabelFilter value={labelFilter} onChange={setLabelFilter} labels={labels} />
       <div style={{ marginLeft:'auto', display:'flex', gap:8, alignItems:'end' }}>
         <button type="button" className="task-btn" onClick={onClear}>Clear Filters</button>
         <button type="button" className="task-btn task-btn-primary" onClick={onNewTask}>New Task</button>

@@ -27,6 +27,31 @@
   box-shadow: var(--shadow-sm);
 }
 
+/* Label filter custom dropdown */
+.tasks-panel .label-filter { position:relative; display:flex; flex-direction:column; gap:4px; }
+.tasks-panel .label-filter-trigger { 
+  display:flex; align-items:center; justify-content:space-between; gap:8px; 
+  min-width:160px; max-width:200px; padding:10px 12px; 
+  background:#fff; border:1px solid var(--gray-300); border-radius:var(--radius-md); cursor:pointer; font-size:var(--text-md); 
+}
+.tasks-panel .label-filter-trigger:hover { background:var(--gray-50); }
+.tasks-panel .label-filter-trigger:focus { outline:none; border-color:var(--primary-500); box-shadow:0 0 0 3px var(--primary-50); }
+.tasks-panel .label-filter-pop { 
+  position:absolute; top:100%; left:0; z-index:30; margin-top:6px; width:240px; 
+  background:#fff; border:1px solid var(--gray-300); border-radius:12px; box-shadow:var(--shadow-md); display:flex; flex-direction:column; animation:fadeSlide .15s ease; 
+}
+.tasks-panel .label-filter-search-row { padding:8px 10px 4px; border-bottom:1px solid var(--gray-200); }
+.tasks-panel .label-filter-search-row input { width:100%; padding:8px 10px; border:1px solid var(--gray-300); border-radius:8px; font-size:12px; }
+.tasks-panel .label-filter-search-row input:focus { outline:none; border-color:var(--primary-500); box-shadow:0 0 0 2px var(--primary-100); }
+.tasks-panel .label-filter-options { max-height:220px; overflow:auto; padding:4px 6px 8px; display:flex; flex-direction:column; gap:2px; }
+.tasks-panel .label-filter-option { padding:6px 8px; border-radius:8px; cursor:pointer; font-size:12.5px; line-height:1.3; word-break:break-word; }
+.tasks-panel .label-filter-option:hover { background:var(--gray-100); }
+.tasks-panel .label-filter-option.active { background:var(--primary-100); color:var(--primary-700); font-weight:600; }
+.tasks-panel .label-filter-empty { padding:12px; font-size:12px; color:var(--gray-600); text-align:center; }
+.tasks-panel .label-filter-value { flex:1; text-align:left; min-width:0; overflow:hidden; text-overflow:ellipsis; }
+.tasks-panel .label-filter .caret { font-size:12px; opacity:.6; }
+@keyframes fadeSlide { from { opacity:0; transform:translateY(-4px);} to { opacity:1; transform:translateY(0);} }
+
 .tasks-panel .filters-bar label.small {
   font-size: var(--text-sm);
   color: var(--gray-600);
@@ -42,6 +67,14 @@
   font-size: var(--text-md);
   min-height: 40px;
 }
+
+/* Prevent a single select (Label) from stretching 100% width when line-wrapped */
+.tasks-panel .filters-bar > div { flex: 0 0 auto; }
+.tasks-panel .filters-bar { align-items:flex-end; }
+.tasks-panel .filters-bar select { max-width: 200px; }
+.tasks-panel .filters-bar select:only-child { max-width: 200px; }
+/* Specific label control: using preceding label text 'Label' but safer to target by order (last group before actions) */
+.tasks-panel .filters-bar > div:nth-last-of-type(3) select { max-width: 180px; }
 
 .tasks-panel .filters-bar input:focus,
 .tasks-panel .filters-bar select:focus {

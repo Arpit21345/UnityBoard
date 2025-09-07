@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 import './LabelsEditor.css';
 
+const MAX_LABEL_LENGTH = 32; // keep labels concise for UI integrity
+
 export default function LabelsEditor({ task, onChange, collapsedByDefault = false }) {
   const [draft, setDraft] = useState('');
   const [open, setOpen] = useState(!collapsedByDefault);
   const labels = Array.isArray(task.labels) ? task.labels : [];
   function add() {
-    const v = (draft || '').trim();
+    let v = (draft || '').trim();
     if (!v) return;
+    if (v.length > MAX_LABEL_LENGTH) v = v.slice(0, MAX_LABEL_LENGTH);
     if (labels.includes(v)) { setDraft(''); return; }
     const next = [...labels, v].slice(0, 5);
     onChange(next);

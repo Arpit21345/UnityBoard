@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import Spinner from '../../../components/ui/Spinner.jsx';
 import { apiListSnippets, apiCreateSnippet, apiUpdateSnippet, apiDeleteSnippet } from '../../../services/snippets.js';
 import { useToast } from '../../../components/Toast/ToastContext.jsx';
 import SnippetsFilters from './Snippets/SnippetsFilters.jsx';
@@ -146,7 +147,7 @@ export default function SnippetsPanel({ projectId, me }) {
         </div>
       )}
 
-      {loading ? <p>Loading…</p> : (
+  {loading ? <Spinner size={24} /> : (
         itemsSorted.length ? (
           <SnippetsList
             items={itemsSorted}

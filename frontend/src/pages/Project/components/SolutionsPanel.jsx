@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import Spinner from '../../../components/ui/Spinner.jsx';
 import { apiListSolutions, apiCreateSolution, apiUpdateSolution, apiDeleteSolution } from '../../../services/solutions.js';
 import { useToast } from '../../../components/Toast/ToastContext.jsx';
 import Modal from '../../../components/Modal/Modal.jsx';
@@ -87,7 +88,7 @@ export default function SolutionsPanel({ projectId, me }) {
         </div>
       </div>
 
-      {loading ? <p>Loading…</p> : (
+  {loading ? <Spinner size={24} /> : (
         filtered.length ? (
           <div className="table like-table">
             <div className="thead">

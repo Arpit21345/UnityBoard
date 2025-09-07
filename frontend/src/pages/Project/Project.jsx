@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import Spinner from '../../components/ui/Spinner.jsx';
 import './Project.css';
 import { useParams } from 'react-router-dom';
 import { apiGetProject, apiListProjectTasks, apiCreateTask, apiUpdateTask } from '../../services/projects.js';
@@ -6,7 +7,7 @@ import { apiMe } from '../../services/auth.js';
 import { apiListResources } from '../../services/resources.js';
 import { useAiContext } from '../../components/AiHelper/AiContext.jsx';
 import AppLayout from '../../components/layout/AppLayout.jsx';
-import Topbar from '../../components/layout/Topbar.jsx';
+import GlobalNavbar from '../../components/layout/GlobalNavbar.jsx';
 import ProjectSidebar from '../../components/layout/ProjectSidebar.jsx';
 import MemberPicker from '../../components/Members/MemberPicker.jsx';
 import { useToast } from '../../components/Toast/ToastContext.jsx';
@@ -16,7 +17,7 @@ import TaskComments from './components/TaskComments.jsx';
 import TasksPanel from './components/TasksPanel.jsx';
 import ResourcesPanel from './components/Resources/ResourcesPanel.jsx';
 import SettingsPanel from './components/SettingsPanel.jsx';
-import DashboardPanel from './components/DashboardPanel.jsx';
+import DashboardPanel from './components/Dashboard/DashboardPanel.jsx';
 import LearningPanel from './components/LearningPanel.jsx';
 import SnippetsPanel from './components/SnippetsPanel.jsx';
 import SolutionsPanel from './components/Solutions/SolutionsPanel.jsx';
@@ -40,39 +41,47 @@ export default function Project() {
   const [modalLabels, setModalLabels] = useState([]);
   // task filters and resources interactions are now encapsulated inside their panels
 
+  const firstLoadRef = useRef(true);
   useEffect(() => {
-    (async () => {
+    let cancelled = false;
+    async function load() {
+      if(!firstLoadRef.current && project && project._id === id) return; // prevent redundant
       try {
         setError(null);
-        const user = await apiMe();
-        setMe(user);
-        const p = await apiGetProject(id);
-        setProject(p);
+        setProject(null);
+        setTasksLoading(true); setResourcesLoading(true);
+        const user = await apiMe(); if(cancelled) return; setMe(user);
+        const p = await apiGetProject(id); if(cancelled) return; setProject(p);
         const [t, r] = await Promise.all([
           apiListProjectTasks(id).catch(() => []),
           apiListResources(id).catch(() => [])
         ]);
+        if(cancelled) return;
         setTasks(t); setTasksLoading(false);
         setResources(r); setResourcesLoading(false);
       } catch (e) {
-        notify('Failed to load project data', 'error');
-        setError(e?.message || 'Failed to load project data');
-        setTasksLoading(false);
-        setResourcesLoading(false);
-      }
-    })();
+        if(cancelled) return;
+        // Differentiate common auth/permission cases
+        let msg = e?.message || 'Failed to load project data';
+        if(/403/i.test(msg) || /Forbidden/i.test(msg)) msg = 'You do not have access to this project (403).';
+        if(/404/i.test(msg) || /Not found/i.test(msg)) msg = 'Project not found (404).';
+        setError(msg);
+        setTasksLoading(false); setResourcesLoading(false);
+      } finally { firstLoadRef.current = false; }
+    }
+    load();
+    return () => { cancelled = true; };
   }, [id]);
 
   async function retryLoad() {
+    firstLoadRef.current = true;
+    // trigger effect by resetting a dummy state or just re-running logic inline
     try {
       setError(null);
       setProject(null);
-      setTasksLoading(true);
-      setResourcesLoading(true);
-      const user = await apiMe();
-      setMe(user);
-      const p = await apiGetProject(id);
-      setProject(p);
+      setTasksLoading(true); setResourcesLoading(true);
+      const user = await apiMe(); setMe(user);
+      const p = await apiGetProject(id); setProject(p);
       const [t, r] = await Promise.all([
         apiListProjectTasks(id).catch(() => []),
         apiListResources(id).catch(() => [])
@@ -80,10 +89,11 @@ export default function Project() {
       setTasks(t); setTasksLoading(false);
       setResources(r); setResourcesLoading(false);
     } catch (e) {
-      notify('Failed to load project data', 'error');
-      setError(e?.message || 'Failed to load project data');
-      setTasksLoading(false);
-      setResourcesLoading(false);
+      let msg = e?.message || 'Failed to load project data';
+      if(/403/i.test(msg) || /Forbidden/i.test(msg)) msg = 'You do not have access to this project (403).';
+      if(/404/i.test(msg) || /Not found/i.test(msg)) msg = 'Project not found (404).';
+      setError(msg);
+      setTasksLoading(false); setResourcesLoading(false);
     }
   }
 
@@ -128,10 +138,10 @@ export default function Project() {
   return (
     <AppLayout
       sidebar={<ProjectSidebar active={tab} onChange={setTab} title={project?.name} subtitle={project?.description} />}
-      topbar={<Topbar />}
+  topbar={<GlobalNavbar />}
     >
       {!project && !error ? (
-        <p>Loading...</p>
+        <div style={{padding:'20px 0'}}><Spinner size={28} /></div>
       ) : error ? (
         <div className="card p-3">
           <h4 style={{marginTop:0}}>Couldn’t load project</h4>

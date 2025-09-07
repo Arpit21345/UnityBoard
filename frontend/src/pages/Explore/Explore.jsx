@@ -25,7 +25,19 @@ export default function Explore() {
   const count = useMemo(() => projects.length, [projects]);
 
   return (
-    <main className="explore-page">
+    <main className="explore-page" role="main">
+      <header className="explore-header" role="banner">
+        <div className="header-inner">
+          <a href="/" className="brand" aria-label="UnityBoard home">
+            <img className="brand-logo" src="/api/assets/mainLogo.png" alt="UnityBoard logo" onError={(e)=>{ e.currentTarget.style.display='none'; }} />
+            <span className="brand-name">UnityBoard</span>
+          </a>
+          <nav className="header-nav" aria-label="Primary">
+            <a href="/login" className="nav-link">Sign in</a>
+            <a href="/register" className="nav-link nav-link-primary">Get started</a>
+          </nav>
+        </div>
+      </header>
       {/* Hero Section */}
       <section className="hero-section">
         <div className="container">
@@ -39,7 +51,7 @@ export default function Explore() {
               </div>
             </div>
             <div className="hero-visual">
-              <img src="/api/assets/hero illustration.png" alt="UnityBoard" onError={(e)=>{ e.currentTarget.src='/api/assets/mainLogo.png'; }} />
+              <img src="/api/assets/hero illustration.png" alt="Platform illustration" onError={(e)=>{ e.currentTarget.src='/api/assets/mainLogo.png'; }} />
             </div>
           </div>
         </div>
@@ -83,14 +95,14 @@ export default function Explore() {
               </ul>
             </div>
             <div className="feature-visual">
-              <img src="/api/assets/smartdashboardcard.png" alt="Project dashboard" onError={(e)=>{ e.currentTarget.src='/api/assets/attendeceMonitor.png'; }} />
+              <img src="/api/assets/smartdashboardcard.png" alt="Project dashboard preview" onError={(e)=>{ e.currentTarget.src='/api/assets/attendeceMonitor.png'; }} />
             </div>
           </div>
 
           {/* Tasks - Image Left, Text Right */}
           <div className="feature-row feature-row-reverse">
             <div className="feature-visual">
-              <img src="/api/assets/aipoweredtask.png" alt="AI tasks" onError={(e)=>{ e.currentTarget.src='/api/assets/aipoweredtashmanageschedule.png'; }} />
+              <img src="/api/assets/aipoweredtask.png" alt="AI assisted tasks" onError={(e)=>{ e.currentTarget.src='/api/assets/aipoweredtashmanageschedule.png'; }} />
             </div>
             <div className="feature-text">
               <div className="feature-kicker">Tasks</div>
@@ -117,14 +129,14 @@ export default function Explore() {
               </ul>
             </div>
             <div className="feature-visual">
-              <img src="/api/assets/resource vault.png" alt="Resources" />
+              <img src="/api/assets/resource vault.png" alt="Resources management" onError={(e)=>{ e.currentTarget.src='/api/assets/mainLogo.png'; }} />
             </div>
           </div>
 
           {/* Discussion - Image Left, Text Right */}
           <div className="feature-row feature-row-reverse">
             <div className="feature-visual">
-              <img src="/api/assets/discussion room.png" alt="Discussion" />
+              <img src="/api/assets/discussion room.png" alt="Discussion threads" onError={(e)=>{ e.currentTarget.src='/api/assets/mainLogo.png'; }} />
             </div>
             <div className="feature-text">
               <div className="feature-kicker">Discussion</div>
@@ -151,14 +163,14 @@ export default function Explore() {
               </ul>
             </div>
             <div className="feature-visual">
-              <img src="/api/assets/learntrack.png" alt="Learning tracker" />
+              <img src="/api/assets/learntrack.png" alt="Learning tracker" onError={(e)=>{ e.currentTarget.src='/api/assets/mainLogo.png'; }} />
             </div>
           </div>
 
           {/* Snippets - Image Left, Text Right */}
           <div className="feature-row feature-row-reverse">
             <div className="feature-visual">
-              <img src="/api/assets/snippets.png" alt="Code snippets" />
+              <img src="/api/assets/snippets.png" alt="Code snippets" onError={(e)=>{ e.currentTarget.src='/api/assets/mainLogo.png'; }} />
             </div>
             <div className="feature-text">
               <div className="feature-kicker">Snippets</div>
@@ -185,7 +197,7 @@ export default function Explore() {
               </ul>
             </div>
             <div className="feature-visual">
-              <img src="/api/assets/solutiondb.png" alt="Solution database" />
+              <img src="/api/assets/solutiondb.png" alt="Solution database" onError={(e)=>{ e.currentTarget.src='/api/assets/mainLogo.png'; }} />
             </div>
           </div>
 
@@ -201,10 +213,10 @@ export default function Explore() {
             <div className="feature-visual">
               <div className="theme-showcase">
                 <div className="theme-card">
-                  <img src="/api/assets/mode-light.png" alt="Light mode" onError={(e)=>{ e.currentTarget.style.display='none'; }} />
+                  <img src="/api/assets/mode-light.png" alt="Light mode preview" onError={(e)=>{ e.currentTarget.style.display='none'; }} />
                 </div>
                 <div className="theme-card">
-                  <img src="/api/assets/mode-dark.png" alt="Dark mode" onError={(e)=>{ e.currentTarget.style.display='none'; }} />
+                  <img src="/api/assets/mode-dark.png" alt="Dark mode preview" onError={(e)=>{ e.currentTarget.style.display='none'; }} />
                 </div>
               </div>
             </div>

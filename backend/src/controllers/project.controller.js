@@ -47,8 +47,9 @@ export async function updateProjectSettings(req, res) {
     const project = await Project.findById(id);
     if (!project) return res.status(404).json({ ok: false, error: 'Not found' });
     const me = req.user.id;
-    const isPrivileged = project.members.some(m => String(m.user) === me && (m.role === 'owner' || m.role === 'admin'));
-    if (!isPrivileged) return res.status(403).json({ ok: false, error: 'Forbidden' });
+  // Settings editing is intentionally restricted to OWNER ONLY (admins get read-only client UI)
+  const isOwner = project.members.some(m => String(m.user) === me && m.role === 'owner');
+  if (!isOwner) return res.status(403).json({ ok: false, error: 'Forbidden' });
     if (visibility) project.visibility = visibility;
     if (typeof allowMemberInvites === 'boolean') project.allowMemberInvites = allowMemberInvites;
     if (name) project.name = name;
@@ -152,6 +153,23 @@ export async function removeMember(req, res) {
   }
 }
 
+// Allow a non-owner member (member or admin) to leave the project themselves
+export async function leaveProject(req, res) {
+  try {
+    const { id } = req.params; // project id
+    const project = await Project.findById(id);
+    if (!project) return res.status(404).json({ ok: false, error: 'Not found' });
+    const idx = project.members.findIndex(m => String(m.user) === req.user.id);
+    if (idx === -1) return res.status(403).json({ ok: false, error: 'Forbidden' });
+    if (project.members[idx].role === 'owner') return res.status(400).json({ ok: false, error: 'Owner cannot leave (transfer ownership first)' });
+    project.members.splice(idx, 1);
+    await project.save();
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: 'Leave failed' });
+  }
+}
+
 export async function deleteProject(req, res) {
   try {
     const { id } = req.params;
@@ -175,4 +193,30 @@ export async function deleteProject(req, res) {
   } catch (e) {
     res.status(500).json({ ok: false, error: 'Delete failed' });
   }
+}
+
+export async function archiveProject(req, res) {
+  try {
+    const { id } = req.params;
+    const project = await Project.findById(id);
+    if (!project) return res.status(404).json({ ok: false, error: 'Not found' });
+    const meIsOwner = project.members.some(m => String(m.user) === req.user.id && m.role === 'owner');
+    if (!meIsOwner) return res.status(403).json({ ok: false, error: 'Forbidden' });
+    project.status = 'archived';
+    await project.save();
+    res.json({ ok: true, project });
+  } catch (e) { res.status(500).json({ ok: false, error: 'Archive failed' }); }
+}
+
+export async function unarchiveProject(req, res) {
+  try {
+    const { id } = req.params;
+    const project = await Project.findById(id);
+    if (!project) return res.status(404).json({ ok: false, error: 'Not found' });
+    const meIsOwner = project.members.some(m => String(m.user) === req.user.id && m.role === 'owner');
+    if (!meIsOwner) return res.status(403).json({ ok: false, error: 'Forbidden' });
+    project.status = 'active';
+    await project.save();
+    res.json({ ok: true, project });
+  } catch (e) { res.status(500).json({ ok: false, error: 'Unarchive failed' }); }
 }

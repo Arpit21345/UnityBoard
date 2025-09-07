@@ -7,6 +7,75 @@
   padding: 0;
 }
 
+/* Landing Header */
+.explore-header {
+  width: 100%;
+  background: #ffffffcc;
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--gray-200);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.explore-header .header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.explore-header .brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: #111827;
+  text-decoration: none;
+}
+
+.explore-header .brand-logo {
+  height: 32px;
+  width: auto;
+  display: block;
+}
+
+.explore-header .header-nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.explore-header .nav-link {
+  text-decoration: none;
+  font-weight: 500;
+  color: #374151;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition: all .2s ease;
+}
+
+.explore-header .nav-link:hover {
+  background: var(--gray-100);
+  color: #111827;
+}
+
+.explore-header .nav-link-primary {
+  background: #111827;
+  color: #ffffff;
+  border-color: #111827;
+  font-weight: 600;
+}
+
+.explore-header .nav-link-primary:hover {
+  background: #1f2937;
+}
+
 /* Hero Section */
 .hero-section {
   padding: var(--sp-8) 0;
@@ -674,9 +743,9 @@
 /* Container */
 .explore-page .container {
   width: 100%;
-  max-width: 100%; /* span full viewport width */
-  margin: 0;
-  padding: 0 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
 }
 
 /* Responsive Design */

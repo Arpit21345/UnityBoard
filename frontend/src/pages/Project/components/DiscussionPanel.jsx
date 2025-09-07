@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import Spinner from '../../../components/ui/Spinner.jsx';
 import { apiListThreads, apiCreateThread, apiUpdateThread, apiDeleteThread, apiListMessages, apiCreateMessage, apiDeleteMessage } from '../../../services/discussion.js';
 import { useToast } from '../../../components/Toast/ToastContext.jsx';
 import Modal from '../../../components/Modal/Modal.jsx';
@@ -136,7 +137,7 @@ export default function DiscussionPanel({ projectId, me, amPrivileged, project }
             <button key={t} className={`chip ${tagsFilter.includes(t)?'chip-active':''}`} onClick={()=> setTagsFilter(v => v.includes(t) ? v.filter(x=>x!==t) : [...v, t])}>{t}</button>
           ))}
         </div>
-        {loading ? <p>Loading…</p> : (
+  {loading ? <Spinner size={24} /> : (
           <div className="card-list">
             {filtered.map(item => (
               <div key={item._id} className={`card ${active?._id===item._id?'card-active':''}`} onClick={()=>openThread(item)} style={{ cursor:'pointer' }}>

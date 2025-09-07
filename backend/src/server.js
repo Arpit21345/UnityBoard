@@ -21,6 +21,10 @@ import learningRouter from './routes/learning.route.js';
 import snippetsRouter from './routes/snippets.route.js';
 import solutionsRouter from './routes/solutions.route.js';
 import threadsRouter from './routes/threads.route.js';
+import searchRouter from './routes/search.route.js';
+import dashboardRouter from './routes/dashboard.route.js';
+import notificationsRouter from './routes/notifications.route.js';
+import usersRouter from './routes/users.route.js';
 import Project from './models/Project.js';
 import { setIo } from './socketHub.js';
 
@@ -72,6 +76,10 @@ app.use('/api', learningRouter);
 app.use('/api', snippetsRouter);
 app.use('/api', solutionsRouter);
 app.use('/api', threadsRouter);
+app.use('/api', searchRouter);
+app.use('/api', dashboardRouter);
+app.use('/api/notifications', notificationsRouter);
+app.use('/api', usersRouter);
 
 app.get('/', (_req, res) => {
   res.json({ ok: true, service: 'UnityBoard API' });

@@ -10,3 +10,5 @@
 .search input{width:100%;}
 .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--sp-4)}
 .kpi .card{padding:var(--sp-4)}
+.ub-spinner{display:inline-block;border:3px solid var(--gray-200);border-top-color:var(--primary-500);border-radius:50%;animation:ubspin 0.8s linear infinite}
+@keyframes ubspin{to{transform:rotate(360deg)}}

@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import AppLayout from '../../components/layout/AppLayout.jsx';
 import Sidebar from '../../components/layout/Sidebar.jsx';
-import Topbar from '../../components/layout/Topbar.jsx';
-import { apiListProjects } from '../../services/projects.js';
+import GlobalNavbar from '../../components/layout/GlobalNavbar.jsx';
+import { apiListProjects, apiUnarchiveProject } from '../../services/projects.js';
+import Spinner from '../../components/ui/Spinner.jsx';
 
 export default function PastProjects(){
 	const [projects, setProjects] = useState([]);
@@ -33,7 +34,7 @@ export default function PastProjects(){
 	}, [projects, q]);
 
 	return (
-		<AppLayout sidebar={<Sidebar />} topbar={<Topbar />}>
+		<AppLayout sidebar={<Sidebar />} topbar={<GlobalNavbar />}>
 			<div className="container">
 				<div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:12, flexWrap:'wrap' }}>
 					<h2 style={{ margin: 0 }}>Past Projects</h2>
@@ -41,7 +42,7 @@ export default function PastProjects(){
 				</div>
 
 				{loading ? (
-					<p className="small" style={{ marginTop: 12 }}>Loading…</p>
+					<div style={{ marginTop: 12 }}><Spinner /></div>
 				) : err ? (
 					<div className="card p-3" style={{ marginTop: 12 }}>
 						<h4 style={{ margin: '0 0 6px 0' }}>Couldn’t load</h4>
@@ -64,8 +65,12 @@ export default function PastProjects(){
 								{(p.ownerName||p.ownerEmail) && (
 									<div className="small" style={{ color:'#6b7280' }}>Owner: {p.ownerName || p.ownerEmail}</div>
 								)}
-								<div style={{ marginTop: 10 }}>
+								<div style={{ marginTop: 10, display:'flex', gap:8 }}>
 									<a className="btn" href={`/project/${p._id}`}>Open</a>
+									<button className="btn" onClick={async ()=>{
+										try { const upd = await apiUnarchiveProject(p._id); setProjects(projects.map(pr=> pr._id===p._id? upd : pr)); }
+										catch(e){ console.warn(e); alert('Unarchive failed'); }
+									}}>Unarchive</button>
 								</div>
 							</div>
 						))}

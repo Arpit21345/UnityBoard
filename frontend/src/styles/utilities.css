@@ -17,5 +17,7 @@
 .badge{display:inline-flex;align-items:center;gap:6px;padding:3px 8px;border-radius:999px;background:var(--gray-100);color:var(--gray-700);font-size:var(--text-sm)}
 .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:var(--radius-md);border:1px solid var(--gray-300);background:#fff;color:var(--gray-900);cursor:pointer}
 .btn.primary{background:linear-gradient(135deg,var(--primary-600),var(--accent-500));color:#fff;border:0}
+.btn.primary:hover,.btn.primary:focus{background:linear-gradient(135deg,var(--primary-700),var(--accent-600));color:#fff;box-shadow:0 0 0 2px rgba(0,0,0,0.05);outline:none}
+.btn.primary:active{background:linear-gradient(135deg,var(--primary-800),var(--accent-700));transform:translateY(1px)}
 .btn.dark{background:var(--gray-900);color:#fff;border:0}
 .input{padding:10px 12px;border:1px solid var(--gray-300);border-radius:var(--radius-md);background:#fff}

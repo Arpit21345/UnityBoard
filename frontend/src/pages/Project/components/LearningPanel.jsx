@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import Spinner from '../../../components/ui/Spinner.jsx';
 import { apiListLearning, apiCreateLearning, apiUpdateLearning, apiDeleteLearning } from '../../../services/learning.js';
 import { useToast } from '../../../components/Toast/ToastContext.jsx';
 import LearningFilters from './Learning/LearningFilters.jsx';
@@ -213,7 +214,7 @@ export default function LearningPanel({ projectId, me }) {
         </div>
       )}
 
-      {loading ? <p>Loading…</p> : (
+  {loading ? <Spinner size={24} /> : (
         itemsSorted.length === 0 ? (
           hasActiveFilters ? (
             <div className="card">

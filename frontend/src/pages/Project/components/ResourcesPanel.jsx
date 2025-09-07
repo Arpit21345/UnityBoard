@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import Spinner from '../../../components/ui/Spinner.jsx';
 import { useToast } from '../../../components/Toast/ToastContext.jsx';
 import { apiUploadResourceFile, apiDeleteResource, apiCreateResourceLink } from '../../../services/resources.js';
 
@@ -133,7 +134,7 @@ export default function ResourcesPanel({ projectId, resources, setResources, res
         <input placeholder="https://example.com" value={linkForm.url} onChange={e=>setLinkForm({...linkForm, url:e.target.value})} />
         <button className="btn" onClick={async ()=>{ try { if(!linkForm.url) return; let url = linkForm.url.trim(); if (!/^https?:\/\//i.test(url)) url = `https://${url}`; const r = await apiCreateResourceLink(projectId, { title: linkForm.title, url }); setResources([r, ...resources]); setLinkForm({ title:'', url:'' }); notify('Link added','success'); } catch(_) { notify('Link add failed','error'); } }}>Add link</button>
       </div>
-      {resourcesLoading ? <p className="small">Loading resources…</p> : null}
+  {resourcesLoading ? <Spinner size={20} /> : null}
       {!resourcesLoading && itemsSorted.length === 0 && (
         <p className="small">No resources yet.</p>
       )}

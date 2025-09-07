@@ -7,6 +7,14 @@
   --gray-900:#111827; --gray-800:#1f2937; --gray-700:#374151; --gray-600:#4b5563; --gray-500:#6b7280; --gray-400:#9ca3af; --gray-300:#d1d5db; --gray-200:#e5e7eb; --gray-100:#f3f4f6; --gray-50:#fafafa;
   /* state */
   --success-500:#16a34a; --warning-500:#d97706; --danger-500:#dc2626;
+  /* extended semantic (light backgrounds + readable text) */
+  --success-bg:#dcfce7; --success-text:#166534;
+  --warning-bg:#fef3c7; --warning-text:#92400e;
+  --danger-bg:#fee2e2; --danger-text:#991b1b;
+  --info-bg:#e0f2fe; --info-text:#075985;
+  /* gradients */
+  --gradient-brand: linear-gradient(135deg,var(--primary-500),var(--primary-600));
+  --gradient-soft: linear-gradient(135deg,var(--primary-50),var(--primary-100));
   /* radii */
   --radius-sm:6px; --radius-md:10px; --radius-lg:14px;
   /* shadows */

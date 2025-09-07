@@ -36,16 +36,20 @@
   color: #b91c1c; /* Ensure text color remains visible */
 }
 
-.btn-primary {
-  background: var(--primary-600);
-  color: white;
-  border-color: var(--primary-700);
+/* Primary (standard) – unified gradient style used by both `.btn-primary` and `.btn primary` */
+.btn-primary, .btn.primary {
+  background: linear-gradient(135deg,var(--primary-600),var(--accent-500));
+  color:#fff;
+  border:0;
+  box-shadow: 0 1px 2px rgba(0,0,0,.08);
 }
+.btn-primary:hover, .btn.primary:hover, .btn-primary:focus, .btn.primary:focus {
+  background: linear-gradient(135deg,var(--primary-700),var(--accent-600));
+  color:#fff;
+}
+.btn-primary:active, .btn.primary:active { background: linear-gradient(135deg,var(--primary-800),var(--accent-700)); }
 
-.btn-primary:hover {
-  background: var(--primary-700);
-  color: white; /* Ensure text remains white on hover */
-}
+/* (Legacy alias retained above). */
 
 .btn-icon {
   display: inline-block;

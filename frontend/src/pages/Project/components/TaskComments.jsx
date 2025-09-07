@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { apiListTaskComments, apiAddTaskComment } from '../../../services/projects.js';
+import Spinner from '../../../components/ui/Spinner.jsx';
 import { useToast } from '../../../components/Toast/ToastContext.jsx';
 
 export default function TaskComments({ taskId, embedded = false }) {
@@ -32,7 +33,7 @@ export default function TaskComments({ taskId, embedded = false }) {
       )}
       {open && (
         <div>
-          {loading ? <p className="small">Loading…</p> : (
+          {loading ? <Spinner size={18} /> : (
             <ul className="list" style={{ marginTop:8 }}>
               {items.map((c, idx) => (
                 <li key={idx} className="small">{new Date(c.createdAt).toLocaleString()} — {c.text}</li>
