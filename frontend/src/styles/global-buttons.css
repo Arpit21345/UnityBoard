@@ -36,18 +36,21 @@
   color: #b91c1c; /* Ensure text color remains visible */
 }
 
-/* Primary (standard) – unified gradient style used by both `.btn-primary` and `.btn primary` */
+/* Primary (standard) – solid black style used by both `.btn-primary` and `.btn primary` */
 .btn-primary, .btn.primary {
-  background: linear-gradient(135deg,var(--primary-600),var(--accent-500));
+  background: #000;
   color:#fff;
   border:0;
   box-shadow: 0 1px 2px rgba(0,0,0,.08);
 }
 .btn-primary:hover, .btn.primary:hover, .btn-primary:focus, .btn.primary:focus {
-  background: linear-gradient(135deg,var(--primary-700),var(--accent-600));
+  background: #333;
   color:#fff;
 }
-.btn-primary:active, .btn.primary:active { background: linear-gradient(135deg,var(--primary-800),var(--accent-700)); }
+.btn-primary:active, .btn.primary:active { 
+  background: #555; 
+  color:#fff;
+}
 
 /* (Legacy alias retained above). */
 
@@ -86,3 +89,19 @@
   display: flex;
   gap: var(--sp-2);
 }
+
+/* Mini action buttons (project cards) */
+.mini-btn {
+  background:#fff;
+  border:1px solid var(--gray-300);
+  padding:4px 8px;
+  font-size:12px;
+  border-radius:6px;
+  cursor:pointer;
+  line-height:1.1;
+  color:var(--gray-800);
+  transition:background .15s,border-color .15s,color .15s;
+}
+.mini-btn:hover { background:var(--gray-100); border-color:var(--gray-400); }
+[data-theme='dark'] .mini-btn { background:#1f2937; border-color:#374151; color:var(--gray-100); }
+[data-theme='dark'] .mini-btn:hover { background:#374151; border-color:#4b5563; }

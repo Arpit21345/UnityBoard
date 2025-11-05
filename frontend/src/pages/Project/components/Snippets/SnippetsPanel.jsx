@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import Spinner from '../../../components/ui/Spinner.jsx';
-import { apiListSnippets, apiCreateSnippet, apiUpdateSnippet, apiDeleteSnippet } from '../../../services/snippets.js';
-import { useToast } from '../../../components/Toast/ToastContext.jsx';
-import SnippetsFilters from './Snippets/SnippetsFilters.jsx';
-import SnippetsList from './Snippets/SnippetsList.jsx';
-import SnippetsFormModal from './Snippets/SnippetsFormModal.jsx';
-import './Snippets/Snippets.css';
+import Spinner from '../../../../components/ui/Spinner.jsx';
+import { apiListSnippets, apiCreateSnippet, apiUpdateSnippet, apiDeleteSnippet } from '../../../../services/snippets.js';
+import { useToast } from '../../../../components/Toast/ToastContext.jsx';
+import SnippetsFilters from './SnippetsFilters.jsx';
+import SnippetsList from './SnippetsList.jsx';
+import SnippetsFormModal from './SnippetsFormModal.jsx';
+import './Snippets.css';
 
 const LANGS = ['plaintext','javascript','typescript','python','java','csharp','cpp','go','rust','sql','bash','json','yaml','html','css'];
 

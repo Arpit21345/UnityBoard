@@ -5,12 +5,12 @@ export default function Logout(){
   const navigate = useNavigate();
   useEffect(()=>{
     localStorage.removeItem('token');
-    const t = setTimeout(()=> navigate('/login'), 150);
+  const t = setTimeout(()=> navigate('/'), 150);
     return ()=> clearTimeout(t);
   }, [navigate]);
   return (
     <div style={{padding:40,textAlign:'center'}}>
-      <h3>Logging out…</h3>
+  <h3>Logging out… redirecting to Explore</h3>
     </div>
   );
 }

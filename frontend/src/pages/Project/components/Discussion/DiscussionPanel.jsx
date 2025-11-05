@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import Spinner from '../../../components/ui/Spinner.jsx';
-import { apiListThreads, apiCreateThread, apiUpdateThread, apiDeleteThread, apiListMessages, apiCreateMessage, apiDeleteMessage } from '../../../services/discussion.js';
-import { useToast } from '../../../components/Toast/ToastContext.jsx';
-import Modal from '../../../components/Modal/Modal.jsx';
-import { getSocket } from '../../../services/socket.js';
-import { SOCKET_ENABLED } from '../../../services/api.js';
+import Spinner from '../../../../components/ui/Spinner.jsx';
+import { apiListThreads, apiCreateThread, apiUpdateThread, apiDeleteThread, apiListMessages, apiCreateMessage, apiDeleteMessage } from '../../../../services/discussion.js';
+import { useToast } from '../../../../components/Toast/ToastContext.jsx';
+import Modal from '../../../../components/Modal/Modal.jsx';
+import { getSocket } from '../../../../services/socket.js';
+import { SOCKET_ENABLED } from '../../../../services/api.js';
 
 export default function DiscussionPanel({ projectId, me, amPrivileged, project }) {
   const { notify } = useToast();
@@ -17,7 +17,7 @@ export default function DiscussionPanel({ projectId, me, amPrivileged, project }
   const [msgText, setMsgText] = useState('');
   const [modal, setModal] = useState({ open:false, item:null });
   const [form, setForm] = useState({ title:'', tagsDraft:'' });
-  const isCreator = (item) => me && item && String(item.createdBy) === String(me._id);
+  const isCreator = (item) => me && item && String(item.createdBy) === String(me.id || me._id);
   const canCreate = !!amPrivileged;
   const canEditDelete = (item) => !!(amPrivileged || isCreator(item));
   const canModerate = !!amPrivileged;
@@ -123,6 +123,11 @@ export default function DiscussionPanel({ projectId, me, amPrivileged, project }
 
   return (
     <section style={{ display:'grid', gridTemplateColumns: singleRoom ? '1fr' : '280px 1fr', gap:12 }}>
+      <div className="card" style={{ gridColumn: singleRoom? '1' : '1 / -1', marginBottom:8, padding:8, background:'var(--bg-subtle)' }}>
+        <p className="small" style={{ margin:0 }}>
+          Discussion advanced features (typing indicators, pin ordering enhancements, richer moderation) are deferred in this polish phase. Current implementation is minimal for demo purposes.
+        </p>
+      </div>
       {!singleRoom && <div>
         <div className="section-header" style={{ marginBottom:8 }}>
           <h3>Threads</h3>
@@ -177,7 +182,7 @@ export default function DiscussionPanel({ projectId, me, amPrivileged, project }
                 <div key={m._id} className="bubble" style={{ opacity: m.deleted ? 0.7 : 1 }}>
                   <div className="small" style={{ opacity:0.7 }}>{new Date(m.createdAt).toLocaleString()}</div>
                   <div>{m.text}</div>
-                  {!m.deleted && (canModerate || (me && String(me._id) === String(m.user))) && (
+                  {!m.deleted && (canModerate || (me && String(me.id || me._id) === String(m.user))) && (
                     <div className="small" style={{ marginTop:4 }}>
                       <button className="btn btn-ghost" onClick={()=>deleteMsg(m)}>Delete</button>
                     </div>

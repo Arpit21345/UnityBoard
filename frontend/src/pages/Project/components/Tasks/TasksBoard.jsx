@@ -1,10 +1,11 @@
 import React, { useCallback, useState } from 'react';
-import PriorityBadge from '../PriorityBadge.jsx';
-import LabelsEditor from '../LabelsEditor.jsx';
+import PriorityBadge from './PriorityBadge.jsx';
+import LabelsEditor from './LabelsEditor.jsx';
 
 export default function TasksBoard({
   items,
   me,
+  members,
   onDragStart,
   onDropTo,
   onStartRename,
@@ -18,6 +19,54 @@ export default function TasksBoard({
 }){
   const changeTaskStatus = async (taskId, status) => {
     await onUpdateTask(taskId, { status });
+  };
+
+  // Helper function to get user display name
+  const getUserDisplayName = (userId) => {
+    // console.log('getUserDisplayName called with:', { userId, members, me });
+    if (!userId) return 'Unknown User';
+    
+    // Check if it's the current user
+    const currentUserId = String(me?.id || me?._id);
+    if (String(userId) === currentUserId) {
+      return me?.name || me?.email || 'You';
+    }
+    
+    // Try to find in members list
+    if (members && members.length > 0) {
+      const member = members.find(m => {
+        const memberUserId = String(m.user?._id || m.user);
+        return memberUserId === String(userId);
+      });
+      // console.log('Found member:', member);
+      if (member) {
+        // Handle both populated and non-populated user data
+        return member.user?.name || member.user?.email || member.name || member.email || 'Unknown User';
+      }
+    }
+    
+    return 'Unknown User';
+  };
+
+  // Simple function to render assigned user name (no buttons)
+  const renderAssignedUser = (task) => {
+    const assignees = task.assignees || [];
+    if (assignees.length === 0) return null;
+    
+    if (assignees.length === 1) {
+      return (
+        <span className="small" style={{ color: 'var(--gray-600)' }}>
+          Assigned: {getUserDisplayName(assignees[0])}
+        </span>
+      );
+    } else {
+      const names = assignees.map(id => getUserDisplayName(id)).join(', ');
+      return (
+        <span className="small" style={{ color: 'var(--gray-600)' }}>
+          Assigned: {names}
+        </span>
+      );
+    }
   };
 
   const Column = ({ title, status }) => {
@@ -57,7 +106,7 @@ export default function TasksBoard({
                   <option value="low">Low</option>
                 </select>
                 <LabelsEditor collapsedByDefault task={t} onChange={async (labels)=> onUpdateTask(t._id, { labels })} />
-                {me && <button className="link" onClick={async ()=>{ await onUpdateTask(t._id, { assignees: [me._id] }); }}>Assign me</button>}
+                {renderAssignedUser(t)}
                 <button className="link" onClick={()=>onStartRename(t)}>Rename</button>
                 <button className="link" onClick={()=> onOpenTaskModal(t)}>Edit</button>
                 <button className="link danger" onClick={async ()=>{ if(!confirm('Delete task?')) return; await onUpdateTask(t._id, { __delete: true }); }}>Delete</button>

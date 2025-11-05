@@ -1,8 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Spinner from '../../components/ui/Spinner.jsx';
 import './Project.css';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { apiGetProject, apiListProjectTasks, apiCreateTask, apiUpdateTask } from '../../services/projects.js';
+import { apiJoinPublicProject } from '../../services/invites.js';
+import { categorizeJoinError } from '../../utils/joinErrors.js';
 import { apiMe } from '../../services/auth.js';
 import { apiListResources } from '../../services/resources.js';
 import { useAiContext } from '../../components/AiHelper/AiContext.jsx';
@@ -12,19 +14,20 @@ import ProjectSidebar from '../../components/layout/ProjectSidebar.jsx';
 import MemberPicker from '../../components/Members/MemberPicker.jsx';
 import { useToast } from '../../components/Toast/ToastContext.jsx';
 import Modal from '../../components/Modal/Modal.jsx';
-import LabelsEditor from './components/LabelsEditor.jsx';
-import TaskComments from './components/TaskComments.jsx';
-import TasksPanel from './components/TasksPanel.jsx';
+import LabelsEditor from './components/Tasks/LabelsEditor.jsx';
+import TaskComments from './components/Tasks/TaskComments.jsx';
+import TasksPanel from './components/Tasks/TasksPanel.jsx';
 import ResourcesPanel from './components/Resources/ResourcesPanel.jsx';
-import SettingsPanel from './components/SettingsPanel.jsx';
+import SettingsPanel from './components/Settings/SettingsPanel.jsx';
 import DashboardPanel from './components/Dashboard/DashboardPanel.jsx';
-import LearningPanel from './components/LearningPanel.jsx';
-import SnippetsPanel from './components/SnippetsPanel.jsx';
+import LearningPanel from './components/Learning/LearningPanel.jsx';
+import SnippetsPanel from './components/Snippets/SnippetsPanel.jsx';
 import SolutionsPanel from './components/Solutions/SolutionsPanel.jsx';
-import DiscussionPanel from './components/DiscussionPanel.jsx';
+import DiscussionPanel from './components/Discussion/DiscussionPanel.jsx';
 
 export default function Project() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [project, setProject] = useState(null);
   const [error, setError] = useState(null);
   const { setCtx } = useAiContext();
@@ -39,6 +42,7 @@ export default function Project() {
   const [taskModal, setTaskModal] = useState({ open:false, task:null });
   const [modalAssignee, setModalAssignee] = useState('');
   const [modalLabels, setModalLabels] = useState([]);
+  const [joining, setJoining] = useState(false);
   // task filters and resources interactions are now encapsulated inside their panels
 
   const firstLoadRef = useRef(true);
@@ -52,6 +56,12 @@ export default function Project() {
         setTasksLoading(true); setResourcesLoading(true);
         const user = await apiMe(); if(cancelled) return; setMe(user);
         const p = await apiGetProject(id); if(cancelled) return; setProject(p);
+        try {
+          // Fix: Use consistent user ID and string comparison
+          const userId = user?.id || user?._id;
+          const role = p?.members?.find(m => String(m.user) === String(userId))?.role;
+          window.dispatchEvent(new CustomEvent('project-context', { detail:{ project:{ name:p.name, visibility:p.visibility, _myRole: role } } }));
+        } catch {/* ignore */}
         const [t, r] = await Promise.all([
           apiListProjectTasks(id).catch(() => []),
           apiListResources(id).catch(() => [])
@@ -61,10 +71,16 @@ export default function Project() {
         setResources(r); setResourcesLoading(false);
       } catch (e) {
         if(cancelled) return;
-        // Differentiate common auth/permission cases
         let msg = e?.message || 'Failed to load project data';
-        if(/403/i.test(msg) || /Forbidden/i.test(msg)) msg = 'You do not have access to this project (403).';
-        if(/404/i.test(msg) || /Not found/i.test(msg)) msg = 'Project not found (404).';
+        const is403 = /403/i.test(msg) || /Forbidden/i.test(msg);
+        const is404 = /404/i.test(msg) || /Not found/i.test(msg);
+        if(is403){
+          notify('Access denied to project','error');
+          // redirect away for private / unauthorized project
+          setTimeout(()=> navigate('/dashboard', { replace:true }), 50);
+          return; // stop further state changes; no error card flash
+        }
+        if(is404) msg = 'Project not found (404).';
         setError(msg);
         setTasksLoading(false); setResourcesLoading(false);
       } finally { firstLoadRef.current = false; }
@@ -82,6 +98,12 @@ export default function Project() {
       setTasksLoading(true); setResourcesLoading(true);
       const user = await apiMe(); setMe(user);
       const p = await apiGetProject(id); setProject(p);
+      try {
+        // Fix: Use consistent user ID and string comparison
+        const userId = user?.id || user?._id;
+        const role = p?.members?.find(m => String(m.user) === String(userId))?.role;
+        window.dispatchEvent(new CustomEvent('project-context', { detail:{ project:{ name:p.name, visibility:p.visibility, _myRole: role } } }));
+      } catch {/* ignore */}
       const [t, r] = await Promise.all([
         apiListProjectTasks(id).catch(() => []),
         apiListResources(id).catch(() => [])
@@ -90,7 +112,7 @@ export default function Project() {
       setResources(r); setResourcesLoading(false);
     } catch (e) {
       let msg = e?.message || 'Failed to load project data';
-      if(/403/i.test(msg) || /Forbidden/i.test(msg)) msg = 'You do not have access to this project (403).';
+      if(/403/i.test(msg) || /Forbidden/i.test(msg)) { notify('Access denied to project','error'); navigate('/dashboard',{replace:true}); return; }
       if(/404/i.test(msg) || /Not found/i.test(msg)) msg = 'Project not found (404).';
       setError(msg);
       setTasksLoading(false); setResourcesLoading(false);
@@ -107,11 +129,20 @@ export default function Project() {
 
   async function addTask(e) {
     e.preventDefault();
-    if (!newTask.title) return;
+    if (!newTask.title) {
+      notify('Task title is required', 'error');
+      return;
+    }
+    if (!modalAssignee) {
+      notify('Task must be assigned to someone', 'error');
+      return;
+    }
     const payload = { ...newTask };
     if (!payload.dueDate) delete payload.dueDate;
     if (!payload.priority) payload.priority = 'medium';
     // include modal assignee and labels for both create/edit
+    // console.log('Creating task with modalAssignee:', modalAssignee);
+    // console.log('Project members:', project?.members);
     payload.assignees = modalAssignee ? [modalAssignee] : [];
     payload.labels = Array.isArray(modalLabels) ? modalLabels : [];
     try {
@@ -132,8 +163,51 @@ export default function Project() {
       notify(taskModal.task ? 'Update task failed' : 'Create task failed', 'error');
     }
   }
-  const amPrivileged = project && me && project.members?.some(m => m.user === me._id && (m.role === 'owner' || m.role === 'admin'));
-  const amOwner = project && me && project.members?.some(m => m.user === me._id && m.role === 'owner');
+  // Fix: Use consistent user ID (me.id, not me._id) and string comparison for all membership checks
+  const userId = me?.id || me?._id;
+  const amPrivileged = project && userId && project.members?.some(m => String(m.user) === String(userId) && (m.role === 'owner' || m.role === 'admin'));
+  const amOwner = project && userId && project.members?.some(m => String(m.user) === String(userId) && m.role === 'owner');
+
+  const isMember = project && userId && project.members?.some(m => String(m.user) === String(userId));
+  const isPublic = project && project.visibility === 'public';
+
+  async function handleJoinPublic(){
+    if(joining) return;
+    setJoining(true);
+    try {
+      const joined = await apiJoinPublicProject(project._id);
+      notify('Joined project','success');
+  try { window.dispatchEvent(new Event('projects-changed')); } catch {}
+      // refetch tasks/resources for fresh membership context
+      const [t, r] = await Promise.all([
+        apiListProjectTasks(project._id).catch(()=>[]),
+        apiListResources(project._id).catch(()=>[])
+      ]);
+      setTasks(t); setResources(r);
+      setProject(joined);
+      try {
+        // Fix: Use consistent user ID and string comparison
+        const userId = me?.id || me?._id;
+        const role = joined?.members?.find(m => String(m.user) === String(userId))?.role;
+        window.dispatchEvent(new CustomEvent('project-context', { detail:{ project:{ name:joined.name, visibility:joined.visibility, _myRole: role } } }));
+      } catch {/* ignore */}
+    } catch(e){
+      const cat = categorizeJoinError(e?.message);
+      if(cat.type === 'already-member') {
+        notify(cat.message,'info');
+        try { window.dispatchEvent(new Event('projects-changed')); } catch {}
+        setTimeout(()=> navigate(`/project/${project._id}`), 400);
+      } else if(cat.type === 'unauthorized') {
+        notify('Session expired. Please login again','error');
+        localStorage.removeItem('token');
+        navigate('/login');
+      } else {
+        notify(cat.message, cat.level === 'warn' ? 'error' : cat.level);
+      }
+    } finally {
+      setJoining(false);
+    }
+  }
 
   return (
     <AppLayout
@@ -150,6 +224,20 @@ export default function Project() {
             <button className="btn" onClick={retryLoad}>Retry</button>
           </div>
         </div>
+      ) : (project && !isMember && isPublic) ? (
+        <div className="card p-4" style={{maxWidth:560}}>
+          <h2 style={{marginTop:0}}>{project.name}</h2>
+          <div style={{display:'flex',gap:8,marginTop:4}}>
+            <span className="vis-tag">{project.visibility}</span>
+            <span className="small" style={{color:'var(--gray-600)'}}>{project.members?.length || 0} members</span>
+          </div>
+          <p className="small" style={{marginTop:8}}>{project.description || 'No description provided.'}</p>
+          <div style={{marginTop:16,display:'flex',gap:12}}>
+            <button className="btn btn-primary" disabled={joining} onClick={handleJoinPublic}>{joining? 'Joining…':'Join Project'}</button>
+            <button className="btn" onClick={()=>navigate('/dashboard')}>Back</button>
+          </div>
+          <p className="small" style={{marginTop:16,color:'var(--gray-600)'}}>This is a public project. Joining will add it to your dashboard.</p>
+        </div>
       ) : (
         <div className="container">
           {tab === 'dashboard' && <DashboardPanel project={project} tasks={tasks} />}
@@ -157,6 +245,7 @@ export default function Project() {
             <TasksPanel
               projectId={id}
               me={me}
+              members={project?.members || []}
               tasks={tasks}
               setTasks={setTasks}
               tasksLoading={tasksLoading}
@@ -222,8 +311,8 @@ export default function Project() {
         <div className="task-form-secondary">
           <div className="task-form-row">
             <div className="assignee-section">
-              <label>Assignee</label>
-              <MemberPicker projectId={id} value={modalAssignee} onChange={setModalAssignee} placeholder="Select member" />
+              <label>Assignee <span style={{ color: 'red' }}>*</span></label>
+              <MemberPicker projectId={id} value={modalAssignee} onChange={setModalAssignee} placeholder="Select member (required)" />
             </div>
             <div className="labels-section">
               <label>Labels</label>

@@ -1,5 +1,6 @@
 import Notification from '../models/Notification.js';
 import { getIo } from '../socketHub.js';
+import { deleteNotifications, deleteAllNotifications } from '../utils/notificationHelpers.js';
 
 export async function listNotifications(req, res) {
   try {
@@ -16,13 +17,53 @@ export async function markAllRead(req, res) {
   } catch (e) { res.status(500).json({ ok: false, error: 'Update failed' }); }
 }
 
+export async function deleteSelected(req, res) {
+  try {
+    const { notificationIds } = req.body;
+    if (!Array.isArray(notificationIds) || notificationIds.length === 0) {
+      return res.status(400).json({ ok: false, error: 'Notification IDs required' });
+    }
+    
+    const deletedCount = await deleteNotifications(req.user.id, notificationIds);
+    res.json({ ok: true, deletedCount });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message || 'Delete failed' });
+  }
+}
+
+export async function deleteAll(req, res) {
+  try {
+    const deletedCount = await deleteAllNotifications(req.user.id);
+    res.json({ ok: true, deletedCount });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message || 'Delete all failed' });
+  }
+}
+
 export async function createTestNotification(req, res){
   try {
-    const n = await Notification.create({ user: req.user.id, type:'test.message', message:`Test notification at ${new Date().toLocaleTimeString()}` });
+    const n = await Notification.create({ 
+      user: req.user.id, 
+      type:'test_message', 
+      message:`Test notification at ${new Date().toLocaleTimeString()}`,
+      meta: { test: true }
+    });
+    
     // emit socket event if available
     const io = getIo();
-    if (io) io.to([]).emit && io.to(req.user.id); // placeholder no-op to satisfy instrumentation
-    if (io) io.emit('notification:new', { userId: req.user.id, item: n });
-    res.json({ ok:true, item:n });
-  } catch (e){ res.status(500).json({ ok:false, error:'Create failed' }); }
+    if (io) {
+      console.log('Emitting test notification via socket to user:', req.user.id);
+      io.emit('notification:new', { 
+        userId: String(req.user.id), 
+        item: n 
+      });
+    } else {
+      console.log('Socket.IO not available for test notification');
+    }
+    
+    res.json({ ok: true, item: n });
+  } catch (e) { 
+    console.error('Test notification creation failed:', e);
+    res.status(500).json({ ok: false, error: 'Create failed' }); 
+  }
 }

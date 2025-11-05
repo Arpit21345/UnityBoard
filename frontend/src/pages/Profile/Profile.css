@@ -1,0 +1,436 @@
+/* Profile Page - Modern Analytics Design */
+
+.profile-page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.error-message {
+  background: #fee2e2;
+  color: #b91c1c;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+/* Profile Header */
+.profile-header {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.profile-name {
+  font-size: 28px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.profile-badge {
+  font-size: 12px;
+  font-weight: 600;
+  background: #e0e7ff;
+  color: #3730a3;
+  padding: 4px 12px;
+  border-radius: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.profile-email {
+  font-size: 16px;
+  color: #6b7280;
+  margin: 0 0 12px 0;
+}
+
+.profile-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #9ca3af;
+}
+
+.profile-meta span {
+  white-space: nowrap;
+}
+
+/* Analytics Grid */
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.analytics-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.analytics-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #d1d5db;
+}
+
+.analytics-number {
+  font-size: 36px;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, #1a1a1a 0%, #4a4a4a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.analytics-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 4px;
+}
+
+.analytics-detail {
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+/* Projects Portfolio */
+.projects-portfolio {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.projects-portfolio h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 20px 0;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #9ca3af;
+}
+
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.project-card {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.project-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #3b82f6 0%, #06b6d4 50%, #10b981 100%);
+  opacity: 0.7;
+}
+
+.project-card:nth-child(2)::before {
+  background: linear-gradient(90deg, #8b5cf6 0%, #a855f7 50%, #ec4899 100%);
+}
+
+.project-card:nth-child(3)::before {
+  background: linear-gradient(90deg, #f59e0b 0%, #f97316 50%, #ef4444 100%);
+}
+
+.project-card:nth-child(4)::before {
+  background: linear-gradient(90deg, #06b6d4 0%, #0891b2 50%, #0e7490 100%);
+}
+
+.project-card:nth-child(5)::before {
+  background: linear-gradient(90deg, #10b981 0%, #059669 50%, #047857 100%);
+}
+
+.project-card:nth-child(6)::before {
+  background: linear-gradient(90deg, #ec4899 0%, #db2777 50%, #be185d 100%);
+}
+
+.project-card:hover {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border-color: #cbd5e1;
+}
+
+.project-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  gap: 12px;
+}
+
+.project-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.role-badge {
+  font-size: 11px;
+  padding: 5px 10px;
+  border-radius: 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.role-owner {
+  background: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #bfdbfe;
+}
+
+.role-admin {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.role-member {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+.project-description {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0 0 12px 0;
+  line-height: 1.4;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.project-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.project-visibility {
+  text-transform: capitalize;
+}
+
+.view-more {
+  text-align: center;
+  margin-top: 20px;
+  padding: 16px;
+  font-size: 14px;
+  color: #9ca3af;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* Dark mode */
+[data-theme='dark'] .profile-header,
+[data-theme='dark'] .analytics-card,
+[data-theme='dark'] .projects-portfolio {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme='dark'] .profile-name {
+  color: #e2e8f0;
+}
+
+[data-theme='dark'] .profile-email {
+  color: #cbd5e1;
+}
+
+[data-theme='dark'] .profile-meta {
+  color: #94a3b8;
+}
+
+[data-theme='dark'] .analytics-number {
+  color: #e2e8f0;
+  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-theme='dark'] .analytics-label {
+  color: #cbd5e1;
+}
+
+[data-theme='dark'] .analytics-detail {
+  color: #94a3b8;
+}
+
+[data-theme='dark'] .projects-portfolio h3 {
+  color: #e2e8f0;
+}
+
+[data-theme='dark'] .project-card {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border-color: #334155;
+}
+
+[data-theme='dark'] .project-card:hover {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border-color: #475569;
+}
+
+[data-theme='dark'] .role-owner {
+  background: #1e3a8a;
+  color: #93c5fd;
+  border-color: #3730a3;
+}
+
+[data-theme='dark'] .role-admin {
+  background: #14532d;
+  color: #86efac;
+  border-color: #166534;
+}
+
+[data-theme='dark'] .role-member {
+  background: #334155;
+  color: #cbd5e1;
+  border-color: #475569;
+}
+
+[data-theme='dark'] .project-name {
+  color: #e2e8f0;
+}
+
+[data-theme='dark'] .project-description {
+  color: #cbd5e1;
+}
+
+[data-theme='dark'] .project-meta {
+  color: #94a3b8;
+}
+
+[data-theme='dark'] .empty-state {
+  color: #94a3b8;
+}
+
+[data-theme='dark'] .view-more {
+  color: #94a3b8;
+  border-color: #334155;
+}
+
+[data-theme='dark'] .error-message {
+  background: #371917;
+  color: #f87171;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .profile-header {
+    flex-direction: column;
+    text-align: center;
+    padding: 24px;
+    gap: 16px;
+  }
+  
+  .profile-meta {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .analytics-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+  }
+  
+  .analytics-card {
+    padding: 16px;
+  }
+  
+  .analytics-number {
+    font-size: 28px;
+  }
+  
+  .projects-portfolio {
+    padding: 20px;
+  }
+  
+  .projects-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-avatar {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+  }
+  
+  .profile-name {
+    font-size: 24px;
+  }
+  
+  .analytics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

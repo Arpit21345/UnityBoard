@@ -5,8 +5,8 @@
   "type": "module",
   "main": "src/server.js",
   "scripts": {
-  "dev": "nodemon src/server.js",
-  "dev2": "set PORT=5002&& nodemon src/server.js",
+    "dev": "nodemon src/server.js",
+    "dev2": "set PORT=5002&& nodemon src/server.js",
     "start": "node src/server.js",
     "lint": "echo \"No linter configured yet\""
   },
@@ -21,7 +21,8 @@
     "mongoose": "^8.5.3",
     "morgan": "^1.10.0",
     "multer": "^2.0.2",
-    "node-fetch": "^2.7.0"
+    "node-fetch": "^2.7.0",
+    "socket.io": "^4.8.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.0"

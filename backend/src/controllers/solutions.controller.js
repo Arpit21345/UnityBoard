@@ -1,5 +1,6 @@
 import Solution from '../models/Solution.js';
 import Project from '../models/Project.js';
+import { incrementUserAnalytics } from '../utils/analyticsHelpers.js';
 
 export async function listSolutions(req, res) {
   try {
@@ -23,6 +24,10 @@ export async function createSolution(req, res) {
     const isMember = project.members.some(m => String(m.user) === req.user.id);
     if (!isMember) return res.status(403).json({ ok: false, error: 'Forbidden' });
   const item = await Solution.create({ project: id, title, problemUrl, category, difficulty, approach, code, language, tags, timeComplexity, spaceComplexity, references, related, createdBy: req.user.id });
+  
+  // Increment user's lifetime solutions count
+  await incrementUserAnalytics(req.user.id, 'lifetimeSolutions');
+  
     res.status(201).json({ ok: true, item });
   } catch (e) { res.status(500).json({ ok: false, error: 'Create failed' }); }
 }

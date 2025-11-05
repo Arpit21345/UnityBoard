@@ -2,12 +2,16 @@ import React, { useEffect, useState, useMemo } from 'react';
 import './Explore.css';
 import { apiListPublicProjects } from '../../services/projects.js';
 import { apiJoinPublicProject } from '../../services/invites.js';
+import { categorizeJoinError } from '../../utils/joinErrors.js';
 import Footer from '../../components/Footer/Footer.jsx';
+import { useToast } from '../../components/Toast/ToastContext.jsx';
 
 export default function Explore() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [joiningId, setJoiningId] = useState(null);
+  const { notify } = useToast();
 
   useEffect(() => {
     (async () => {
@@ -25,29 +29,17 @@ export default function Explore() {
   const count = useMemo(() => projects.length, [projects]);
 
   return (
-    <main className="explore-page" role="main">
-      <header className="explore-header" role="banner">
-        <div className="header-inner">
-          <a href="/" className="brand" aria-label="UnityBoard home">
-            <img className="brand-logo" src="/api/assets/mainLogo.png" alt="UnityBoard logo" onError={(e)=>{ e.currentTarget.style.display='none'; }} />
-            <span className="brand-name">UnityBoard</span>
-          </a>
-          <nav className="header-nav" aria-label="Primary">
-            <a href="/login" className="nav-link">Sign in</a>
-            <a href="/register" className="nav-link nav-link-primary">Get started</a>
-          </nav>
-        </div>
-      </header>
+  <main className="explore-page" role="main">
       {/* Hero Section */}
       <section className="hero-section">
         <div className="container">
           <div className="hero-grid">
-            <div className="hero-content">
+      <div className="hero-content">
               <h1 className="hero-title">Build together, faster</h1>
               <p className="hero-subtitle">Plan tasks, share resources, and discuss work—with an AI helper and public projects to explore.</p>
               <div className="hero-actions">
-                <a className="btn btn-primary" href="/register">Get started</a>
-                <a className="btn btn-secondary" href="/login">Sign in</a>
+        <a className="btn btn-secondary" href="/login">Sign in</a>
+        <a className="btn btn-primary" href="/register">Get started</a>
               </div>
             </div>
             <div className="hero-visual">
@@ -211,12 +203,9 @@ export default function Explore() {
         <div className="container">
           <div className="feature-row feature-row-reverse">
             <div className="feature-visual">
-              <div className="theme-showcase">
-                <div className="theme-card">
-                  <img src="/api/assets/mode-light.png" alt="Light mode preview" onError={(e)=>{ e.currentTarget.style.display='none'; }} />
-                </div>
-                <div className="theme-card">
-                  <img src="/api/assets/mode-dark.png" alt="Dark mode preview" onError={(e)=>{ e.currentTarget.style.display='none'; }} />
+              <div className="logo-single-showcase">
+                <div className="logo-card large">
+                  <img src="/api/assets/mainLogo.png" alt="UnityBoard primary logo" onError={(e)=>{ e.currentTarget.src='/api/assets/logo.png'; }} />
                 </div>
               </div>
             </div>
@@ -319,28 +308,41 @@ export default function Explore() {
                           ) : (
                             <p className="project-description project-description-empty">No description</p>
                           )}
-                          <button
-                            className="btn btn-project-join"
-                            onClick={async () => {
-                              try {
-                                const token = localStorage.getItem('token');
-                                if (!token) { window.location.href = '/login'; return; }
-                                const joined = await apiJoinPublicProject(project._id);
-                                if (!joined || !joined._id) throw new Error('Join failed');
-                                window.location.href = `/project/${joined._id}`;
-                              } catch (e) {
-                                if (String(e?.message || '').toLowerCase().includes('unauthorized') || String(e?.message || '').toLowerCase().includes('invalid token')) {
-                                  // token expired or unauthorized
-                                  localStorage.removeItem('token');
-                                  window.location.href = '/login';
-                                } else {
-                                  alert('Could not join project. Please try again.');
-                                }
-                              }
-                            }}
-                          >
-                            Join Project
-                          </button>
+        <button
+          className="btn btn-project-join"
+          disabled={joiningId === project._id}
+          onClick={async () => {
+            if (joiningId) return;
+            try {
+              const token = localStorage.getItem('token');
+              if (!token) {
+                localStorage.setItem('postLoginRedirect', `/project/${project._id}`);
+                window.location.href = '/login';
+                return;
+              }
+              setJoiningId(project._id);
+              const joined = await apiJoinPublicProject(project._id);
+              try { window.dispatchEvent(new Event('projects-changed')); } catch {}
+              if (!joined || !joined._id) throw new Error('Join failed');
+              window.location.href = `/project/${joined._id}`;
+            } catch (e) {
+              const cat = categorizeJoinError(e?.message);
+              if (cat.type === 'unauthorized') {
+                localStorage.removeItem('token');
+                window.location.href = '/login';
+              } else if (cat.type === 'already-member') {
+                notify(cat.message,'info');
+                setTimeout(()=> window.location.href = `/project/${project._id}`, 500);
+              } else {
+                notify(cat.message, cat.level === 'warn' ? 'error' : cat.level);
+              }
+            } finally {
+              setJoiningId(null);
+            }
+          }}
+        >
+          {joiningId === project._id ? 'Joining…' : 'Join Project'}
+        </button>
                         </div>
                       </div>
                     ))}

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { apiUpdateProject, apiListProjectMembers, apiUpdateMemberRole, apiRemoveMember, apiDeleteProject, apiLeaveProject } from '../../../services/projects.js';
 import { apiListInvites, apiCreateInvite, apiToggleInvite } from '../../../services/invites.js';
 import { useToast } from '../../../components/Toast/ToastContext.jsx';
@@ -6,16 +7,25 @@ import { useToast } from '../../../components/Toast/ToastContext.jsx';
 // amPrivileged previously meant owner OR admin for some actions.
 // Now: owner = full edit, admin = read-only (can still generate invites per policy), member limited to invite creation when allowMemberInvites.
 export default function SettingsPanel({ project, setProject, amPrivileged, amOwner, myRole }) {
+  const navigate = useNavigate();
   const { notify } = useToast();
   const [invites, setInvites] = useState([]);
-  const [settings, setSettings] = useState({ name:'', description:'', visibility: 'private', allowMemberInvites: false });
+  const [settings, setSettings] = useState({ name:'', description:'', visibility: 'private', allowMemberInvites: false, projectPassword: '' });
   const [members, setMembers] = useState([]);
   const [loadingMembers, setLoadingMembers] = useState(false);
-  useEffect(() => { if (project) setSettings({ name: project.name || '', description: project.description || '', visibility: project.visibility, allowMemberInvites: project.allowMemberInvites }); }, [project]);
+  useEffect(() => { 
+    if (project) setSettings({ 
+      name: project.name || '', 
+      description: project.description || '', 
+      visibility: project.visibility, 
+      allowMemberInvites: project.allowMemberInvites,
+      projectPassword: project.projectPassword || ''
+    }); 
+  }, [project]);
 
   async function loadInvites() { if (!(amOwner || myRole==='admin')) return; try { const list = await apiListInvites(project._id); setInvites(list); notify('Invites loaded','success'); } catch { notify('Load invites failed','error'); } }
-  async function saveSettings(e) { e.preventDefault(); if (!amOwner) return; try { const updated = await apiUpdateProject(project._id, settings); setProject(updated); notify('Settings saved','success'); } catch { notify('Save failed','error'); } }
-  async function makeInvite() { try { const inv = await apiCreateInvite(project._id, { expiresInDays: 7 }); setInvites([inv, ...invites]); notify('Invite created','success'); } catch { notify('Create invite failed','error'); } }
+  async function saveSettings(e) { e.preventDefault(); if (!amOwner) { notify('Owner role required','error'); return; } try { const updated = await apiUpdateProject(project._id, settings); setProject(updated); notify('Settings saved','success'); } catch { notify('Save failed','error'); } }
+  async function makeInvite() { if(!(amOwner || myRole==='admin' || (myRole==='member' && project.allowMemberInvites))){ notify('Insufficient permissions','error'); return; } try { const inv = await apiCreateInvite(project._id, { expiresInDays: 7 }); setInvites([inv, ...invites]); notify('Invite created','success'); } catch { notify('Create invite failed','error'); } }
   async function loadMembers() { try { setLoadingMembers(true); const list = await apiListProjectMembers(project._id); setMembers(list); } catch { notify('Load members failed','error'); } finally { setLoadingMembers(false); } }
   useEffect(() => { if (amOwner && project?._id) loadMembers(); }, [amOwner, project?._id]);
 
@@ -32,7 +42,7 @@ export default function SettingsPanel({ project, setProject, amPrivileged, amOwn
       )}
       {myRole !== 'owner' && (
         <div style={{marginTop:16}}>
-          <button className="btn danger" onClick={async ()=>{ if(!confirm('Leave this project?')) return; try { await apiLeaveProject(project._id); notify('Left project','success'); window.location.href='/dashboard'; } catch { notify('Leave failed','error'); } }}>Leave Project</button>
+          <button className="btn danger" onClick={async ()=>{ if(!confirm('Leave this project?')) return; try { await apiLeaveProject(project._id); notify('Left project','success'); try { window.dispatchEvent(new Event('projects-changed')); } catch {}; navigate('/dashboard'); } catch { notify('Leave failed','error'); } }}>Leave Project</button>
         </div>
       )}
     </div>
@@ -43,6 +53,9 @@ export default function SettingsPanel({ project, setProject, amPrivileged, amOwn
       <form onSubmit={saveSettings} className="task-form">
         <label>Name
           <input value={settings.name} disabled={!amOwner} onChange={e=>setSettings({...settings, name:e.target.value})} placeholder="Project name" />
+          <p className="small" style={{ marginTop: '4px', color: '#6b7280' }}>
+            Must be unique (like GitHub repositories). Case-sensitive.
+          </p>
         </label>
         <label>Description
           <input value={settings.description} disabled={!amOwner} onChange={e=>setSettings({...settings, description:e.target.value})} placeholder="Short description" />
@@ -53,6 +66,51 @@ export default function SettingsPanel({ project, setProject, amPrivileged, amOwn
             <option value="public">Public</option>
           </select>
         </label>
+        {settings.visibility === 'private' && (
+          <label>Project Password
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <input 
+                type="text" 
+                value={settings.projectPassword} 
+                disabled={!amOwner} 
+                onChange={e=>setSettings({...settings, projectPassword:e.target.value})} 
+                placeholder="Set password for private project access" 
+                style={{ flex: 1 }}
+              />
+              {amOwner && (
+                <button 
+                  type="button" 
+                  onClick={() => {
+                    const randomPassword = Math.random().toString(36).substring(2, 10);
+                    setSettings({...settings, projectPassword: randomPassword});
+                  }}
+                  style={{ padding: '4px 8px', fontSize: '12px' }}
+                >
+                  Generate
+                </button>
+              )}
+              {settings.projectPassword && (
+                <button 
+                  type="button" 
+                  onClick={async() => { 
+                    try { 
+                      await navigator.clipboard.writeText(settings.projectPassword); 
+                      notify('Password copied!', 'success'); 
+                    } catch(_) { 
+                      notify('Copy failed', 'error'); 
+                    } 
+                  }}
+                  style={{ padding: '4px 8px', fontSize: '12px' }}
+                >
+                  Copy
+                </button>
+              )}
+            </div>
+            <p className="small" style={{ marginTop: '4px', color: '#6b7280' }}>
+              Share this password with users to allow them to join your private project
+            </p>
+          </label>
+        )}
         <label style={{ display:'flex', gap:6, alignItems:'center' }}>
           <input type="checkbox" checked={settings.allowMemberInvites} disabled={!amOwner} onChange={e=>setSettings({...settings, allowMemberInvites:e.target.checked})} />
           Allow members to invite
@@ -60,6 +118,37 @@ export default function SettingsPanel({ project, setProject, amPrivileged, amOwn
         {amOwner && <button type="submit">Save</button>}
         {!amOwner && <p className="small" style={{marginTop:4}}>Read-only (admin)</p>}
       </form>
+
+      {/* Simple Password Sharing for Private Projects */}
+      {settings.visibility === 'private' && settings.projectPassword && (
+        <div className="card p-3" style={{ marginTop:16 }}>
+          <h4 style={{ marginTop:0 }}>� Private Project Access</h4>
+          <p className="small">Share these details with users to join your private project:</p>
+          <div style={{ background: '#f8f9fa', padding: '12px', borderRadius: '6px', border: '1px solid #e9ecef' }}>
+            <div style={{ marginBottom: '8px' }}>
+              <strong>Project Name:</strong> <code style={{ background: '#fff', padding: '2px 6px', borderRadius: '3px' }}>{project?.name}</code>
+            </div>
+            <div style={{ marginBottom: '8px' }}>
+              <strong>Password:</strong> <code style={{ background: '#fff', padding: '2px 6px', borderRadius: '3px' }}>{settings.projectPassword}</code>
+            </div>
+            <button 
+              onClick={async() => { 
+                try { 
+                  await navigator.clipboard.writeText(`Project: ${project?.name}\nPassword: ${settings.projectPassword}`); 
+                  notify('Project details copied!', 'success'); 
+                } catch(_) { 
+                  notify('Copy failed', 'error'); 
+                } 
+              }}
+              className="btn btn-sm"
+              style={{ marginTop: '8px' }}
+            >
+              📋 Copy Details
+            </button>
+          </div>
+        </div>
+      )}
+
   {/* Members management - owners only */}
       <div className="card p-3" style={{ marginTop:16 }}>
         <h4 style={{ marginTop:0 }}>Members</h4>
@@ -114,14 +203,14 @@ export default function SettingsPanel({ project, setProject, amPrivileged, amOwn
         <h4 style={{ marginTop:0 }}>Danger Zone</h4>
         <p className="small">Deleting a project permanently removes tasks, resources, snippets, solutions, discussions, and invites. This action cannot be undone.</p>
         <button className="btn btn-danger" disabled={!amOwner} title={amOwner?'' :'Only owners can delete projects'} onClick={async ()=>{
-          if (!amOwner) return;
+          if (!amOwner) { notify('Owner role required','error'); return; }
           if (!confirm('Delete this project and all its data? This cannot be undone.')) return;
-          try { await apiDeleteProject(project._id); notify('Project deleted','success'); window.location.href = '/dashboard'; }
+          try { await apiDeleteProject(project._id); notify('Project deleted','success'); try { window.dispatchEvent(new Event('projects-changed')); } catch {}; navigate('/dashboard'); }
           catch { notify('Delete failed','error'); }
         }}>Delete Project</button>
         {!amOwner && (
           <div style={{marginTop:12}}>
-            <button className="btn" onClick={async ()=>{ if(!confirm('Leave this project?')) return; try { await apiLeaveProject(project._id); notify('Left project','success'); window.location.href='/dashboard'; } catch { notify('Leave failed','error'); } }}>Leave Project</button>
+            <button className="btn" onClick={async ()=>{ if(!confirm('Leave this project?')) return; try { await apiLeaveProject(project._id); notify('Left project','success'); try { window.dispatchEvent(new Event('projects-changed')); } catch {}; navigate('/dashboard'); } catch { notify('Leave failed','error'); } }}>Leave Project</button>
           </div>
         )}
       </div>

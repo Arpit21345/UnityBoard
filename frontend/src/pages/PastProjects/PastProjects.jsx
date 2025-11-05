@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import AppLayout from '../../components/layout/AppLayout.jsx';
 import Sidebar from '../../components/layout/Sidebar.jsx';
 import GlobalNavbar from '../../components/layout/GlobalNavbar.jsx';
+import { useToast } from '../../components/Toast/ToastContext.jsx';
 import { apiListProjects, apiUnarchiveProject } from '../../services/projects.js';
 import Spinner from '../../components/ui/Spinner.jsx';
 
@@ -10,6 +11,7 @@ export default function PastProjects(){
 	const [loading, setLoading] = useState(true);
 	const [q, setQ] = useState('');
 	const [err, setErr] = useState('');
+	const { notify } = useToast();
 
 	useEffect(() => { (async ()=>{
 		try {
@@ -50,8 +52,8 @@ export default function PastProjects(){
 					</div>
 				) : archived.length === 0 ? (
 					<div className="card p-4" style={{ marginTop: 12 }}>
-						<h4 style={{ marginTop: 0 }}>No past projects</h4>
-						<p className="small" style={{ margin: 0 }}>Projects marked archived/completed will appear here.</p>
+						<h4 style={{ marginTop: 0 }}>No past projects.</h4>
+						<p className="small" style={{ margin: 0 }}>When you archive or complete projects, they’ll show up here for reference.</p>
 					</div>
 				) : (
 					<div className="grid cols-3 mt-4">
@@ -68,8 +70,8 @@ export default function PastProjects(){
 								<div style={{ marginTop: 10, display:'flex', gap:8 }}>
 									<a className="btn" href={`/project/${p._id}`}>Open</a>
 									<button className="btn" onClick={async ()=>{
-										try { const upd = await apiUnarchiveProject(p._id); setProjects(projects.map(pr=> pr._id===p._id? upd : pr)); }
-										catch(e){ console.warn(e); alert('Unarchive failed'); }
+										try { const upd = await apiUnarchiveProject(p._id); setProjects(projects.map(pr=> pr._id===p._id? upd : pr)); notify('Project restored','success'); }
+										catch(e){ console.warn(e); notify('Unarchive failed','error'); }
 									}}>Unarchive</button>
 								</div>
 							</div>

@@ -37,5 +37,21 @@ export async function login(req, res) {
 }
 
 export async function me(req, res) {
-  res.json({ ok: true, user: req.user });
+  try {
+    const user = await User.findById(req.user.id).select('name email analytics createdAt');
+    res.json({ 
+      ok: true, 
+      user: {
+        ...req.user,
+        analytics: user.analytics || {
+          totalProjectsCreated: 0,
+          totalTasksCompleted: 0,
+          totalContributions: 0,
+          lifetimeSolutions: 0
+        }
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ ok: false, error: 'Failed to get user data' });
+  }
 }

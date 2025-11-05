@@ -9,6 +9,7 @@ const taskSchema = new mongoose.Schema({
   labels: [{ type: String, trim: true }],
   assignees: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   dueDate: { type: Date },
+  dueDateNotificationSent: { type: Boolean, default: false },
   votes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   comments: [{
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },

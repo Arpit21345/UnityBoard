@@ -17,3 +17,29 @@ export async function updateMe(req, res){
 		res.status(500).json({ ok:false, error:'Failed to update profile' });
 	}
 }
+
+export async function getUserById(req, res){
+	try {
+		const { userId } = req.params;
+		const user = await User.findById(userId).select('name email analytics createdAt');
+		if (!user) return res.status(404).json({ ok: false, error: 'User not found' });
+		
+		res.json({ 
+			ok: true, 
+			user: {
+				id: user._id,
+				name: user.name,
+				email: user.email,
+				analytics: user.analytics || {
+					totalProjectsCreated: 0,
+					totalTasksCompleted: 0,
+					totalContributions: 0,
+					lifetimeSolutions: 0
+				},
+				createdAt: user.createdAt
+			}
+		});
+	} catch (e){
+		res.status(500).json({ ok: false, error: 'Failed to get user profile' });
+	}
+}

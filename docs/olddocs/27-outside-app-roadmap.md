@@ -9,7 +9,7 @@ Scope: Global experience outside an individual project. Sections: Home Dashboard
    - Remove search bar (will reintroduce later optionally via shortcut).
    - Single brand left, then theme toggle, notifications, profile menu.
 3. Primary button style unification (purple) across app.
-4. File organization cleanup (group outside pages; delete unused Topbar/legacy navbar, update imports; doc + changelog entries).
+4. File organization cleanup (completed: removed unused legacy topbar component, unified GlobalNavbar).
 5. Permissions sanity check
    - Non-member cannot access /project/:id internals (already guarded by ProtectedRoute + server membership checks).
    - Owner/Admin/Member scoping validated (document quick matrix link to main roles file).

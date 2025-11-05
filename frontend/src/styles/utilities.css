@@ -19,5 +19,7 @@
 .btn.primary{background:linear-gradient(135deg,var(--primary-600),var(--accent-500));color:#fff;border:0}
 .btn.primary:hover,.btn.primary:focus{background:linear-gradient(135deg,var(--primary-700),var(--accent-600));color:#fff;box-shadow:0 0 0 2px rgba(0,0,0,0.05);outline:none}
 .btn.primary:active{background:linear-gradient(135deg,var(--primary-800),var(--accent-700));transform:translateY(1px)}
-.btn.dark{background:var(--gray-900);color:#fff;border:0}
+.btn.dark{background:#1a1a1a;color:#fff;border:0;transition:all 0.3s ease;box-shadow:0 2px 8px rgba(0,0,0,0.15)}
+.btn.dark:hover{background:#333;transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.2)}
+.btn.dark:active{background:#555;transform:translateY(0px)}
 .input{padding:10px 12px;border:1px solid var(--gray-300);border-radius:var(--radius-md);background:#fff}

@@ -1,12 +1,13 @@
 import React from 'react';
 import MemberPicker from '../../../../components/Members/MemberPicker.jsx';
-import PriorityBadge from '../PriorityBadge.jsx';
-import TaskComments from '../TaskComments.jsx';
+import PriorityBadge from './PriorityBadge.jsx';
+import TaskComments from './TaskComments.jsx';
 
 export default function TasksList({
   projectId,
   items,
   me,
+  members,
   selectedTaskIds,
   toggleSelect,
   clearSelection,
@@ -21,6 +22,51 @@ export default function TasksList({
   onUpdateTask,
   onOpenTaskModal,
 }){
+  // Helper function to get user display name
+  const getUserDisplayName = (userId) => {
+    if (!userId) return 'Unknown User';
+    
+    // Check if it's the current user
+    const currentUserId = String(me?.id || me?._id);
+    if (String(userId) === currentUserId) {
+      return me?.name || me?.email || 'You';
+    }
+    
+    // Try to find in members list
+    if (members && members.length > 0) {
+      const member = members.find(m => {
+        const memberUserId = String(m.user?._id || m.user);
+        return memberUserId === String(userId);
+      });
+      if (member) {
+        // Handle both populated and non-populated user data
+        return member.user?.name || member.user?.email || member.name || member.email || 'Unknown User';
+      }
+    }
+    
+    return 'Unknown User';
+  };
+
+  // Simple function to render assigned user name (no buttons)
+  const renderAssignedUser = (task) => {
+    const assignees = task.assignees || [];
+    if (assignees.length === 0) return null;
+    
+    if (assignees.length === 1) {
+      return (
+        <span className="small" style={{ color: 'var(--gray-600)' }}>
+          Assigned: {getUserDisplayName(assignees[0])}
+        </span>
+      );
+    } else {
+      const names = assignees.map(id => getUserDisplayName(id)).join(', ');
+      return (
+        <span className="small" style={{ color: 'var(--gray-600)' }}>
+          Assigned: {names}
+        </span>
+      );
+    }
+  };
   return (
     <>
       {selectedTaskIds.length > 0 && (
@@ -70,7 +116,7 @@ export default function TasksList({
                 <option value="medium">Medium</option>
                 <option value="low">Low</option>
               </select>
-              {me && <button className="task-btn" onClick={()=> onUpdateTask(t._id, { assignees: [me._id] })}>Assign me</button>}
+              {renderAssignedUser(t)}
               <MemberPicker projectId={projectId} value={(t.assignees && t.assignees[0]) || ''} onChange={(uid)=> onUpdateTask(t._id, { assignees: uid? [uid] : [] })} />
               <input type="date" value={t.dueDate ? new Date(t.dueDate).toISOString().slice(0,10) : ''} onChange={(e)=> onUpdateTask(t._id, { dueDate: e.target.value })} />
               <button className="task-btn" onClick={()=>onStartRename(t)}>Rename</button>

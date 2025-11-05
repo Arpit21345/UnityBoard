@@ -11,7 +11,13 @@ export default function Register() {
     setMsg('');
     try {
       await apiRegister(form);
-      window.location.href = '/dashboard';
+      const redirect = localStorage.getItem('postLoginRedirect');
+      if(redirect){
+        localStorage.removeItem('postLoginRedirect');
+        window.location.href = redirect;
+      } else {
+        window.location.href = '/dashboard';
+      }
     } catch (e) {
       setMsg(e.message || 'Registration failed');
     }

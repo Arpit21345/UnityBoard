@@ -14,3 +14,24 @@ export async function apiMarkAllNotificationsRead(){
   if(!res.ok || !data.ok) throw new Error(data.error||'Failed');
   return true;
 }
+
+export async function apiDeleteSelectedNotifications(notificationIds){
+  const res = await http(`${API}/api/notifications/selected`, { 
+    method:'DELETE', 
+    headers:{ 'Content-Type':'application/json', ...authHeaders() }, 
+    body: JSON.stringify({ notificationIds })
+  });
+  const data = await res.json();
+  if(!res.ok || !data.ok) throw new Error(data.error||'Failed');
+  return data.deletedCount;
+}
+
+export async function apiDeleteAllNotifications(){
+  const res = await http(`${API}/api/notifications/all`, { 
+    method:'DELETE', 
+    headers:{ 'Content-Type':'application/json', ...authHeaders() } 
+  });
+  const data = await res.json();
+  if(!res.ok || !data.ok) throw new Error(data.error||'Failed');
+  return data.deletedCount;
+}

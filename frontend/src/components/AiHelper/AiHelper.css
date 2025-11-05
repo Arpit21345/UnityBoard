@@ -98,6 +98,51 @@
   cursor: pointer;
 }
 
+/* Dark Mode Styling */
+[data-theme='dark'] .ai-helper .panel {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .ai-helper .header {
+  color: #e2e8f0;
+  border-color: #334155;
+}
+
+[data-theme='dark'] .ai-helper .msg.user {
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+[data-theme='dark'] .ai-helper .msg.assistant {
+  background: #334155;
+  color: #e2e8f0;
+}
+
+[data-theme='dark'] .ai-helper .input-row {
+  border-color: #334155;
+}
+
+[data-theme='dark'] .ai-helper .input-row input {
+  background: #334155;
+  border-color: #475569;
+  color: #e2e8f0;
+}
+
+[data-theme='dark'] .ai-helper .input-row input::placeholder {
+  color: #94a3b8;
+}
+
+[data-theme='dark'] .ai-helper .input-row button {
+  background: #000000;
+  color: #ffffff;
+}
+
+[data-theme='dark'] .ai-helper .input-row button:hover {
+  background: #333333;
+}
+
 /* Small screens: keep panel fully within viewport to avoid horizontal scroll */
 @media (max-width: 480px) {
   .ai-helper .fab {

@@ -31,3 +31,10 @@ export async function apiMe() {
   if (!res.ok || !data.ok) throw new Error('Not authenticated');
   return data.user;
 }
+
+export async function apiGetUserById(userId) {
+  const res = await http(`${API}/api/users/${userId}`, { headers: { Authorization: `Bearer ${getToken()}` } });
+  const data = await res.json();
+  if (!res.ok || !data.ok) throw new Error(data.error || 'Failed to get user profile');
+  return data.user;
+}

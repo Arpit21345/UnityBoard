@@ -1,14 +1,35 @@
 import Task from '../models/Task.js';
 import Project from '../models/Project.js';
+import User from '../models/User.js';
+import { notifyTaskAssigned } from '../utils/notificationHelpers.js';
+import { incrementUserAnalytics } from '../utils/analyticsHelpers.js';
 
 export async function createTask(req, res) {
   try {
     const { id } = req.params; // project id
-  const { title, description, priority, dueDate, assignees = [], labels = [] } = req.body;
+    const { title, description, priority, dueDate, assignees = [], labels = [] } = req.body;
     const project = await Project.findById(id);
     if (!project) return res.status(404).json({ ok: false, error: 'Project not found' });
     if (!project.members.some(m => String(m.user) === req.user.id)) return res.status(403).json({ ok: false, error: 'Forbidden' });
-  const task = await Task.create({ project: id, title, description, priority, dueDate, assignees, labels });
+    
+    const task = await Task.create({ project: id, title, description, priority, dueDate, assignees, labels });
+    
+    // Send notifications to assigned users
+    if (assignees && assignees.length > 0) {
+      const assignedBy = await User.findById(req.user.id);
+      const notificationPromises = assignees.map(async (assigneeId) => {
+        // Don't notify if user assigned task to themselves
+        if (String(assigneeId) !== req.user.id) {
+          await notifyTaskAssigned(task, project, String(assigneeId), assignedBy);
+        }
+      });
+      
+      // Don't wait for notifications to complete
+      Promise.all(notificationPromises).catch(err => 
+        console.error('Failed to send task assignment notifications:', err)
+      );
+    }
+    
     res.status(201).json({ ok: true, task });
   } catch (e) {
     res.status(500).json({ ok: false, error: 'Create failed' });
@@ -29,9 +50,50 @@ export async function updateTask(req, res) {
   try {
     const { taskId } = req.params;
     const updates = req.body;
-    const task = await Task.findByIdAndUpdate(taskId, updates, { new: true });
+    delete updates._id; // Prevent ID override
+    
+    const task = await Task.findById(taskId).populate('project', 'members name');
     if (!task) return res.status(404).json({ ok: false, error: 'Not found' });
-    res.json({ ok: true, task });
+    
+    // Ensure requester is a project member
+    if (!task.project.members.some(m => String(m.user) === req.user.id)) {
+      return res.status(403).json({ ok: false, error: 'Forbidden' });
+    }
+    
+    // Store old values for comparison
+    const oldAssignees = task.assignees ? task.assignees.map(id => String(id)) : [];
+    const oldStatus = task.status;
+    
+    // Update task
+    const updated = await Task.findByIdAndUpdate(taskId, updates, { new: true });
+    
+    // If task was completed by user, increment their analytics
+    if (updates.status === 'completed' && oldStatus !== 'completed') {
+      await incrementUserAnalytics(req.user.id, 'totalTasksCompleted');
+    }
+    
+    // Handle notifications for assignment changes
+    if (updates.assignees !== undefined) {
+      const newAssignees = Array.isArray(updates.assignees) ? updates.assignees.map(id => String(id)) : [];
+      const addedAssignees = newAssignees.filter(id => !oldAssignees.includes(id));
+      
+      if (addedAssignees.length > 0) {
+        const assignedBy = await User.findById(req.user.id);
+        const notificationPromises = addedAssignees.map(async (assigneeId) => {
+          // Don't notify if user assigned task to themselves
+          if (String(assigneeId) !== req.user.id) {
+            await notifyTaskAssigned(updated, task.project, assigneeId, assignedBy);
+          }
+        });
+        
+        // Don't wait for notifications to complete
+        Promise.all(notificationPromises).catch(err => 
+          console.error('Failed to send task assignment notifications:', err)
+        );
+      }
+    }
+    
+    res.json({ ok: true, task: updated });
   } catch (e) {
     res.status(500).json({ ok: false, error: 'Update failed' });
   }

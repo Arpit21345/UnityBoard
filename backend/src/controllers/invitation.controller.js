@@ -65,10 +65,22 @@ async function consumeInvite(invite, userId) {
   const project = await Project.findById(invite.project);
   if (!project) throw new Error('Project not found');
   if (project.members.some(m => String(m.user) === userId)) return project;
+  
   project.members.push({ user: userId, role: invite.role === 'admin' ? 'admin' : 'member' });
   await project.save();
   invite.usedCount += 1;
   await invite.save();
+  
+  // Send notifications about new member joining via invite
+  const User = (await import('../models/User.js')).default;
+  const newMember = await User.findById(userId);
+  if (newMember) {
+    const { notifyMemberJoined } = await import('../utils/notificationHelpers.js');
+    notifyMemberJoined(project, newMember).catch(err => 
+      console.error('Failed to send member joined notifications:', err)
+    );
+  }
+  
   return project;
 }
 

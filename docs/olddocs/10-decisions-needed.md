@@ -29,7 +29,7 @@ Learning Tracker v1
   - [ ] Private to author  [ ] Project-visible
 
 AI helper
-- Quick actions in Topbar (Summarize project, Suggest tasks):
+- Quick actions (Summarize project, Suggest tasks) deferred; will attach to project dashboard header later.
   - [ ] Yes  [ ] No
 - Hide AI FAB on auth pages (login/register):
   - [ ] Yes  [ ] No

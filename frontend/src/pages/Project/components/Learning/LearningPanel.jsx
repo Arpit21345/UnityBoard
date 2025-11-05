@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import Spinner from '../../../components/ui/Spinner.jsx';
-import { apiListLearning, apiCreateLearning, apiUpdateLearning, apiDeleteLearning } from '../../../services/learning.js';
-import { useToast } from '../../../components/Toast/ToastContext.jsx';
-import LearningFilters from './Learning/LearningFilters.jsx';
-import LearningList from './Learning/LearningList.jsx';
-import LearningFormModal from './Learning/LearningFormModal.jsx';
-import './Learning/Learning.css';
+import Spinner from '../../../../components/ui/Spinner.jsx';
+import { apiListLearning, apiCreateLearning, apiUpdateLearning, apiDeleteLearning } from '../../../../services/learning.js';
+import { useToast } from '../../../../components/Toast/ToastContext.jsx';
+import LearningFilters from './LearningFilters.jsx';
+import LearningList from './LearningList.jsx';
+import LearningFormModal from './LearningFormModal.jsx';
+import './Learning.css';
 
 export default function LearningPanel({ projectId, me }) {
   const { notify } = useToast();

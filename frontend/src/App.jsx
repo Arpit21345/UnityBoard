@@ -14,31 +14,35 @@ import Project from './pages/Project/Project.jsx';
 import PastProjects from './pages/PastProjects/PastProjects.jsx';
 import AiHelper from './components/AiHelper/AiHelper.jsx';
 import { AiContextProvider } from './components/AiHelper/AiContext.jsx';
+import { UserProvider } from './context/UserContext.jsx';
 import InviteAccept from './pages/InviteAccept/InviteAccept.jsx';
 import { ToastProvider } from './components/Toast/ToastContext.jsx';
 
 export default function App() {
   const RootProviders = () => (
-    <AiContextProvider>
-      <ToastProvider>
-        <Outlet />
-        <AiHelper />
-      </ToastProvider>
-    </AiContextProvider>
+    <UserProvider>
+      <AiContextProvider>
+        <ToastProvider>
+          <Outlet />
+          <AiHelper />
+        </ToastProvider>
+      </AiContextProvider>
+    </UserProvider>
   );
 
   const router = createBrowserRouter([
     {
       element: <RootProviders />,
       children: [
-  { path: '/', element: <><GlobalNavbar compact /><Explore /></> },
-  { path: '/login', element: <><GlobalNavbar compact /><Login /></> },
-  { path: '/register', element: <><GlobalNavbar compact /><Register /></> },
-  { path: '/invite/:token', element: <><GlobalNavbar compact /><InviteAccept /></> },
+  { path: '/', element: <><GlobalNavbar /><Explore /></> },
+  { path: '/login', element: <><GlobalNavbar /><Login /></> },
+  { path: '/register', element: <><GlobalNavbar /><Register /></> },
+  { path: '/invite/:token', element: <><GlobalNavbar /><InviteAccept /></> },
         { path: '/dashboard', element: <ProtectedRoute><Dashboard /></ProtectedRoute> },
   { path: '/past-projects', element: <ProtectedRoute><PastProjects /></ProtectedRoute> },
         { path: '/project/:id', element: <ProtectedRoute><Project /></ProtectedRoute> },
   { path: '/profile', element: <ProtectedRoute><Profile /></ProtectedRoute> },
+  { path: '/profile/:userId', element: <ProtectedRoute><Profile /></ProtectedRoute> },
   { path: '/settings', element: <ProtectedRoute><UserSettings /></ProtectedRoute> },
   { path: '/notifications', element: <ProtectedRoute><Notifications /></ProtectedRoute> },
   { path: '/logout', element: <ProtectedRoute><Logout /></ProtectedRoute> },

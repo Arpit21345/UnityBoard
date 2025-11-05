@@ -13,11 +13,38 @@ export async function apiListProjects() {
   return data.projects;
 }
 
+export async function apiListUserProjects(userId) {
+  const res = await http(`${API}/api/projects/user/${userId}`, { headers: { ...authHeaders() } });
+  const data = await res.json();
+  if (!res.ok || !data.ok) throw new Error(data.error || 'Fetch failed');
+  return data.projects;
+}
+
 export async function apiCreateProject(payload) {
   const res = await http(`${API}/api/projects`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...authHeaders() }, body: JSON.stringify(payload) });
   const data = await res.json();
   if (!res.ok || !data.ok) throw new Error(data.error || 'Create failed');
   return data.project;
+}
+
+export async function apiSearchProjects(searchTerm) {
+  const res = await http(`${API}/api/projects/search?q=${encodeURIComponent(searchTerm)}`, { 
+    headers: { ...authHeaders() } 
+  });
+  const data = await res.json();
+  if (!res.ok || !data.ok) throw new Error(data.error || 'Search failed');
+  return data.projects;
+}
+
+export async function apiJoinPrivateProject(projectName, password) {
+  const res = await http(`${API}/api/projects/join-private`, { 
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify({ projectName, password })
+  });
+  const data = await res.json();
+  if (!res.ok || !data.ok) throw new Error(data.error || 'Join failed');
+  return data;
 }
 
 export async function apiGetProject(id) {

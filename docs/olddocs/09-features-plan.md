@@ -3,7 +3,7 @@
 Last updated: 2025-08-11
 
 Snapshot
-- Base UI: tokens/reset/utilities, public Navbar, private AppLayout (Sidebar + Topbar).
+- Base UI: tokens/reset/utilities, public Navbar, private AppLayout (Sidebar + GlobalNavbar unified).
 - Explore page: FINAL (hero, alternating sections, feature cards, benefits, dark/light, CTA with image overlay, public projects, monochrome footer).
 - AI helper: globally mounted, route-aware context; visible on all pages.
 - Backend: assets at /api/assets; projects public list/join; invites; AI /api/ai/qna fixed.

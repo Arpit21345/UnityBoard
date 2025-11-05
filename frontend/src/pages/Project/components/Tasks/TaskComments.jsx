@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { apiListTaskComments, apiAddTaskComment } from '../../../services/projects.js';
-import Spinner from '../../../components/ui/Spinner.jsx';
-import { useToast } from '../../../components/Toast/ToastContext.jsx';
+import { apiListTaskComments, apiAddTaskComment } from '../../../../services/projects.js';
+import Spinner from '../../../../components/ui/Spinner.jsx';
+import { useToast } from '../../../../components/Toast/ToastContext.jsx';
 
 export default function TaskComments({ taskId, embedded = false }) {
   const [open, setOpen] = useState(embedded ? true : false);

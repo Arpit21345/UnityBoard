@@ -2,6 +2,7 @@ import Thread from '../models/Thread.js';
 import Message from '../models/Message.js';
 import Project from '../models/Project.js';
 import { getIo } from '../socketHub.js';
+import { incrementUserAnalytics } from '../utils/analyticsHelpers.js';
 
 function isMember(project, userId){
   return project.members?.some(m => String(m.user) === String(userId));
@@ -39,6 +40,10 @@ export async function createThread(req, res){
   if (project.chatSingleRoom) return res.status(400).json({ ok:false, error:'Single-room mode: cannot create threads' });
   if (!isOwnerOrAdmin(project, req.user.id)) return res.status(403).json({ ok:false, error:'Only owner/admin can create threads' });
   const item = await Thread.create({ project: id, title, tags, createdBy: req.user.id, lastActivityAt: new Date() });
+  
+  // Increment user's contributions count
+  await incrementUserAnalytics(req.user.id, 'totalContributions');
+  
     res.status(201).json({ ok:true, item });
   } catch { res.status(500).json({ ok:false, error:'Create failed' }); }
 }
@@ -117,6 +122,9 @@ export async function createMessage(req, res){
     const msg = await Message.create({ thread: threadId, user: req.user.id, text });
     thread.lastActivityAt = new Date();
     await thread.save();
+    
+    // Increment user's contributions count
+    await incrementUserAnalytics(req.user.id, 'totalContributions');
     // Broadcast new message to project room
     try {
       const io = getIo();

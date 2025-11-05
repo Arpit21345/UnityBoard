@@ -1,17 +1,17 @@
 import React, { useMemo, useState, useCallback } from 'react';
-import Spinner from '../../../components/ui/Spinner.jsx';
-import MemberPicker from '../../../components/Members/MemberPicker.jsx';
-import { useToast } from '../../../components/Toast/ToastContext.jsx';
-import { apiUpdateTask, apiDeleteTask } from '../../../services/projects.js';
+import Spinner from '../../../../components/ui/Spinner.jsx';
+import MemberPicker from '../../../../components/Members/MemberPicker.jsx';
+import { useToast } from '../../../../components/Toast/ToastContext.jsx';
+import { apiUpdateTask, apiDeleteTask } from '../../../../services/projects.js';
 import PriorityBadge from './PriorityBadge.jsx';
 import LabelsEditor from './LabelsEditor.jsx';
 import TaskComments from './TaskComments.jsx';
-import TasksFilters from './Tasks/TasksFilters.jsx';
-import TasksBoard from './Tasks/TasksBoard.jsx';
-import TasksList from './Tasks/TasksList.jsx';
-import './Tasks/Tasks.css';
+import TasksFilters from './TasksFilters.jsx';
+import TasksBoard from './TasksBoard.jsx';
+import TasksList from './TasksList.jsx';
+import './Tasks.css';
 
-export default function TasksPanel({ projectId, me, tasks, setTasks, tasksLoading, onOpenTaskModal }) {
+export default function TasksPanel({ projectId, me, members, tasks, setTasks, tasksLoading, onOpenTaskModal }) {
   const { notify } = useToast();
   const [taskView, setTaskView] = useState(()=>{
     try { const v = localStorage.getItem(`proj:${projectId}:tasks:view`); return (v==='list'||v==='board')? v : 'board'; } catch { return 'board'; }
@@ -90,6 +90,7 @@ export default function TasksPanel({ projectId, me, tasks, setTasks, tasksLoadin
           projectId={projectId}
           items={filteredTasks}
           me={me}
+          members={members}
           selectedTaskIds={selectedTaskIds}
           toggleSelect={toggleSelect}
           clearSelection={clearSelection}
@@ -112,6 +113,7 @@ export default function TasksPanel({ projectId, me, tasks, setTasks, tasksLoadin
         <TasksBoard
           items={filteredTasks}
           me={me}
+          members={members}
           onDragStart={onDragStart}
           onDropTo={onDropTo}
           onStartRename={startRenameTask}

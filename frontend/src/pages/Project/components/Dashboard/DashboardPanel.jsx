@@ -1,7 +1,21 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { apiListProjectMembers } from '../../../../services/projects.js';
 import './DashboardPanel.css';
 
 export default function DashboardPanel({ project, tasks = [] }) {
+  const navigate = useNavigate();
+  const [members, setMembers] = useState([]);
+  
+  // Fetch project members with names
+  useEffect(() => {
+    if (project?._id) {
+      apiListProjectMembers(project._id)
+        .then(memberList => setMembers(memberList))
+        .catch(() => setMembers([]));
+    }
+  }, [project?._id]);
+
   const now = Date.now();
   const in7 = now + 7 * 24 * 60 * 60 * 1000;
 
@@ -15,9 +29,10 @@ export default function DashboardPanel({ project, tasks = [] }) {
     const overdue = tasks.filter(t => t.dueDate && t.status !== 'done' && new Date(t.dueDate).getTime() < now);
     const dueSoon = tasks.filter(t => t.dueDate && t.status !== 'done' && new Date(t.dueDate).getTime() >= now && new Date(t.dueDate).getTime() <= in7);
     const unassigned = tasks.filter(t => (!t.assignees || t.assignees.length === 0) && t.status !== 'done');
+    // Use both project.members for basic structure and members for names
     const memberLoad = (project?.members||[]).map(m => {
-      const uid = m.user;
-      const assigned = tasks.filter(t => Array.isArray(t.assignees) && t.assignees.includes(uid));
+      const uid = m.user?._id || m.user;
+      const assigned = tasks.filter(t => Array.isArray(t.assignees) && t.assignees.some(a => String(a) === String(uid)));
       const open = assigned.filter(t => t.status !== 'done').length;
       const closed = assigned.filter(t => t.status === 'done').length;
       return { user: uid, role: m.role, open, closed, total: assigned.length };
@@ -28,15 +43,18 @@ export default function DashboardPanel({ project, tasks = [] }) {
   const priorityOrder = ['urgent','high','medium','low'];
 
   function displayUser(id) {
-  const member = (project?.members||[]).find(m => m.user === id);
-  if (!member) return 'User';
-  // Future profile naming priority (to be implemented when user profiles added)
-  // 1. displayName (planned field)
-  // 2. name / profileName (fallbacks)
-  // 3. username
-  // 4. email
-  const candidate = member.displayName || member.name || member.profileName || member.username || member.email;
-  return candidate || 'Pending Name';
+    // Simple approach: find member in the fetched members list which has populated user data
+    const member = members.find(m => String(m.user) === String(id));
+    if (member && member.name) {
+      return member.name;
+    }
+    
+    // Fallback to email if name not available
+    if (member && member.email) {
+      return member.email;
+    }
+    
+    return 'Anonymous User';
   }
 
   return (
@@ -147,19 +165,27 @@ export default function DashboardPanel({ project, tasks = [] }) {
                     const roleRank = r => r === 'owner' ? 0 : r === 'admin' ? 1 : 2;
                     const rr = roleRank(a.role) - roleRank(b.role);
                     if (rr !== 0) return rr;
-                    const an = (displayUser(a.user) || '').toLowerCase();
-                    const bn = (displayUser(b.user) || '').toLowerCase();
+                    const aUserId = a.user?._id || a.user;
+                    const bUserId = b.user?._id || b.user;
+                    const an = (displayUser(aUserId) || '').toLowerCase();
+                    const bn = (displayUser(bUserId) || '').toLowerCase();
                     return an.localeCompare(bn);
                   })
                   .map(m => {
-                    const load = metrics.memberLoad.find(x => x.user === m.user) || { open:0, total:0 };
+                    const userId = m.user?._id || m.user;
+                    const load = metrics.memberLoad.find(x => String(x.user) === String(userId)) || { open:0, total:0 };
                     return (
-                      <li key={m.user} className={"team-member-row "+(m.role==='owner'?'owner':'')}> 
+                      <li key={userId} className={"team-member-row "+(m.role==='owner'?'owner':'')}> 
                         <div className="tm-left">
-                          <span className="tm-name" title={displayUser(m.user)}>{displayUser(m.user)}</span>
+                          <button 
+                            className="tm-name-btn" 
+                            onClick={() => navigate(`/profile/${userId}`)}
+                            title={`View ${displayUser(userId)}'s profile`}
+                          >
+                            {displayUser(userId)}
+                          </button>
                           <span className="role-badge small" style={{marginLeft:0}}>{m.role}</span>
                         </div>
-                        <span className="tm-open" title="Open / Total tasks">{load.open}/{load.total}</span>
                       </li>
                     );
                   })}
@@ -187,7 +213,16 @@ export default function DashboardPanel({ project, tasks = [] }) {
                 <tbody>
                   {metrics.memberLoad.slice(0,10).map(m => (
                     <tr key={m.user}>
-                      <td className="member-cell"><span className="truncate" title={displayUser(m.user)}>{displayUser(m.user)}</span> <span className="role-badge small">{m.role}</span></td>
+                      <td className="member-cell">
+                        <button 
+                          className="member-name-btn" 
+                          onClick={() => navigate(`/profile/${m.user}`)}
+                          title={`View ${displayUser(m.user)}'s profile`}
+                        >
+                          {displayUser(m.user)}
+                        </button> 
+                        <span className="role-badge small">{m.role}</span>
+                      </td>
                       <td className="ta-right">{m.open}</td>
                       <td className="ta-right">{m.closed}</td>
                       <td className="ta-right">{m.total}</td>

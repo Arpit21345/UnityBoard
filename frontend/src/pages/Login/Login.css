@@ -1,6 +1,23 @@
 .auth-wrapper { display:flex; align-items:center; justify-content:center; min-height:100vh; }
-.auth-card { width: 360px; border:1px solid #e5e7eb; border-radius:8px; padding:24px; box-shadow: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -4px rgba(0,0,0,.1); }
-.auth-card h2 { margin:0 0 16px; }
-.auth-card label { display:block; margin-bottom:12px; font-size:14px; }
+.auth-card { width: 360px; border:1px solid #e5e7eb; border-radius:12px; padding:24px; box-shadow: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -4px rgba(0,0,0,.1); background:#fff; }
+.auth-card h2 { margin:0 0 16px; color:#111827; }
+.auth-card label { display:block; margin-bottom:12px; font-size:14px; color:#374151; }
 .auth-card input { width:100%; padding:10px 12px; border:1px solid #d1d5db; border-radius:6px; margin-top:6px; }
-.auth-card button { width:100%; margin-top:12px; padding:10px 12px; background:#111827; color:#fff; border:none; border-radius:6px; cursor:pointer; }
+.auth-card button { width:100%; margin-top:12px; padding:10px 12px; background:#111827; color:#fff; border:none; border-radius:6px; cursor:pointer; transition:background 0.2s ease; }
+.auth-card button:hover { background:#1f2937; }
+.auth-alt { margin-top:16px; font-size:13px; text-align:center; color:#6b7280; }
+.auth-alt a { color:#111827; font-weight:600; text-decoration:none; }
+.auth-alt a:hover { color:#1f2937; }
+
+/* Dark mode auth pages */
+[data-theme='dark'] .auth-wrapper { background:#0f172a; }
+[data-theme='dark'] .auth-card { background:#1e293b; border-color:#334155; box-shadow: 0 10px 15px -3px rgba(0,0,0,.3), 0 4px 6px -4px rgba(0,0,0,.2); }
+[data-theme='dark'] .auth-card h2 { color:#e2e8f0; }
+[data-theme='dark'] .auth-card label { color:#cbd5e1; }
+[data-theme='dark'] .auth-card input { background:#0f172a; border-color:#475569; color:#e2e8f0; }
+[data-theme='dark'] .auth-card input:focus { border-color:#64748b; outline:none; }
+[data-theme='dark'] .auth-card button { background:#111827; }
+[data-theme='dark'] .auth-card button:hover { background:#1f2937; }
+[data-theme='dark'] .auth-alt { color:#94a3b8; }
+[data-theme='dark'] .auth-alt a { color:#e2e8f0; }
+[data-theme='dark'] .auth-alt a:hover { color:#cbd5e1; }

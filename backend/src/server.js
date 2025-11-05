@@ -27,6 +27,7 @@ import notificationsRouter from './routes/notifications.route.js';
 import usersRouter from './routes/users.route.js';
 import Project from './models/Project.js';
 import { setIo } from './socketHub.js';
+import { startTaskScheduler } from './services/taskScheduler.js';
 
 dotenv.config();
 
@@ -89,6 +90,8 @@ app.get('/', (_req, res) => {
 (async () => {
   if (env.mongoUri) {
     await connectDB(env.mongoUri);
+    // Start task scheduler after DB connection
+    startTaskScheduler();
   }
   // Setup Socket.IO (optional)
   if (env.enableSocket) {

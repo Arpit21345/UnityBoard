@@ -10,8 +10,15 @@ export default function Login() {
     e.preventDefault();
     setMsg('');
     try {
-      await apiLogin(form);
-      window.location.href = '/dashboard';
+  const user = await apiLogin(form);
+  try { window.dispatchEvent(new CustomEvent('user-updated', { detail:{ user } })); } catch {}
+      const redirect = localStorage.getItem('postLoginRedirect');
+      if(redirect){
+        localStorage.removeItem('postLoginRedirect');
+        window.location.href = redirect;
+      } else {
+        window.location.href = '/dashboard';
+      }
     } catch (e) {
       setMsg(e.message || 'Login failed');
     }
@@ -19,7 +26,7 @@ export default function Login() {
 
   return (
     <div className="auth-wrapper">
-      <form className="auth-card" onSubmit={onSubmit}>
+  <form className="auth-card" onSubmit={onSubmit}>
         <h2>Login</h2>
         <label>
           Email
@@ -30,7 +37,8 @@ export default function Login() {
           <input type="password" name="password" placeholder="••••••••" value={form.password} onChange={e=>setForm({...form, password:e.target.value})} />
         </label>
         {msg && <div className="error">{msg}</div>}
-        <button type="submit">Sign in</button>
+  <button type="submit">Sign in</button>
+  <div className="auth-alt">Don't have an account? <a href="/register">Register</a></div>
       </form>
     </div>
   );
