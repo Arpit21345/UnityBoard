@@ -5,10 +5,18 @@ import { getIo } from '../socketHub.js';
 import { incrementUserAnalytics } from '../utils/analyticsHelpers.js';
 
 function isMember(project, userId){
-  return project.members?.some(m => String(m.user) === String(userId));
+  return project.members?.some(m => {
+    // Handle both populated and non-populated user references
+    const memberId = typeof m.user === 'object' ? m.user._id : m.user;
+    return String(memberId) === String(userId);
+  });
 }
 function isOwnerOrAdmin(project, userId){
-  return project.members?.some(m => String(m.user) === String(userId) && (m.role === 'owner' || m.role === 'admin'));
+  return project.members?.some(m => {
+    // Handle both populated and non-populated user references
+    const memberId = typeof m.user === 'object' ? m.user._id : m.user;
+    return String(memberId) === String(userId) && (m.role === 'owner' || m.role === 'admin');
+  });
 }
 
 export async function listThreads(req, res){
@@ -99,11 +107,28 @@ export async function listMessages(req, res){
     const { threadId } = req.params;
     const thread = await Thread.findById(threadId);
     if (!thread) return res.status(404).json({ ok:false, error:'Thread not found' });
-    const project = await Project.findById(thread.project).select('members');
+    const project = await Project.findById(thread.project).populate('members.user', 'name email avatar');
     if (!project) return res.status(404).json({ ok:false, error:'Project not found' });
     if (!isMember(project, req.user.id)) return res.status(403).json({ ok:false, error:'Forbidden' });
-  const docs = await Message.find({ thread: threadId }).sort({ createdAt: 1 });
-  const items = docs.map(m => m.deleted ? ({ _id: m._id, thread: m.thread, user: m.user, text: '(message deleted)', createdAt: m.createdAt, deleted: true }) : m);
+    
+    const docs = await Message.find({ thread: threadId }).populate('user', 'name email avatar').sort({ createdAt: 1 });
+    const items = docs.map(m => {
+      if (m.deleted) {
+        return { _id: m._id, thread: m.thread, user: m.user, text: '(message deleted)', createdAt: m.createdAt, deleted: true };
+      }
+      return {
+        _id: m._id,
+        thread: m.thread,
+        user: {
+          _id: m.user._id,
+          name: m.user.name,
+          email: m.user.email,
+          avatar: m.user.avatar
+        },
+        text: m.text,
+        createdAt: m.createdAt
+      };
+    });
     res.json({ ok:true, items });
   } catch { res.status(500).json({ ok:false, error:'Fetch failed' }); }
 }
@@ -120,17 +145,31 @@ export async function createMessage(req, res){
     if (!project) return res.status(404).json({ ok:false, error:'Project not found' });
     if (!isMember(project, req.user.id)) return res.status(403).json({ ok:false, error:'Forbidden' });
     const msg = await Message.create({ thread: threadId, user: req.user.id, text });
+    await msg.populate('user', 'name email avatar');
     thread.lastActivityAt = new Date();
     await thread.save();
+    
+    const messageData = {
+      _id: msg._id,
+      thread: msg.thread,
+      user: {
+        _id: msg.user._id,
+        name: msg.user.name,
+        email: msg.user.email,
+        avatar: msg.user.avatar
+      },
+      text: msg.text,
+      createdAt: msg.createdAt
+    };
     
     // Increment user's contributions count
     await incrementUserAnalytics(req.user.id, 'totalContributions');
     // Broadcast new message to project room
     try {
       const io = getIo();
-      if (io) io.to(`project:${thread.project}`).emit('message:new', { threadId, item: msg });
+      if (io) io.to(`project:${thread.project}`).emit('message:new', { threadId, item: messageData });
     } catch {}
-    res.status(201).json({ ok:true, item: msg });
+    res.status(201).json({ ok:true, item: messageData });
   } catch { res.status(500).json({ ok:false, error:'Create failed' }); }
 }
 

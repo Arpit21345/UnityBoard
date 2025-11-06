@@ -23,7 +23,7 @@ import DashboardPanel from './components/Dashboard/DashboardPanel.jsx';
 import LearningPanel from './components/Learning/LearningPanel.jsx';
 import SnippetsPanel from './components/Snippets/SnippetsPanel.jsx';
 import SolutionsPanel from './components/Solutions/SolutionsPanel.jsx';
-import DiscussionPanel from './components/Discussion/DiscussionPanel.jsx';
+import ChatPanel from './components/Discussion/ChatPanel.jsx';
 
 export default function Project() {
   const { id } = useParams();
@@ -273,7 +273,7 @@ export default function Project() {
             <SolutionsPanel projectId={id} me={me} />
           )}
           {tab === 'discussion' && (
-            <DiscussionPanel projectId={id} me={me} amPrivileged={amPrivileged} project={project} />
+            <ChatPanel projectId={id} me={me} project={project} />
           )}
         </div>
       )}

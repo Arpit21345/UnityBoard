@@ -8,7 +8,8 @@ export async function listLearning(req, res) {
     if (!project) return res.status(404).json({ ok: false, error: 'Project not found' });
     const isMember = project.members.some(m => String(m.user) === req.user.id);
     if (!isMember) return res.status(403).json({ ok: false, error: 'Forbidden' });
-    const items = await Learning.find({ project: id }).sort({ createdAt: -1 });
+    // Only show learnings created by the current user (personal learning tracker)
+    const items = await Learning.find({ project: id, createdBy: req.user.id }).sort({ createdAt: -1 });
     res.json({ ok: true, items });
   } catch (e) { res.status(500).json({ ok: false, error: 'Fetch failed' }); }
 }

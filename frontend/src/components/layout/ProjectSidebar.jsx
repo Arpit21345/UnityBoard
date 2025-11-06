@@ -7,7 +7,7 @@ const items = [
   { key: 'snippets', label: 'Smart Snippets' },
   { key: 'solutions', label: 'Solution Database' },
   { key: 'resources', label: 'Resource Vault' },
-  { key: 'discussion', label: 'Discussion Room' },
+  { key: 'discussion', label: 'Team Chat' },
   { key: 'settings', label: 'Project Settings' },
 ];
 
