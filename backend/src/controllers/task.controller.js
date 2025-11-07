@@ -25,9 +25,7 @@ export async function createTask(req, res) {
       });
       
       // Don't wait for notifications to complete
-      Promise.all(notificationPromises).catch(err => 
-        console.error('Failed to send task assignment notifications:', err)
-      );
+      Promise.all(notificationPromises).catch(() => {});
     }
     
     res.status(201).json({ ok: true, task });
@@ -87,9 +85,7 @@ export async function updateTask(req, res) {
         });
         
         // Don't wait for notifications to complete
-        Promise.all(notificationPromises).catch(err => 
-          console.error('Failed to send task assignment notifications:', err)
-        );
+        Promise.all(notificationPromises).catch(() => {});
       }
     }
     

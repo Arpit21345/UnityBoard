@@ -6,7 +6,6 @@ import Resource from '../models/Resource.js';
 import Thread from '../models/Thread.js';
 import Message from '../models/Message.js';
 import Learning from '../models/Learning.js';
-import Invitation from '../models/Invitation.js';
 import User from '../models/User.js';
 import { incrementUserAnalytics } from '../utils/analyticsHelpers.js';
 
@@ -129,39 +128,6 @@ export async function listPublicProjects(_req, res) {
   }
 }
 
-// Simple project search for dashboard
-export async function searchProjects(req, res) {
-  try {
-    const { q } = req.query;
-    if (!q || q.trim().length < 2) {
-      return res.json({ ok: true, projects: [] });
-    }
-    
-    const searchQuery = {
-      visibility: 'public', // Only search public projects
-      $or: [
-        { name: { $regex: q.trim(), $options: 'i' } },
-        { description: { $regex: q.trim(), $options: 'i' } }
-      ]
-    };
-    
-    const projects = await Project.find(searchQuery)
-      .sort({ createdAt: -1 })
-      .limit(10) // Limit results to keep it simple
-      .select('name description visibility members createdAt')
-      .lean();
-    
-    // Add member count for each project
-    const projectsWithStats = projects.map(p => ({
-      ...p,
-      memberCount: p.members?.length || 0
-    }));
-    
-    res.json({ ok: true, projects: projectsWithStats });
-  } catch (e) {
-    res.status(500).json({ ok: false, error: 'Search failed' });
-  }
-}
 
 export async function joinPublicProject(req, res) {
   try {
@@ -278,34 +244,7 @@ export async function listProjectMembers(req, res) {
   }
 }
 
-export async function updateMemberRole(req, res) {
-  try {
-    const { id, userId } = req.params;
-    const { role } = req.body || {};
-    if (!['admin', 'member'].includes(role)) return res.status(400).json({ ok: false, error: 'Invalid role' });
-    const project = await Project.findById(id).populate('members.user', 'name email avatar');
-    if (!project) return res.status(404).json({ ok: false, error: 'Not found' });
-    // Only owners can change member roles
-    // Fix: consistent string comparison
-    const meIsOwner = project.members.some(m => String(m.user?._id || m.user) === String(req.user.id) && m.role === 'owner');
-    if (!meIsOwner) return res.status(403).json({ ok: false, error: 'Forbidden' });
-    const mIdx = project.members.findIndex(m => String(m.user?._id || m.user) === String(userId));
-    if (mIdx === -1) return res.status(404).json({ ok: false, error: 'Member not found' });
-    if (project.members[mIdx].role === 'owner') return res.status(400).json({ ok: false, error: 'Cannot modify owner role' });
-    project.members[mIdx].role = role;
-    await project.save();
-    const updated = project.members.map(m => ({
-      user: m.user?._id || m.user,
-      name: m.user?.name || '',
-      email: m.user?.email || '',
-      avatar: m.user?.avatar || '',
-      role: m.role
-    }));
-    res.json({ ok: true, members: updated });
-  } catch (e) {
-    res.status(500).json({ ok: false, error: 'Update failed' });
-  }
-}
+
 
 export async function removeMember(req, res) {
   try {
@@ -390,40 +329,11 @@ export async function deleteProject(req, res) {
       Resource.deleteMany({ project: id }),
       Thread.deleteMany({ project: id }),
       Message.deleteMany({ project: id }),
-      Learning.deleteMany({ project: id }),
-      Invitation.deleteMany({ project: id })
+      Learning.deleteMany({ project: id })
     ]);
     await Project.findByIdAndDelete(id);
     res.json({ ok: true });
   } catch (e) {
     res.status(500).json({ ok: false, error: 'Delete failed' });
   }
-}
-
-export async function archiveProject(req, res) {
-  try {
-    const { id } = req.params;
-    const project = await Project.findById(id);
-    if (!project) return res.status(404).json({ ok: false, error: 'Not found' });
-    // Fix: consistent string comparison
-    const meIsOwner = project.members.some(m => String(m.user) === String(req.user.id) && m.role === 'owner');
-    if (!meIsOwner) return res.status(403).json({ ok: false, error: 'Forbidden' });
-    project.status = 'archived';
-    await project.save();
-    res.json({ ok: true, project });
-  } catch (e) { res.status(500).json({ ok: false, error: 'Archive failed' }); }
-}
-
-export async function unarchiveProject(req, res) {
-  try {
-    const { id } = req.params;
-    const project = await Project.findById(id);
-    if (!project) return res.status(404).json({ ok: false, error: 'Not found' });
-    // Fix: consistent string comparison
-    const meIsOwner = project.members.some(m => String(m.user) === String(req.user.id) && m.role === 'owner');
-    if (!meIsOwner) return res.status(403).json({ ok: false, error: 'Forbidden' });
-    project.status = 'active';
-    await project.save();
-    res.json({ ok: true, project });
-  } catch (e) { res.status(500).json({ ok: false, error: 'Unarchive failed' }); }
 }

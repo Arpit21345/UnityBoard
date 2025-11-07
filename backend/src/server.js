@@ -8,12 +8,10 @@ import connectDB from './config/db.js';
 import env from './config/env.js';
 import rateLimiter from './middleware/rateLimit.js';
 import jwt from 'jsonwebtoken';
-import healthRouter from './routes/health.route.js';
 import authRouter from './routes/auth.route.js';
 import uploadsRouter from './routes/uploads.route.js';
 import aiRouter from './routes/ai.route.js';
 import projectsRouter from './routes/projects.route.js';
-import invitesRouter from './routes/invites.route.js';
 import exploreRouter from './routes/explore.route.js';
 import tasksRouter from './routes/tasks.route.js';
 import resourcesRouter from './routes/resources.route.js';
@@ -21,7 +19,6 @@ import learningRouter from './routes/learning.route.js';
 import snippetsRouter from './routes/snippets.route.js';
 import solutionsRouter from './routes/solutions.route.js';
 import threadsRouter from './routes/threads.route.js';
-import searchRouter from './routes/search.route.js';
 import dashboardRouter from './routes/dashboard.route.js';
 import notificationsRouter from './routes/notifications.route.js';
 import usersRouter from './routes/users.route.js';
@@ -64,20 +61,17 @@ app.use(`/${env.uploadsDir}`, express.static(path.resolve(process.cwd(), env.upl
 app.use('/api/assets', express.static(path.resolve(process.cwd(), 'src/assets')));
 
 // Routes
-app.use('/api/health', healthRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/uploads', uploadsRouter);
 app.use('/api/ai', aiRouter);
 app.use('/api/projects', projectsRouter);
 app.use('/api/tasks', tasksRouter);
 app.use('/api/projects', resourcesRouter);
-app.use('/api', invitesRouter);
 app.use('/api/explore', exploreRouter);
 app.use('/api', learningRouter);
 app.use('/api', snippetsRouter);
 app.use('/api', solutionsRouter);
 app.use('/api', threadsRouter);
-app.use('/api', searchRouter);
 app.use('/api', dashboardRouter);
 app.use('/api/notifications', notificationsRouter);
 app.use('/api', usersRouter);
@@ -120,6 +114,11 @@ app.get('/', (_req, res) => {
       socket.on('join', async ({ projectId }) => {
         try {
           if (!projectId) return;
+          // For development: skip membership check if no database
+          if (!env.mongoUri) {
+            socket.join(`project:${projectId}`);
+            return;
+          }
           const project = await Project.findById(projectId).select('members');
           if (!project) return;
           const isMember = project.members?.some(m => String(m.user) === String(socket.user.id));

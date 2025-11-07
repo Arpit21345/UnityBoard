@@ -7,7 +7,7 @@ import GlobalNavbar from '../../components/layout/GlobalNavbar.jsx';
 import Spinner from '../../components/ui/Spinner.jsx';
 import ProjectSearch from '../../components/ProjectSearch/ProjectSearch.jsx';
 import { apiMe } from '../../services/auth.js';
-import { apiListProjects, apiCreateProject, apiDashboardOverview, apiArchiveProject } from '../../services/projects.js';
+import { apiListProjects, apiCreateProject, apiDashboardOverview } from '../../services/projects.js';
 import { useToast } from '../../components/Toast/ToastContext.jsx';
 
 export default function Dashboard() {

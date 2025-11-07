@@ -3,7 +3,7 @@ import AppLayout from '../../components/layout/AppLayout.jsx';
 import Sidebar from '../../components/layout/Sidebar.jsx';
 import GlobalNavbar from '../../components/layout/GlobalNavbar.jsx';
 import { useToast } from '../../components/Toast/ToastContext.jsx';
-import { apiListProjects, apiUnarchiveProject } from '../../services/projects.js';
+import { apiListProjects } from '../../services/projects.js';
 import Spinner from '../../components/ui/Spinner.jsx';
 
 export default function PastProjects(){
@@ -69,10 +69,6 @@ export default function PastProjects(){
 								)}
 								<div style={{ marginTop: 10, display:'flex', gap:8 }}>
 									<a className="btn" href={`/project/${p._id}`}>Open</a>
-									<button className="btn" onClick={async ()=>{
-										try { const upd = await apiUnarchiveProject(p._id); setProjects(projects.map(pr=> pr._id===p._id? upd : pr)); notify('Project restored','success'); }
-										catch(e){ console.warn(e); notify('Unarchive failed','error'); }
-									}}>Unarchive</button>
 								</div>
 							</div>
 						))}

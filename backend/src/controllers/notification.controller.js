@@ -49,21 +49,16 @@ export async function createTestNotification(req, res){
       meta: { test: true }
     });
     
-    // emit socket event if available
     const io = getIo();
     if (io) {
-      console.log('Emitting test notification via socket to user:', req.user.id);
       io.emit('notification:new', { 
         userId: String(req.user.id), 
         item: n 
       });
-    } else {
-      console.log('Socket.IO not available for test notification');
     }
     
     res.json({ ok: true, item: n });
   } catch (e) { 
-    console.error('Test notification creation failed:', e);
     res.status(500).json({ ok: false, error: 'Create failed' }); 
   }
 }

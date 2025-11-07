@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { apiUpdateProject, apiListProjectMembers, apiUpdateMemberRole, apiRemoveMember, apiDeleteProject, apiLeaveProject } from '../../../../services/projects.js';
+import { apiUpdateProject, apiListProjectMembers, apiRemoveMember, apiDeleteProject, apiLeaveProject } from '../../../../services/projects.js';
 import { apiListInvites, apiCreateInvite, apiToggleInvite } from '../../../../services/invites.js';
 import { useToast } from '../../../../components/Toast/ToastContext.jsx';
 

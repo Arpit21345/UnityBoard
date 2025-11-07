@@ -27,14 +27,6 @@ export async function apiCreateProject(payload) {
   return data.project;
 }
 
-export async function apiSearchProjects(searchTerm) {
-  const res = await http(`${API}/api/projects/search?q=${encodeURIComponent(searchTerm)}`, { 
-    headers: { ...authHeaders() } 
-  });
-  const data = await res.json();
-  if (!res.ok || !data.ok) throw new Error(data.error || 'Search failed');
-  return data.projects;
-}
 
 export async function apiJoinPrivateProject(projectName, password) {
   const res = await http(`${API}/api/projects/join-private`, { 
@@ -119,16 +111,7 @@ export async function apiListProjectMembers(id) {
   return data.members;
 }
 
-export async function apiUpdateMemberRole(projectId, userId, role) {
-  const res = await http(`${API}/api/projects/${projectId}/members/${userId}`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...authHeaders() },
-    body: JSON.stringify({ role })
-  });
-  const data = await res.json();
-  if (!res.ok || !data.ok) throw new Error(data.error || 'Update failed');
-  return data.members; // returns full members
-}
+
 
 export async function apiRemoveMember(projectId, userId) {
   const res = await http(`${API}/api/projects/${projectId}/members/${userId}`, { method: 'DELETE', headers: { ...authHeaders() } });
@@ -155,19 +138,7 @@ export async function apiLeaveProject(projectId){
   return true;
 }
 
-export async function apiArchiveProject(projectId) {
-  const res = await http(`${API}/api/projects/${projectId}/archive`, { method: 'POST', headers: { ...authHeaders() } });
-  const data = await res.json();
-  if(!res.ok || !data.ok) throw new Error(data.error||'Archive failed');
-  return data.project;
-}
 
-export async function apiUnarchiveProject(projectId) {
-  const res = await http(`${API}/api/projects/${projectId}/unarchive`, { method: 'POST', headers: { ...authHeaders() } });
-  const data = await res.json();
-  if(!res.ok || !data.ok) throw new Error(data.error||'Unarchive failed');
-  return data.project;
-}
 
 
 export async function apiDashboardOverview(){

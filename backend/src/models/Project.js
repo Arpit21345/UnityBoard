@@ -10,10 +10,7 @@ const projectSchema = new mongoose.Schema({
   description: { type: String },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   visibility: { type: String, enum: ['public', 'private'], default: 'private' },
-  allowMemberInvites: { type: Boolean, default: false },
   members: { type: [memberSchema], default: [] },
-  // archived projects are hidden from active lists
-  status: { type: String, enum: ['active', 'archived'], default: 'active' },
   // when true, Discussion operates as a single-room; threads list should be limited
   chatSingleRoom: { type: Boolean, default: false },
   // password for private projects (optional, only required if visibility is 'private')
