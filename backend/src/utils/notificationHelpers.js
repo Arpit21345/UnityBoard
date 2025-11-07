@@ -83,26 +83,85 @@ export async function notifyMemberJoined(project, newMember) {
 }
 
 /**
- * Send notification when a member leaves a project  
+ * Send notification when a member leaves a project voluntarily
  * @param {Object} project - Project object
  * @param {Object} leavingMember - Member who left
  */
 export async function notifyMemberLeft(project, leavingMember) {
+  const promises = [];
+  
+  // Notify the user who left
+  promises.push(
+    createNotification(
+      String(leavingMember._id || leavingMember.id),
+      'project_left',
+      `You left project "${project.name}"`,
+      { 
+        projectId: project._id,
+        projectName: project.name
+      }
+    )
+  );
+
   // Notify all admins and the owner about member leaving
   const adminsAndOwners = project.members.filter(m => 
     m.role === 'owner' || m.role === 'admin'
   );
 
-  const promises = adminsAndOwners.map(member => 
+  adminsAndOwners.forEach(member => {
+    promises.push(
+      createNotification(
+        String(member.user),
+        'member_left',
+        `${leavingMember.name || leavingMember.email} left project "${project.name}"`,
+        { 
+          projectId: project._id,
+          projectName: project.name,
+          leftMemberId: leavingMember._id || leavingMember.id,
+          leftMemberName: leavingMember.name || leavingMember.email
+        }
+      )
+    );
+  });
+
+  await Promise.all(promises);
+}
+
+/**
+ * Send notification when a member is removed by owner
+ * @param {Object} project - Project object
+ * @param {Object} removedMember - Member who was removed
+ * @param {Object} removedBy - Owner who removed the member
+ */
+export async function notifyMemberRemoved(project, removedMember, removedBy) {
+  const promises = [];
+  
+  // Notify the user who was removed
+  promises.push(
     createNotification(
-      String(member.user),
-      'member_left',
-      `${leavingMember.name || leavingMember.email} left project "${project.name}"`,
+      String(removedMember._id || removedMember.id),
+      'removed_from_project',
+      `You were removed from project "${project.name}" by ${removedBy.name || removedBy.email}`,
       { 
         projectId: project._id,
         projectName: project.name,
-        leftMemberId: leavingMember._id || leavingMember.id,
-        leftMemberName: leavingMember.name || leavingMember.email
+        removedBy: removedBy._id || removedBy.id,
+        removedByName: removedBy.name || removedBy.email
+      }
+    )
+  );
+
+  // Notify the owner who removed the member
+  promises.push(
+    createNotification(
+      String(removedBy._id || removedBy.id),
+      'member_removed_confirmation',
+      `You removed ${removedMember.name || removedMember.email} from project "${project.name}"`,
+      { 
+        projectId: project._id,
+        projectName: project.name,
+        removedMemberId: removedMember._id || removedMember.id,
+        removedMemberName: removedMember.name || removedMember.email
       }
     )
   );

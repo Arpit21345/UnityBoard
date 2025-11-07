@@ -163,12 +163,62 @@ export default function Project() {
       notify(taskModal.task ? 'Update task failed' : 'Create task failed', 'error');
     }
   }
-  // Fix: Use consistent user ID (me.id, not me._id) and string comparison for all membership checks
+  // Fix: Use consistent user ID and handle both populated and non-populated member data
   const userId = me?.id || me?._id;
-  const amPrivileged = project && userId && project.members?.some(m => String(m.user) === String(userId) && (m.role === 'owner' || m.role === 'admin'));
-  const amOwner = project && userId && project.members?.some(m => String(m.user) === String(userId) && m.role === 'owner');
+  
+  // Helper function to match user ID with member, handling both populated and non-populated cases
+  const findMemberByUserId = (members, targetUserId) => {
+    if (!members || !targetUserId) return null;
+    return members.find(m => {
+      const memberUserId = typeof m.user === 'object' ? m.user._id : m.user;
+      return String(memberUserId) === String(targetUserId);
+    });
+  };
+  
+  const memberData = findMemberByUserId(project?.members, userId);
+  const myRole = memberData?.role;
+  const amPrivileged = myRole === 'owner' || myRole === 'admin';
+  const amOwner = myRole === 'owner';
 
-  const isMember = project && userId && project.members?.some(m => String(m.user) === String(userId));
+  // Debug the me object and role detection
+  console.log('🔍 Me Object Debug:', {
+    me,
+    userId,
+    userIdFromId: me?.id,
+    userIdFrom_id: me?._id,
+    memberDataFound: memberData,
+    calculatedRole: myRole,
+    calculatedAmOwner: amOwner
+  });
+
+  // Debug role calculation
+  console.log('🔍 Project.jsx Role Debug [' + new Date().toLocaleTimeString() + ']:', {
+    projectName: project?.name,
+    userId,
+    userIdType: typeof userId,
+    myRole,
+    amOwner,
+    amPrivileged,
+    projectMembers: project?.members?.map(m => ({ 
+      user: m.user, 
+      userType: typeof m.user,
+      userString: String(m.user), 
+      role: m.role,
+      matches: String(m.user) === String(userId),
+      // Additional debugging for populated vs non-populated
+      userObjectId: typeof m.user === 'object' ? m.user._id : 'not-object',
+      userObjectIdString: typeof m.user === 'object' ? String(m.user._id) : 'not-object',
+      matchesId: typeof m.user === 'object' ? String(m.user._id) === String(userId) : 'not-object',
+      matchesUser: String(m.user) === String(userId)
+    })),
+    memberMatch: project?.members?.find(m => String(m.user) === String(userId)),
+    // Try finding by _id too
+    memberMatchById: project?.members?.find(m => typeof m.user === 'object' && String(m.user._id) === String(userId))
+  });
+  
+
+
+  const isMember = !!memberData;
   const isPublic = project && project.visibility === 'public';
 
   async function handleJoinPublic(){
@@ -261,7 +311,7 @@ export default function Project() {
             />
           )}
           {tab === 'settings' && (
-            <SettingsPanel project={project} setProject={setProject} amPrivileged={amPrivileged} amOwner={amOwner} />
+            <SettingsPanel project={project} setProject={setProject} amPrivileged={amPrivileged} amOwner={amOwner} myRole={myRole} />
           )}
           {tab === 'learning' && (
             <LearningPanel projectId={id} me={me} />

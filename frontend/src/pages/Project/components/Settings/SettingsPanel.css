@@ -1,0 +1,284 @@
+/* Project Settings Panel Styles */
+
+.project-settings {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.settings-header {
+  margin-bottom: 24px;
+}
+
+.settings-restricted {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.restriction-header h4 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.member-actions {
+  background: #f8f9fa !important;
+  border: 1px solid #e9ecef !important;
+  border-radius: 8px !important;
+}
+
+.member-actions h5 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #495057;
+}
+
+.leave-section h5 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #dc3545;
+}
+
+/* Card styling enhancements */
+.project-settings .card {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+  transition: box-shadow 0.2s ease;
+}
+
+.project-settings .card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Form enhancements */
+.project-settings .task-form label {
+  margin-bottom: 16px;
+  display: block;
+}
+
+.project-settings .task-form input,
+.project-settings .task-form textarea,
+.project-settings .task-form select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.project-settings .task-form input:focus,
+.project-settings .task-form textarea:focus,
+.project-settings .task-form select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.project-settings .task-form input:disabled,
+.project-settings .task-form textarea:disabled,
+.project-settings .task-form select:disabled {
+  background-color: #f8f9fa;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Members list styling */
+.members-list .member-card {
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.members-list .member-card:hover {
+  background-color: #f8f9fa !important;
+  transform: translateY(-1px);
+}
+
+.members-list .member-card img {
+  object-fit: cover;
+}
+
+/* Invites list styling */
+.invites-list .invite-card {
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.invites-list .invite-card:hover {
+  border-color: #007bff;
+}
+
+/* Badge styling */
+.badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-high {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.badge-medium {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
+}
+
+.badge-low {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+/* Button enhancements */
+.btn-sm {
+  padding: 4px 12px;
+  font-size: 12px;
+  border-radius: 4px;
+}
+
+.btn-warning {
+  background-color: #ffc107;
+  border: 1px solid #ffc107;
+  color: #212529;
+}
+
+.btn-warning:hover {
+  background-color: #e0a800;
+  border-color: #d39e00;
+}
+
+.btn-success {
+  background-color: #28a745;
+  border: 1px solid #28a745;
+  color: white;
+}
+
+.btn-success:hover {
+  background-color: #218838;
+  border-color: #1e7e34;
+}
+
+.btn-outline-danger {
+  background-color: transparent;
+  border: 1px solid #dc3545;
+  color: #dc3545;
+}
+
+.btn-outline-danger:hover {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-outline-success {
+  background-color: transparent;
+  border: 1px solid #28a745;
+  color: #28a745;
+}
+
+.btn-outline-success:hover {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 1px solid #6c757d;
+  color: #6c757d;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.btn-outline:hover {
+  background-color: #6c757d;
+  color: white;
+  text-decoration: none;
+}
+
+/* Danger zone specific styling */
+.danger-section h5 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.owner-danger-actions,
+.member-danger-actions {
+  max-width: 100%;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .project-settings {
+    padding: 0 16px;
+  }
+  
+  .members-list .member-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .members-list .member-card > div:last-child {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .invites-list .invite-card > div:last-child {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+}
+
+/* Animation for loading states */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.loading-text {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Code styling */
+code {
+  background-color: #f8f9fa;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 12px;
+  border: 1px solid #e9ecef;
+}
+
+/* Warning/info boxes */
+.warning-box {
+  background-color: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.warning-box p {
+  margin: 0;
+  color: #856404;
+}
+
+.info-box {
+  background-color: #d1ecf1;
+  border: 1px solid #bee5eb;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.info-box p {
+  margin: 0;
+  color: #0c5460;
+}

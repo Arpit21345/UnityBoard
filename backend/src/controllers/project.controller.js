@@ -94,12 +94,12 @@ export async function updateProjectSettings(req, res) {
   try {
     const { id } = req.params;
     const { visibility, allowMemberInvites, name, description, projectPassword } = req.body || {};
-    const project = await Project.findById(id);
+    const project = await Project.findById(id).populate('members.user', 'name email avatar');
     if (!project) return res.status(404).json({ ok: false, error: 'Not found' });
     const me = req.user.id;
   // Settings editing is intentionally restricted to OWNER ONLY (admins get read-only client UI)
-  // Fix: Ensure consistent string comparison for ownership check
-  const isOwner = project.members.some(m => String(m.user) === String(me) && m.role === 'owner');
+  // Fix: Ensure consistent string comparison for ownership check with populated members
+  const isOwner = project.members.some(m => String(m.user?._id || m.user) === String(me) && m.role === 'owner');
   if (!isOwner) return res.status(403).json({ ok: false, error: 'Forbidden' });
     if (visibility) project.visibility = visibility;
     if (typeof allowMemberInvites === 'boolean') project.allowMemberInvites = allowMemberInvites;
@@ -329,9 +329,10 @@ export async function removeMember(req, res) {
     
     // Send notifications about member being removed
     if (removedMember) {
-      const { notifyMemberLeft } = await import('../utils/notificationHelpers.js');
-      notifyMemberLeft(project, removedMember).catch(err => 
-        console.error('Failed to send member left notifications:', err)
+      const { notifyMemberRemoved } = await import('../utils/notificationHelpers.js');
+      const removedBy = await User.findById(req.user.id);
+      notifyMemberRemoved(project, removedMember, removedBy).catch(err => 
+        console.error('Failed to send member removed notifications:', err)
       );
     }
     
