@@ -8,6 +8,8 @@ import { useToast } from '../../components/Toast/ToastContext.jsx';
 
 export default function Explore() {
   const [projects, setProjects] = useState([]);
+  const [filteredProjects, setFilteredProjects] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [joiningId, setJoiningId] = useState(null);
@@ -18,6 +20,7 @@ export default function Explore() {
       try {
         const list = await apiListPublicProjects();
         setProjects(list);
+        setFilteredProjects(list);
       } catch (e) {
         setError('Failed to load public projects');
       } finally {
@@ -26,7 +29,20 @@ export default function Explore() {
     })();
   }, []);
 
-  const count = useMemo(() => projects.length, [projects]);
+  // Search functionality
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setFilteredProjects(projects);
+    } else {
+      const filtered = projects.filter(project =>
+        project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (project.description && project.description.toLowerCase().includes(searchQuery.toLowerCase()))
+      );
+      setFilteredProjects(filtered);
+    }
+  }, [searchQuery, projects]);
+
+  const count = useMemo(() => filteredProjects.length, [filteredProjects]);
 
   return (
   <main className="explore-page" role="main">
@@ -78,12 +94,13 @@ export default function Explore() {
           <div className="feature-row">
             <div className="feature-text">
               <div className="feature-kicker">Projects</div>
-              <h3 className="feature-title">Organize work in focused spaces</h3>
-              <p className="feature-description">Create projects with visibility controls, keep everything in one place, and get a clear picture of progress at a glance.</p>
+              <h3 className="feature-title">Organize work in focused workspaces</h3>
+              <p className="feature-description">Create projects with public/private visibility controls, centralized dashboards, and role-based access. Keep tasks, resources, and discussions organized in dedicated spaces with clear progress tracking.</p>
               <ul className="feature-list">
-                <li>Central dashboards with KPIs</li>
-                <li>Friendly defaults, fine‑grained settings</li>
-                <li>Invite your team in seconds</li>
+                <li>Public and private project visibility</li>
+                <li>Member roles and permission management</li>
+                <li>Project-specific dashboards with analytics</li>
+                <li>Easy invitation system with codes and links</li>
               </ul>
             </div>
             <div className="feature-visual">
@@ -111,12 +128,13 @@ export default function Explore() {
             </div>
             <div className="feature-text">
               <div className="feature-kicker">Tasks</div>
-              <h3 className="feature-title">Plan sprints and ship predictably</h3>
-              <p className="feature-description">Break work down, assign owners, and track status. Let AI suggest subtasks and next steps from context.</p>
+              <h3 className="feature-title">Plan, assign, and track work seamlessly</h3>
+              <p className="feature-description">Create tasks with priorities, due dates, and detailed descriptions. Assign work to team members and track progress with status updates. AI can help break down complex tasks into manageable subtasks.</p>
               <ul className="feature-list">
-                <li>Kanban and list views</li>
-                <li>Dependencies and due dates</li>
-                <li>AI‑assisted breakdowns</li>
+                <li>Task creation with priorities and due dates</li>
+                <li>Assignment to team members with notifications</li>
+                <li>Status tracking and progress updates</li>
+                <li>AI-assisted task breakdown and suggestions</li>
               </ul>
             </div>
           </div>
@@ -125,12 +143,13 @@ export default function Explore() {
           <div className="feature-row">
             <div className="feature-text">
               <div className="feature-kicker">Resources</div>
-              <h3 className="feature-title">Share files, links, and docs</h3>
-              <p className="feature-description">Keep everything discoverable with tidy organization, access controls, and versioning.</p>
+              <h3 className="feature-title">Centralize files, links, and documentation</h3>
+              <p className="feature-description">Upload files, save important links, and organize all project resources in one place. With categories, descriptions, and role-based access, keep everything discoverable and secure.</p>
               <ul className="feature-list">
-                <li>File and link attachments</li>
-                <li>Resource previews</li>
-                <li>Access & roles</li>
+                <li>File uploads with secure storage</li>
+                <li>Link bookmarking with metadata</li>
+                <li>Categorized organization system</li>
+                <li>Role-based access controls</li>
               </ul>
             </div>
             <div className="feature-visual">
@@ -145,12 +164,13 @@ export default function Explore() {
             </div>
             <div className="feature-text">
               <div className="feature-kicker">Discussion</div>
-              <h3 className="feature-title">Decide faster with focused threads</h3>
-              <p className="feature-description">Lightweight discussions with mentions and quick summaries help unblock teams without noisy chats.</p>
+              <h3 className="feature-title">Collaborate through focused conversations</h3>
+              <p className="feature-description">Create discussion threads for specific topics, decisions, or brainstorming. Get notifications for important updates and let AI provide quick summaries of long conversations to keep everyone in sync.</p>
               <ul className="feature-list">
-                <li>Threaded comments</li>
-                <li>@mentions and notifications</li>
-                <li>AI summaries</li>
+                <li>Threaded discussions by topic</li>
+                <li>Smart notifications for task deadlines and updates</li>
+                <li>AI-powered conversation summaries</li>
+                <li>Real-time messaging and updates</li>
               </ul>
             </div>
           </div>
@@ -158,13 +178,14 @@ export default function Explore() {
           {/* Learning - Text Left, Image Right */}
           <div className="feature-row">
             <div className="feature-text">
-              <div className="feature-kicker">Learning</div>
-              <h3 className="feature-title">Track growth with journals and timelines</h3>
-              <p className="feature-description">Capture learnings, milestones, and progress to build a visible record of improvement.</p>
+              <div className="feature-kicker">Profile & Analytics</div>
+              <h3 className="feature-title">Track your growth and showcase achievements</h3>
+              <p className="feature-description">View detailed analytics of your contributions, completed tasks, and project involvement. Build a professional profile showcasing your skills, projects, and accomplishments with portfolio-ready presentation.</p>
               <ul className="feature-list">
-                <li>Personal journals</li>
-                <li>Milestones & timelines</li>
-                <li>Portfolio‑ready exports</li>
+                <li>Personal analytics dashboard</li>
+                <li>Project contribution tracking</li>
+                <li>Skills and achievement showcase</li>
+                <li>Public and private profile views</li>
               </ul>
             </div>
             <div className="feature-visual">
@@ -178,31 +199,33 @@ export default function Explore() {
               <img src="/api/assets/snippets.png" alt="Code snippets" onError={(e)=>{ e.currentTarget.src='/api/assets/mainLogo.png'; }} />
             </div>
             <div className="feature-text">
-              <div className="feature-kicker">Snippets</div>
-              <h3 className="feature-title">Share solutions with clean code snippets</h3>
-              <p className="feature-description">Create a searchable library of examples with syntax highlighting and comments.</p>
+              <div className="feature-kicker">Solutions</div>
+              <h3 className="feature-title">Build a searchable knowledge base</h3>
+              <p className="feature-description">Document solutions to problems, create code snippets with syntax highlighting, and build a searchable library that grows with your team. Tag solutions by difficulty and category for easy discovery.</p>
               <ul className="feature-list">
-                <li>Dark editor styling</li>
-                <li>Comments and reactions</li>
-                <li>Collections & tags</li>
+                <li>Rich text editor with code highlighting</li>
+                <li>Difficulty levels and category tags</li>
+                <li>Searchable solution database</li>
+                <li>Link solutions to tasks and projects</li>
               </ul>
             </div>
           </div>
 
-          {/* Solutions - Text Left, Image Right */}
+          {/* AI Assistant - Text Left, Image Right */}
           <div className="feature-row">
             <div className="feature-text">
-              <div className="feature-kicker">Solutions</div>
-              <h3 className="feature-title">Build a knowledge base that grows with you</h3>
-              <p className="feature-description">Capture solved problems and best practices so your team never solves the same issue twice.</p>
+              <div className="feature-kicker">AI Assistant</div>
+              <h3 className="feature-title">Get intelligent help with project context</h3>
+              <p className="feature-description">Access an AI assistant that understands your project context. Get help with task breakdowns, quick summaries, and answers to project-specific questions, all powered by advanced language models.</p>
               <ul className="feature-list">
-                <li>Searchable library of solutions</li>
-                <li>Difficulty and tags</li>
-                <li>Link tasks and references</li>
+                <li>Context-aware project assistance</li>
+                <li>Task breakdown suggestions</li>
+                <li>Conversation summaries</li>
+                <li>Always-available help and Q&A</li>
               </ul>
             </div>
             <div className="feature-visual">
-              <img src="/api/assets/solutiondb.png" alt="Solution database" onError={(e)=>{ e.currentTarget.src='/api/assets/mainLogo.png'; }} />
+              <img src="/api/assets/solutiondb.png" alt="AI Assistant" onError={(e)=>{ e.currentTarget.src='/api/assets/mainLogo.png'; }} />
             </div>
           </div>
 
@@ -227,10 +250,10 @@ export default function Explore() {
               <h3 className="feature-title">Why choose our platform?</h3>
               <div className="benefits-grid">
                 {[
-                  {icon:'⚡', title:'AI‑Powered', desc:'Insights and automation with Cohere AI.'},
-                  {icon:'🤝', title:'Team‑Focused', desc:'Built for collaborative work with clarity.'},
-                  {icon:'📱', title:'Mobile Ready', desc:'Responsive and touch‑friendly.'},
-                  {icon:'🔒', title:'Secure & Reliable', desc:'Role‑based access and safe by default.'}
+                  {icon:'⚡', title:'AI‑Powered', desc:'Smart assistance and automation with advanced AI.'},
+                  {icon:'🤝', title:'Team‑Focused', desc:'Built for collaborative work with role-based access.'},
+                  {icon:'🔒', title:'Secure & Reliable', desc:'Privacy controls and data protection by design.'},
+                  {icon:'📊', title:'Analytics & Insights', desc:'Track progress and contributions with detailed metrics.'}
                 ].map((benefit, idx) => (
                   <div className="benefit-item" key={idx}>
                     <div className="benefit-icon">{benefit.icon}</div>
@@ -251,17 +274,17 @@ export default function Explore() {
         <div className="container">
           <div className="cta-content">
             <div className="cta-text">
-              <h2 className="cta-title">Ready to transform your team collaboration?</h2>
-              <p className="cta-subtitle">Join thousands of teams using UnityBoard to manage projects, track learning, and collaborate more effectively than ever before.</p>
+              <h2 className="cta-title">Ready to streamline your project workflow?</h2>
+              <p className="cta-subtitle">Join developers and teams who are already using UnityBoard to organize projects, collaborate effectively, and build amazing things together.</p>
               <div className="cta-features">
-                <div className="cta-feature">✅ Free 14-day trial</div>
-                <div className="cta-feature">✅ No credit card required</div>
-                <div className="cta-feature">✅ Setup in under 5 minutes</div>
+                <div className="cta-feature">✅ Free to get started</div>
+                <div className="cta-feature">✅ No setup complexity</div>
+                <div className="cta-feature">✅ Start collaborating immediately</div>
               </div>
             </div>
             <div className="cta-actions">
-              <a className="btn btn-cta-primary" href="/register">Start Free Trial</a>
-              <a className="btn btn-cta-secondary" href="mailto:arpit21345j@gmail.com">Schedule Demo</a>
+              <a className="btn btn-cta-primary" href="/register">Get Started Now</a>
+              <a className="btn btn-cta-secondary" href="mailto:arpit21345j@gmail.com">Contact Us</a>
             </div>
           </div>
         </div>
@@ -279,9 +302,11 @@ export default function Explore() {
                   {icon:'📂', title:'Projects', desc:'Organize workspaces with visibility controls.'},
                   {icon:'✅', title:'Tasks', desc:'Plan sprints, assign work, track progress.'},
                   {icon:'📎', title:'Resources', desc:'Share files, links, and documentation.'},
-                  {icon:'💬', title:'Discussion', desc:'Lightweight threads for decisions.'},
-                  {icon:'🤖', title:'AI helper', desc:'Summaries, suggestions, and Q&A with context.'},
-                  {icon:'✉️', title:'Invites', desc:'Codes, links, and public join for teams.'}
+                  {icon:'💬', title:'Discussion', desc:'Threaded conversations and real-time chat.'},
+                  {icon:'🤖', title:'AI Assistant', desc:'Context-aware help and smart suggestions.'},
+                  {icon:'✉️', title:'Invitations', desc:'Invite codes, links, and public projects.'},
+                  {icon:'📈', title:'Analytics', desc:'Track contributions and project progress.'},
+                  {icon:'🔒', title:'Access Control', desc:'Role-based permissions and privacy settings.'}
                 ].map((feature, i) => (
                   <div className="mini-feature" key={i}>
                     <div className="mini-feature-header">
@@ -293,9 +318,20 @@ export default function Explore() {
                 ))}
               </div>
             </div>
-            <div className="feature-visual">
+            <div className="feature-visual feature-visual-expanded">
               <div className="public-projects">
-                <h3 className="public-projects-title">Public Projects {count > 0 ? `(${count})` : ''}</h3>
+                <div className="public-projects-header">
+                  <h3 className="public-projects-title">Explore Public Projects {count > 0 ? `(${count})` : ''}</h3>
+                  <div className="search-container">
+                    <input
+                      type="text"
+                      placeholder="Search projects..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="project-search"
+                    />
+                  </div>
+                </div>
                 {error && <p className="error-message">{error}</p>}
                 {loading ? (
                   <div className="loading-grid">
@@ -311,8 +347,8 @@ export default function Explore() {
                     </div>
                   </div>
                 ) : (
-                  <div className="projects-list">
-                    {projects.slice(0,4).map((project) => (
+                  <div className="projects-grid">
+                    {filteredProjects.map((project) => (
                       <div className="project-card" key={project._id}>
                         <div className="project-content">
                           <h4 className="project-name">{project.name}</h4>

@@ -33,7 +33,12 @@ export default function Footer() {
           <div>
             <div className="footer-title">Contact</div>
             <ul>
-              <li><a href="mailto:arpit21345j@gmail.com">arpit21345j@gmail.com</a></li>
+              <li>
+                <a href="mailto:arpit21345j@gmail.com">arpit21345j@gmail.com</a>
+              </li>
+              <li>
+                <a href="#">+91 8090113505</a>
+              </li>
             </ul>
           </div>
           <div>

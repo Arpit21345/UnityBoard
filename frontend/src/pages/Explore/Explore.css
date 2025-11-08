@@ -998,8 +998,207 @@
     font-size: 0.875rem;
   }
 
-  .explore-page .projects-list {
-    max-height: 300px;
+  .explore-page .projects-grid {
+    max-height: 400px;
+  }
+  
+  .explore-page .feature-visual-expanded {
+    flex: 1.5;
+  }
+}
+
+/* Enhanced Public Projects Section */
+.explore-page .feature-visual-expanded {
+  flex: 1.2;
+  min-width: 0;
+}
+
+.explore-page .public-projects {
+  background: #f8fafc;
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid #e2e8f0;
+}
+
+.explore-page .public-projects-header {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.explore-page .public-projects-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.explore-page .search-container {
+  position: relative;
+  max-width: 300px;
+  width: 100%;
+}
+
+.explore-page .project-search {
+  width: 100%;
+  padding: 12px 40px 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  height: 44px;
+  box-sizing: border-box;
+}
+
+.explore-page .project-search:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.explore-page .search-container .search-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  pointer-events: none;
+  font-size: 16px;
+  line-height: 1;
+  user-select: none;
+  transition: color 0.2s ease;
+  z-index: 2;
+}
+
+.explore-page .search-container:hover .search-icon {
+  color: #6b7280;
+}
+
+.explore-page .project-search:focus ~ .search-icon {
+  color: #3b82f6;
+}
+
+.explore-page .projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  max-height: 500px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.explore-page .projects-grid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.explore-page .projects-grid::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.explore-page .projects-grid::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.explore-page .projects-grid::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.explore-page .project-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+  height: fit-content;
+}
+
+.explore-page .project-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+  transform: translateY(-2px);
+}
+
+.explore-page .project-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 8px 0;
+}
+
+.explore-page .project-description {
+  font-size: 0.875rem;
+  color: #6b7280;
+  line-height: 1.5;
+  margin: 0 0 16px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.explore-page .project-description-empty {
+  font-style: italic;
+  color: #9ca3af;
+}
+
+.explore-page .empty-projects {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6b7280;
+}
+
+.explore-page .empty-projects h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 8px 0;
+}
+
+.explore-page .empty-projects p {
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.explore-page .loading-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.explore-page .skeleton-card {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  height: 120px;
+  border-radius: 12px;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Mobile responsive for enhanced public projects */
+@media (max-width: 768px) {
+  .explore-page .public-projects-header {
+    align-items: stretch;
+  }
+  
+  .explore-page .search-container {
+    max-width: none;
+  }
+  
+  .explore-page .projects-grid {
+    grid-template-columns: 1fr;
+    max-height: 400px;
+  }
+  
+  .explore-page .feature-visual-expanded {
+    flex: 1;
   }
 }
 
