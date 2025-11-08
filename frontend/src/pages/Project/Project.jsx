@@ -30,7 +30,7 @@ export default function Project() {
   const navigate = useNavigate();
   const [project, setProject] = useState(null);
   const [error, setError] = useState(null);
-  const { setCtx } = useAiContext();
+  const { setProjectContext } = useAiContext();
   const [me, setMe] = useState(null);
   const [tasks, setTasks] = useState([]);
   const [tasksLoading, setTasksLoading] = useState(true);
@@ -121,11 +121,25 @@ export default function Project() {
 
   useEffect(() => {
     if (project) {
-      const taskSummary = tasks.slice(0, 10).map(t => `- [${t.status}] ${t.title}`).join('\n');
-      const resSummary = resources.slice(0, 10).map(r => `- (${r.provider}) ${r.title || r.name || r.url}`).join('\n');
-      setCtx(`Project: ${project.name}\nDescription: ${project.description || ''}\nTasks:\n${taskSummary}\nResources:\n${resSummary}`);
+      setProjectContext({
+        name: project.name,
+        description: project.description,
+        status: project.status,
+        members: project.members,
+        tasks: tasks.map(t => ({
+          title: t.title,
+          status: t.status,
+          priority: t.priority,
+          assignee: t.assignedTo
+        })),
+        resources: resources.map(r => ({
+          title: r.title || r.name,
+          provider: r.provider,
+          url: r.url
+        }))
+      });
     }
-  }, [project, tasks, resources, setCtx]);
+  }, [project, tasks, resources, setProjectContext]);
 
   async function addTask(e) {
     e.preventDefault();
