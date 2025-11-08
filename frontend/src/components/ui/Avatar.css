@@ -1,0 +1,74 @@
+.avatar-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.avatar {
+  position: relative;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Size variants */
+.avatar-small {
+  width: 24px;
+  height: 24px;
+  font-size: 10px;
+}
+
+.avatar-medium {
+  width: 32px;
+  height: 32px;
+  font-size: 12px;
+}
+
+.avatar-large {
+  width: 48px;
+  height: 48px;
+  font-size: 18px;
+}
+
+.avatar-xl {
+  width: 80px;
+  height: 80px;
+  font-size: 32px;
+}
+
+/* Avatar image */
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* Fallback with initials */
+.avatar-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  border-radius: 50%;
+}
+
+/* Avatar name */
+.avatar-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+/* Hover effects */
+.avatar:hover {
+  transform: scale(1.05);
+  transition: transform 0.2s ease;
+}

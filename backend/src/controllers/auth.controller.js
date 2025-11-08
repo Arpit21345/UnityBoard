@@ -38,11 +38,14 @@ export async function login(req, res) {
 
 export async function me(req, res) {
   try {
-    const user = await User.findById(req.user.id).select('name email analytics createdAt');
+    const user = await User.findById(req.user.id).select('name email avatar analytics createdAt');
     res.json({ 
       ok: true, 
       user: {
-        ...req.user,
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
         analytics: user.analytics || {
           totalProjectsCreated: 0,
           totalTasksCompleted: 0,

@@ -1,9 +1,10 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { apiListNotifications } from '../../services/notifications.js';
 import { SOCKET_ENABLED } from '../../services/api.js';
 import { getSocket } from '../../services/socket.js';
 import { useUser } from '../../context/UserContext.jsx';
+import Avatar from '../ui/Avatar.jsx';
 
 // Simplified global navbar (no search). Brand + controls cluster.
 export default function GlobalNavbar({ compact=false }) {
@@ -15,6 +16,8 @@ export default function GlobalNavbar({ compact=false }) {
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
   const navRef = useRef(null);
   const navigate = useNavigate();
+
+
 
   // Lightweight retry if token exists but user not yet loaded (network race)
   useEffect(()=>{
@@ -173,7 +176,7 @@ export default function GlobalNavbar({ compact=false }) {
             </Link>
             <div className="gn-profile">
               <button className="gn-avatar-btn" aria-label="User menu" onClick={()=>setOpen(o=>!o)}>
-                <div className="gn-avatar" aria-label="profile avatar">{(me?.name||'?').slice(0,1).toUpperCase()}</div>
+                <Avatar user={me} size="medium" />
               </button>
               {open && (
                 <div className="gn-menu">

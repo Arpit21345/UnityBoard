@@ -1,11 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import AppLayout from '../../components/layout/AppLayout.jsx';
 import Sidebar from '../../components/layout/Sidebar.jsx';
 import GlobalNavbar from '../../components/layout/GlobalNavbar.jsx';
 import { apiMe } from '../../services/auth.js';
-import { apiUpdateMe } from '../../services/users.js';
+import { apiUpdateMe, apiUploadAvatar } from '../../services/users.js';
 import Spinner from '../../components/ui/Spinner.jsx';
+import Avatar from '../../components/ui/Avatar.jsx';
 import './Settings.css';
+
+const API = import.meta.env.VITE_API_URL || '';
+
+function getAvatarUrl(avatarPath) {
+  if (!avatarPath) return null;
+  if (avatarPath.startsWith('http')) return avatarPath; // Already full URL
+  return `${API}${avatarPath}`; // Prepend API base URL
+}
 
 export default function UserSettings(){
   const [me, setMe] = useState(null);
@@ -17,9 +26,13 @@ export default function UserSettings(){
   const [changingPassword, setChangingPassword] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [err, setErr] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
+
+  // Memoize avatar URL to prevent unnecessary recalculations
+  const avatarUrl = useMemo(() => getAvatarUrl(me?.avatar), [me?.avatar]);
 
   useEffect(() => {
     (async () => {
@@ -59,6 +72,37 @@ export default function UserSettings(){
       setErr(e.message || 'Failed to update name');
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handleAvatarUpload(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setErr('Please select an image file');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setErr('File size must be less than 5MB');
+      return;
+    }
+
+    try {
+      setUploadingAvatar(true);
+      setErr('');
+      const updatedUser = await apiUploadAvatar(file);
+      setMe(updatedUser);
+      window.dispatchEvent(new CustomEvent('user-updated', { detail: { user: updatedUser } }));
+      setSuccessMsg('Profile picture updated successfully');
+      setTimeout(() => setSuccessMsg(''), 3000);
+    } catch (e) {
+      setErr(e.message || 'Failed to upload profile picture');
+    } finally {
+      setUploadingAvatar(false);
     }
   }
 
@@ -143,6 +187,40 @@ export default function UserSettings(){
                   <p>Update your display name and profile details</p>
                 </div>
                 <div className="section-content">
+                  {/* Profile Picture */}
+                  <div className="input-group">
+                    <label>Profile Picture</label>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                      <div style={{ boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)' }}>
+                        <Avatar user={me} size="large" />
+                      </div>
+                      <div>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleAvatarUpload}
+                          disabled={uploadingAvatar}
+                          style={{ display: 'none' }}
+                          id="avatar-upload"
+                        />
+                        <label
+                          htmlFor="avatar-upload"
+                          className="btn btn-secondary"
+                          style={{
+                            cursor: uploadingAvatar ? 'not-allowed' : 'pointer',
+                            opacity: uploadingAvatar ? 0.7 : 1,
+                            marginBottom: '8px'
+                          }}
+                        >
+                          {uploadingAvatar ? 'Uploading...' : 'Change Picture'}
+                        </label>
+                        <div style={{ fontSize: '12px', color: '#6c757d' }}>
+                          JPG, PNG up to 5MB
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="input-group">
                     <label>Email Address</label>
                     <input 

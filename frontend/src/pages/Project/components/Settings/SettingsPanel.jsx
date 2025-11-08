@@ -115,14 +115,16 @@ export default function SettingsPanel({ project, setProject, amPrivileged, amOwn
           />
         </div>
 
-        <div style={{marginBottom: '20px'}}>
-          <label style={{display: 'block', marginBottom: '8px', fontWeight: '500'}}>Project Password</label>
-          <input 
-            value={project?.projectPassword || ''} 
-            disabled 
-            style={{width: '100%', padding: '8px 12px', background: '#f8f9fa', border: '1px solid #e9ecef', borderRadius: '4px'}}
-          />
-        </div>
+        {project?.visibility === 'private' && (
+          <div style={{marginBottom: '20px'}}>
+            <label style={{display: 'block', marginBottom: '8px', fontWeight: '500'}}>Project Password</label>
+            <input 
+              value={project?.projectPassword || ''} 
+              disabled 
+              style={{width: '100%', padding: '8px 12px', background: '#f8f9fa', border: '1px solid #e9ecef', borderRadius: '4px'}}
+            />
+          </div>
+        )}
 
         <hr style={{margin: '20px 0', border: 'none', height: '1px', background: '#e9ecef'}} />
         
@@ -196,50 +198,52 @@ export default function SettingsPanel({ project, setProject, amPrivileged, amOwn
         </div>
       </div>
 
-      {/* Project Password Section */}
-      <div className="card p-4" style={{marginBottom: '20px'}}>
-        <h4 style={{marginTop:0, marginBottom: '16px'}}>🔒 Project Password</h4>
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '12px' }}>
-          <input 
-            type="text" 
-            value={settings.projectPassword} 
-            onChange={e=>setSettings({...settings, projectPassword:e.target.value})} 
-            placeholder="Set password for project access" 
-            style={{ flex: 1, padding: '8px 12px', border: '1px solid #ced4da', borderRadius: '4px' }}
-          />
-          <button 
-            type="button" 
-            onClick={() => {
-              const randomPassword = Math.random().toString(36).substring(2, 12);
-              setSettings({...settings, projectPassword: randomPassword});
-            }}
-            style={{ padding: '8px 12px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px' }}
-          >
-            Generate
-          </button>
-          <button 
-            onClick={async () => {
-              try {
-                const updated = await apiUpdateProject(project._id, { projectPassword: settings.projectPassword });
-                setProject(updated);
-                notify('Project password updated successfully', 'success');
-              } catch (error) {
-                notify('Failed to update project password', 'error');
-              }
-            }}
-            style={{
-              backgroundColor: '#28a745', 
-              color: 'white', 
-              padding: '8px 16px', 
-              border: 'none', 
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}
-          >
-            💾 Save
-          </button>
+      {/* Project Password Section - Only for Private Projects */}
+      {project?.visibility === 'private' && (
+        <div className="card p-4" style={{marginBottom: '20px'}}>
+          <h4 style={{marginTop:0, marginBottom: '16px'}}>🔒 Project Password</h4>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '12px' }}>
+            <input 
+              type="text" 
+              value={settings.projectPassword} 
+              onChange={e=>setSettings({...settings, projectPassword:e.target.value})} 
+              placeholder="Set password for project access" 
+              style={{ flex: 1, padding: '8px 12px', border: '1px solid #ced4da', borderRadius: '4px' }}
+            />
+            <button 
+              type="button" 
+              onClick={() => {
+                const randomPassword = Math.random().toString(36).substring(2, 12);
+                setSettings({...settings, projectPassword: randomPassword});
+              }}
+              style={{ padding: '8px 12px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px' }}
+            >
+              Generate
+            </button>
+            <button 
+              onClick={async () => {
+                try {
+                  const updated = await apiUpdateProject(project._id, { projectPassword: settings.projectPassword });
+                  setProject(updated);
+                  notify('Project password updated successfully', 'success');
+                } catch (error) {
+                  notify('Failed to update project password', 'error');
+                }
+              }}
+              style={{
+                backgroundColor: '#28a745', 
+                color: 'white', 
+                padding: '8px 16px', 
+                border: 'none', 
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              💾 Save
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Members Management */}
       <div className="card p-4" style={{marginBottom: '20px'}}>

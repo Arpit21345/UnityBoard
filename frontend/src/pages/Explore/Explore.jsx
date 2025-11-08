@@ -94,7 +94,20 @@ export default function Explore() {
           {/* Tasks - Image Left, Text Right */}
           <div className="feature-row feature-row-reverse">
             <div className="feature-visual">
-              <img src="/api/assets/aipoweredtask.png" alt="AI assisted tasks" onError={(e)=>{ e.currentTarget.src='/api/assets/aipoweredtashmanageschedule.png'; }} />
+              <img 
+                src="/api/assets/aipoweredtask.png" 
+                alt="AI assisted tasks" 
+                onError={(e) => { 
+                  // Prevent infinite retry loop
+                  if (!e.currentTarget.dataset.retried) {
+                    e.currentTarget.dataset.retried = 'true';
+                    e.currentTarget.src = '/api/assets/aipoweredtashmanageschedule.png';
+                  } else {
+                    // If both images fail, hide the image
+                    e.currentTarget.style.display = 'none';
+                  }
+                }} 
+              />
             </div>
             <div className="feature-text">
               <div className="feature-kicker">Tasks</div>

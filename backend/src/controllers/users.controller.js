@@ -4,14 +4,26 @@ export async function updateMe(req, res){
 	try {
 		const userId = req.user?.id;
 		if(!userId) return res.status(401).json({ ok:false, error:'Unauthorized' });
-		const { name } = req.body || {};
+		const { name, avatar } = req.body || {};
+		
+		const updateData = {};
+		
 		if(typeof name === 'string'){
 			const trimmed = name.trim();
 			if(!trimmed) return res.status(400).json({ ok:false, error:'Name required' });
 			if(trimmed.length > 80) return res.status(400).json({ ok:false, error:'Name too long' });
-			await User.findByIdAndUpdate(userId, { name: trimmed });
+			updateData.name = trimmed;
 		}
-		const fresh = await User.findById(userId).select('name email');
+		
+		if(typeof avatar === 'string'){
+			updateData.avatar = avatar;
+		}
+		
+		if(Object.keys(updateData).length > 0) {
+			await User.findByIdAndUpdate(userId, updateData);
+		}
+		
+		const fresh = await User.findById(userId).select('name email avatar');
 		res.json({ ok:true, user: fresh });
 	} catch (e){
 		res.status(500).json({ ok:false, error:'Failed to update profile' });
@@ -21,7 +33,7 @@ export async function updateMe(req, res){
 export async function getUserById(req, res){
 	try {
 		const { userId } = req.params;
-		const user = await User.findById(userId).select('name email analytics createdAt');
+		const user = await User.findById(userId).select('name email avatar analytics createdAt');
 		if (!user) return res.status(404).json({ ok: false, error: 'User not found' });
 		
 		res.json({ 
@@ -30,6 +42,7 @@ export async function getUserById(req, res){
 				id: user._id,
 				name: user.name,
 				email: user.email,
+				avatar: user.avatar,
 				analytics: user.analytics || {
 					totalProjectsCreated: 0,
 					totalTasksCompleted: 0,

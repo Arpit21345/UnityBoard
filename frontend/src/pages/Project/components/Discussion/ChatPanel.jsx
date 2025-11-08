@@ -1,9 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useToast } from '../../../../components/Toast/ToastContext.jsx';
 import { getSocket } from '../../../../services/socket.js';
-import { SOCKET_ENABLED } from '../../../../services/api.js';
+import { SOCKET_ENABLED, API } from '../../../../services/api.js';
 import { apiListMessages, apiCreateMessage, apiListThreads, apiCreateThread } from '../../../../services/discussion.js';
+import Avatar from '../../../../components/ui/Avatar.jsx';
 import './ChatPanel.css';
+
+
 
 export default function ChatPanel({ projectId, me, project }) {
   const { notify } = useToast();
@@ -161,22 +164,7 @@ export default function ChatPanel({ projectId, me, project }) {
     return 'Unknown User';
   };
 
-  const getUserAvatar = (user) => {
-    if (!user) return '?';
-    
-    // If user object has avatar URL
-    if (typeof user === 'object' && user.avatar) {
-      return <img src={user.avatar} alt="" className="avatar-img" />;
-    }
-    
-    // Generate initial from name
-    const name = getUserName(user);
-    if (name && name !== 'Unknown User' && name !== 'You') {
-      return name.charAt(0).toUpperCase();
-    }
-    
-    return '?';
-  };
+
 
   const isCurrentUser = (user) => {
     const currentUserId = String(me?.id || me?._id || '');
@@ -234,7 +222,7 @@ export default function ChatPanel({ projectId, me, project }) {
                     <div className="message-avatar-wrapper">
                       {showAvatar ? (
                         <div className="message-avatar">
-                          {getUserAvatar(msg.user)}
+                          <Avatar user={msg.user} size="small" />
                         </div>
                       ) : (
                         <div className="message-avatar-spacer"></div>

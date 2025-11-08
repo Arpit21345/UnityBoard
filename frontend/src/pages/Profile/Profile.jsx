@@ -8,7 +8,10 @@ import { apiListProjects, apiListUserProjects } from '../../services/projects.js
 import { apiListSolutions } from '../../services/solutions.js';
 import { apiListThreads, apiListMessages } from '../../services/discussion.js';
 import Spinner from '../../components/ui/Spinner.jsx';
+import Avatar from '../../components/ui/Avatar.jsx';
 import './Profile.css';
+
+const API = import.meta.env.VITE_API_URL || '';
 
 export default function Profile(){
 	const { userId } = useParams(); // Get userId from URL params
@@ -154,6 +157,8 @@ export default function Profile(){
 		return date.toLocaleDateString('en-US', options);
 	}
 
+
+
 	return (
 		<AppLayout sidebar={<Sidebar />} topbar={<GlobalNavbar />}> 
 			<div className="container">
@@ -164,9 +169,7 @@ export default function Profile(){
 					<div className="profile-page">
 						{/* Profile Header */}
 						<div className="profile-header">
-							<div className="profile-avatar">
-								{(viewingUser.name || '?').slice(0, 1).toUpperCase()}
-							</div>
+							<Avatar user={viewingUser} size="xl" />
 							<div className="profile-info">
 								<h1 className="profile-name">
 									{viewingUser.name || 'Unnamed User'}
