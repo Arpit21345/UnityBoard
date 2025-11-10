@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiUpdateProject, apiListProjectMembers, apiRemoveMember, apiDeleteProject, apiLeaveProject } from '../../../../services/projects.js';
-import { apiListInvites, apiCreateInvite, apiToggleInvite } from '../../../../services/invites.js';
+// COMMENTED OUT - Invite feature removed
+// import { apiListInvites, apiCreateInvite, apiToggleInvite } from '../../../../services/invites.js';
 import { useToast } from '../../../../components/Toast/ToastContext.jsx';
 
 export default function SettingsPanel({ project, setProject, amPrivileged, amOwner, myRole }) {
   const navigate = useNavigate();
   const { notify } = useToast();
-  const [invites, setInvites] = useState([]);
+  // COMMENTED OUT - Invite feature removed
+  // const [invites, setInvites] = useState([]);
   const [settings, setSettings] = useState({ name:'', description:'', visibility: 'private', allowMemberInvites: false, projectPassword: '' });
   const [members, setMembers] = useState([]);
   const [loadingMembers, setLoadingMembers] = useState(false);
@@ -32,6 +34,8 @@ export default function SettingsPanel({ project, setProject, amPrivileged, amOwn
     }); 
   }, [project]);
 
+  // COMMENTED OUT - Invite feature removed
+  /*
   async function loadInvites() { 
     if (!(amOwner || myRole==='admin')) return; 
     try { 
@@ -42,6 +46,21 @@ export default function SettingsPanel({ project, setProject, amPrivileged, amOwn
       notify('Load invites failed','error'); 
     } 
   }
+  
+  async function makeInvite() { 
+    if(!(amOwner || myRole==='admin' || (myRole==='member' && project.allowMemberInvites))){ 
+      notify('Insufficient permissions','error'); 
+      return; 
+    } 
+    try { 
+      const inv = await apiCreateInvite(project._id, { expiresInDays: 7 }); 
+      setInvites([inv, ...invites]); 
+      notify('Invite created','success'); 
+    } catch { 
+      notify('Create invite failed','error'); 
+    } 
+  }
+  */
 
   async function saveSettings(e) { 
     e.preventDefault(); 
@@ -55,20 +74,6 @@ export default function SettingsPanel({ project, setProject, amPrivileged, amOwn
       notify('Settings saved successfully','success'); 
     } catch { 
       notify('Failed to save settings','error'); 
-    } 
-  }
-
-  async function makeInvite() { 
-    if(!(amOwner || myRole==='admin' || (myRole==='member' && project.allowMemberInvites))){ 
-      notify('Insufficient permissions','error'); 
-      return; 
-    } 
-    try { 
-      const inv = await apiCreateInvite(project._id, { expiresInDays: 7 }); 
-      setInvites([inv, ...invites]); 
-      notify('Invite created','success'); 
-    } catch { 
-      notify('Create invite failed','error'); 
     } 
   }
 

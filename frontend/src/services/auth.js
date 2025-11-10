@@ -33,8 +33,22 @@ export async function apiMe() {
 }
 
 export async function apiGetUserById(userId) {
-  const res = await http(`${API}/api/users/${userId}`, { headers: { Authorization: `Bearer ${getToken()}` } });
-  const data = await res.json();
-  if (!res.ok || !data.ok) throw new Error(data.error || 'Failed to get user profile');
-  return data.user;
+  try {
+    const res = await http(`${API}/api/users/${userId}`, { headers: { Authorization: `Bearer ${getToken()}` } });
+    const data = await res.json();
+    if (!res.ok) {
+      if (res.status === 401) {
+        throw new Error('Please log in to view user profiles');
+      }
+      if (res.status === 404) {
+        throw new Error('User not found');
+      }
+      throw new Error(data?.error || 'Failed to get user profile');
+    }
+    if (!data.ok) throw new Error(data.error || 'Failed to get user profile');
+    return data.user;
+  } catch (error) {
+    console.error('apiGetUserById error:', error);
+    throw error;
+  }
 }

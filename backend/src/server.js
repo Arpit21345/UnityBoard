@@ -60,13 +60,13 @@ app.use(`/${env.uploadsDir}`, express.static(path.resolve(process.cwd(), env.upl
 // Static serving for app assets (logo, illustrations)
 app.use('/api/assets', express.static(path.resolve(process.cwd(), 'src/assets')));
 
-// Routes
+// Routes - Fixed order to prevent conflicts
 app.use('/api/auth', authRouter);
 app.use('/api/uploads', uploadsRouter);
 app.use('/api/ai', aiRouter);
-app.use('/api/projects', projectsRouter);
 app.use('/api/tasks', tasksRouter);
-app.use('/api/projects', resourcesRouter);
+app.use('/api/projects', resourcesRouter); // Resource routes must come BEFORE projects to match specific paths first
+app.use('/api/projects', projectsRouter);
 app.use('/api/explore', exploreRouter);
 app.use('/api', learningRouter);
 app.use('/api', snippetsRouter);

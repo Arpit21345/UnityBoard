@@ -35,12 +35,25 @@ export default function Profile(){
 				let isOwn = true;
 				let projectsList = [];
 				
-				if (userId && userId !== currentUser.id) {
+				// Ensure consistent string comparison for user IDs
+				const currentUserId = String(currentUser.id || currentUser._id);
+				const viewingUserId = String(userId || '');
+				
+				console.log('🔍 Profile Debug:', {
+					userId,
+					currentUserId,
+					viewingUserId,
+					isEqual: viewingUserId === currentUserId
+				});
+				
+				if (userId && viewingUserId !== currentUserId) {
 					// Viewing someone else's profile
+					console.log('Loading other user profile:', userId);
 					profileUser = await apiGetUserById(userId);
 					isOwn = false;
 				} else {
 					// Viewing own profile (or no userId specified)
+					console.log('Loading own profile');
 					profileUser = currentUser;
 					isOwn = true;
 				}
@@ -49,15 +62,20 @@ export default function Profile(){
 				try {
 					if (isOwn) {
 						// For own profile, use existing API
+						console.log('Loading own projects');
 						const projectsData = await apiListProjects();
 						projectsList = projectsData.projects || projectsData || [];
 					} else {
 						// For others' profile, use new API
-						projectsList = await apiListUserProjects(profileUser._id || profileUser.id);
+						const targetUserId = profileUser.id || profileUser._id;
+						console.log('Loading projects for user:', targetUserId);
+						const projectsData = await apiListUserProjects(targetUserId);
+						projectsList = projectsData.projects || projectsData || [];
 					}
 				} catch (projErr) {
-					console.warn('Failed to load projects:', projErr);
+					console.error('Failed to load projects:', projErr);
 					projectsList = [];
+					// Don't fail the entire profile load if projects fail
 				}
 				
 				setViewingUser(profileUser);
@@ -80,6 +98,9 @@ export default function Profile(){
 				let currentSolutions = 0;
 				let currentContributions = 0;
 				
+				// COMMENTED OUT - Analytics loading can cause auth issues when viewing other profiles
+				// Only load analytics for own profile to prevent 403 errors from projects user can't access
+				/*
 				// Get solutions and discussions for current projects
 				const analyticsPromises = projectsList.map(async (project) => {
 					try {
@@ -125,6 +146,10 @@ export default function Profile(){
 				if (analyticsPromises.length > 0) {
 					await Promise.all(analyticsPromises);
 				}
+				*/
+				
+				// Simplified analytics - only use permanent data to avoid auth issues
+				console.log('Using simplified analytics to prevent auth issues');
 				
 				setAnalytics({
 					// Current state (can decrease when projects deleted)
@@ -133,18 +158,26 @@ export default function Profile(){
 					memberProjects: memberProjects.length,
 					activeProjects: activeProjects.length,
 					
-					// Permanent lifetime stats (never decrease)
+					// Permanent lifetime stats (never decrease) - use only stored analytics
 					totalProjectsCreated: permanentAnalytics.totalProjectsCreated || 0,
 					tasksCompleted: permanentAnalytics.totalTasksCompleted || 0,
 					lifetimeSolutions: permanentAnalytics.lifetimeSolutions || 0,
-					contributions: Math.max(permanentAnalytics.totalContributions || 0, currentContributions), 
+					contributions: permanentAnalytics.totalContributions || 0, // Use stored value only
 					
 					joinedDate: profileUser.createdAt || profileUser.registeredAt || '2024-01-01'
 				});
 				
 			} catch(e) {
 				console.error('Profile data error:', e);
-				setErr(`Failed to load profile data: ${e.message || 'Unknown error'}`);
+				
+				// Don't show auth-related errors to prevent confusion
+				if (e.message && (e.message.includes('401') || e.message.includes('Unauthorized'))) {
+					setErr('Please log in to view user profiles');
+				} else if (e.message && e.message.includes('404')) {
+					setErr('User not found');
+				} else {
+					setErr(`Failed to load profile data: ${e.message || 'Unknown error'}`);
+				}
 			} finally {
 				setLoading(false);
 			}

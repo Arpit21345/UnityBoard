@@ -2,7 +2,13 @@
 export async function http(url, options={}) {
   const res = await fetch(url, options);
   if (res.status === 401) {
-    // Clear token & broadcast
+    // Store current path for post-login redirect BEFORE clearing token
+    const currentPath = window.location.pathname;
+    if (!currentPath.startsWith('/login') && !currentPath.startsWith('/register')) {
+      localStorage.setItem('postLoginRedirect', currentPath);
+    }
+    
+    // Clear token & broadcast - let ProtectedRoute handle the redirect
     localStorage.removeItem('token');
     const evt = new CustomEvent('auth-event', { detail: 'auth-expired' });
     window.dispatchEvent(evt);

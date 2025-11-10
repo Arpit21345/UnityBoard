@@ -78,13 +78,22 @@ export async function getProject(req, res) {
     const project = await Project.findById(id).populate('members.user', 'name email avatar');
     if (!project) return res.status(404).json({ ok: false, error: 'Not found' });
     
-    // Fix: Ensure consistent string comparison for membership check  
-    const userId = req.user.id;
-    const isMember = project.members.some(m => String(m.user?._id || m.user) === String(userId));
+    // Enhanced membership validation with better debugging
+    const userId = String(req.user.id);
+    const isMember = project.members.some(m => {
+      const memberUserId = String(m.user?._id || m.user);
+      return memberUserId === userId;
+    });
     
-    if (!isMember) return res.status(403).json({ ok: false, error: 'Forbidden' });
+    // For public projects, allow read access even if not a member (for join flow)
+    if (!isMember && project.visibility !== 'public') {
+      console.log(`Access denied: User ${userId} not member of project ${id}`);
+      return res.status(403).json({ ok: false, error: 'Forbidden' });
+    }
+    
     res.json({ ok: true, project });
   } catch (e) {
+    console.error('getProject error:', e);
     res.status(500).json({ ok: false, error: 'Fetch failed' });
   }
 }

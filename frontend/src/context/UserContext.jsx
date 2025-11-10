@@ -19,9 +19,19 @@ export function UserProvider({ children }) {
     try {
       const u = await apiMe();
       setUser(u);
-    } catch {
+    } catch (error) {
+      console.error('UserContext load error:', error);
       setUser(null);
       localStorage.removeItem('token'); // Clean up invalid token
+      
+      // For certain pages (like team chat), ensure user is redirected to login
+      const currentPath = window.location.pathname;
+      if (currentPath.includes('/project/') && currentPath.includes('discussion')) {
+        localStorage.setItem('postLoginRedirect', currentPath);
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 100);
+      }
     } finally {
       setLoading(false);
     }

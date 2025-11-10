@@ -6,21 +6,61 @@ function authHeaders() {
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
-// Discussion - Threads & Messages
+// Discussion - Threads & Messages with enhanced error handling
 export async function apiListThreads(projectId) {
-  const res = await http(`${API}/api/projects/${projectId}/threads`, { headers: { ...authHeaders() } });
-  return res.json();
+  try {
+    const res = await http(`${API}/api/projects/${projectId}/threads`, { headers: { ...authHeaders() } });
+    const data = await res.json();
+    if (!res.ok) {
+      if (res.status === 403) {
+        throw new Error('You must be a project member to access team chat');
+      }
+      throw new Error(data?.error || 'Failed to load team chat');
+    }
+    return data;
+  } catch (error) {
+    console.error('apiListThreads error:', error);
+    throw error;
+  }
 }
+
 export async function apiCreateThread(projectId, payload) {
-  const res = await http(`${API}/api/projects/${projectId}/threads`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...authHeaders() }, body: JSON.stringify(payload) });
-  return res.json();
+  try {
+    const res = await http(`${API}/api/projects/${projectId}/threads`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...authHeaders() }, body: JSON.stringify(payload) });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.error || 'Failed to create thread');
+    return data;
+  } catch (error) {
+    console.error('apiCreateThread error:', error);
+    throw error;
+  }
 }
 
 export async function apiListMessages(threadId) {
-  const res = await http(`${API}/api/threads/${threadId}/messages`, { headers: { ...authHeaders() } });
-  return res.json();
+  try {
+    const res = await http(`${API}/api/threads/${threadId}/messages`, { headers: { ...authHeaders() } });
+    const data = await res.json();
+    if (!res.ok) {
+      if (res.status === 403) {
+        throw new Error('You must be a project member to view messages');
+      }
+      throw new Error(data?.error || 'Failed to load messages');
+    }
+    return data;
+  } catch (error) {
+    console.error('apiListMessages error:', error);
+    throw error;
+  }
 }
+
 export async function apiCreateMessage(threadId, payload) {
-  const res = await http(`${API}/api/threads/${threadId}/messages`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...authHeaders() }, body: JSON.stringify(payload) });
-  return res.json();
+  try {
+    const res = await http(`${API}/api/threads/${threadId}/messages`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...authHeaders() }, body: JSON.stringify(payload) });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.error || 'Failed to send message');
+    return data;
+  } catch (error) {
+    console.error('apiCreateMessage error:', error);
+    throw error;
+  }
 }

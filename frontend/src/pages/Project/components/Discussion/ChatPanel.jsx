@@ -52,7 +52,15 @@ export default function ChatPanel({ projectId, me, project }) {
         }
       } catch (error) {
         console.error('Failed to load chat:', error);
-        notify('Failed to load chat', 'error');
+        
+        // Better error handling for authentication issues
+        if (error.message.includes('must be a project member')) {
+          notify('You must be a project member to access team chat', 'error');
+        } else if (error.message.includes('log in')) {
+          notify('Please log in to access team chat', 'error');
+        } else {
+          notify('Failed to load chat', 'error');
+        }
       } finally {
         setLoading(false);
       }

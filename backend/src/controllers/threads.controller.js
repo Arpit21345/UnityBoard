@@ -6,9 +6,10 @@ import { incrementUserAnalytics } from '../utils/analyticsHelpers.js';
 
 function isMember(project, userId){
   return project.members?.some(m => {
-    // Handle both populated and non-populated user references
-    const memberId = typeof m.user === 'object' ? m.user._id : m.user;
-    return String(memberId) === String(userId);
+    // Handle both populated and non-populated user references with enhanced validation
+    const memberId = typeof m.user === 'object' ? String(m.user._id || m.user.id) : String(m.user);
+    const userIdStr = String(userId);
+    return memberId === userIdStr;
   });
 }
 function isOwnerOrAdmin(project, userId){
@@ -24,7 +25,14 @@ export async function listThreads(req, res){
     const { id } = req.params; // project id
     const project = await Project.findById(id).select('members chatSingleRoom');
     if (!project) return res.status(404).json({ ok:false, error:'Project not found' });
-    if (!isMember(project, req.user.id)) return res.status(403).json({ ok:false, error:'Forbidden' });
+    
+    // Enhanced membership check with debugging
+    const userId = req.user.id;
+    if (!isMember(project, userId)) {
+      console.log(`Team chat access denied: User ${userId} not member of project ${id}`);
+      return res.status(403).json({ ok:false, error:'You must be a project member to access team chat' });
+    }
+    
     let items = await Thread.find({ project: id }).sort({ pinned: -1, lastActivityAt: -1, updatedAt: -1 });
     // In single-room mode, ensure one default thread and return only it
     if (project.chatSingleRoom) {
@@ -35,7 +43,10 @@ export async function listThreads(req, res){
       items = [general];
     }
     res.json({ ok:true, items });
-  } catch { res.status(500).json({ ok:false, error:'Fetch failed' }); }
+  } catch (error) {
+    console.error('listThreads error:', error);
+    res.status(500).json({ ok:false, error:'Fetch failed' });
+  }
 }
 
 export async function createThread(req, res){
