@@ -1,121 +1,300 @@
-# UnityBoard (MERN Skeleton)
+# 🚀 UnityBoard - Collaborative Project Management Platform
 
-- Stack: MongoDB, Express.js, React, Node.js (no TypeScript, no Next.js, custom CSS)
-- Clean separation: `backend/` and `frontend/`
-- Ready for local dev and future deployment (Render/Netlify/Vercel). Use env files.
+**UnityBoard** is a comprehensive project management and collaboration platform built with the MERN stack. It empowers teams to organize, track, and deliver projects efficiently with real-time collaboration features, AI assistance, and intuitive project workflows.
 
-## Local development
+[PLACEHOLDER - Main Homepage Screenshot]
 
-1. Backend
-   - Copy `backend/.env.example` to `backend/.env` and set variables.
-   - Install and run:
+## ✨ Key Features
 
-```powershell
-cd backend; npm install; npm run dev
+### 🎯 **Project Management**
+- **Project Creation & Management** - Create public/private projects with detailed descriptions
+- **Team Collaboration** - Invite members, assign roles (Owner, Admin, Member)
+- **Project Dashboard** - Centralized view of all project activities and progress
+- **Task Management** - Create, assign, and track tasks with due dates and priorities
+- **Project Archives** - Archive completed projects and restore when needed
+
+[PLACEHOLDER - Project Dashboard Screenshot]
+
+### 🌐 **Explore & Discovery**
+- **Public Project Gallery** - Discover and join public projects from the community
+- **Project Search & Filtering** - Find projects by name, description, or category
+- **One-Click Joining** - Seamlessly join public projects with instant access
+- **Project Previews** - View project details before joining
+
+[PLACEHOLDER - Explore Page Screenshot]
+
+### 💬 **Real-Time Communication**
+- **Team Chat** - Built-in messaging system for project discussions
+- **Real-Time Updates** - Live notifications and activity feeds
+- **Discussion Threads** - Organized conversations around specific topics
+- **Message History** - Complete chat history with search capabilities
+
+[PLACEHOLDER - Team Chat Screenshot]
+
+### 🤖 **AI-Powered Assistant**
+- **Smart Suggestions** - AI-powered recommendations for project planning
+- **Code Assistance** - Intelligent code snippets and solutions
+- **Problem Solving** - Get instant help with technical challenges
+- **Context-Aware Help** - AI understands your project context for relevant assistance
+
+[PLACEHOLDER - AI Assistant Screenshot]
+
+### 📚 **Knowledge Management**
+- **Resource Vault** - Centralized file storage and sharing
+- **Solution Database** - Curated solutions and best practices
+- **Smart Snippets** - Code snippets library with categorization
+- **Learning Tracker** - Track progress and learning milestones
+
+[PLACEHOLDER - Resource Management Screenshot]
+
+### 🔒 **Security & Administration**
+- **User Authentication** - Secure JWT-based authentication system
+- **Role-Based Access** - Granular permissions for different user roles
+- **Admin Panel** - Comprehensive administration dashboard
+- **User Management** - Monitor users, projects, and system analytics
+
+[PLACEHOLDER - Admin Panel Screenshot]
+
+### 📊 **Analytics & Insights**
+- **Project Analytics** - Track project progress and team performance
+- **User Profiles** - Detailed user profiles with contribution history
+- **Activity Tracking** - Monitor user engagement and project activities
+- **Progress Reports** - Visual insights into project completion rates
+
+## 🛠️ Technology Stack
+
+### **Frontend**
+- **React 18** - Modern React with hooks and context
+- **Vite** - Fast build tool and development server
+- **React Router** - Client-side routing and navigation
+- **Custom CSS** - Responsive design with clean aesthetics
+- **Socket.io Client** - Real-time communication
+
+### **Backend**
+- **Node.js** - JavaScript runtime environment
+- **Express.js** - Web application framework
+- **MongoDB** - NoSQL database for flexible data storage
+- **Mongoose** - MongoDB object modeling
+- **Socket.io** - Real-time bidirectional communication
+- **JWT** - Secure authentication tokens
+
+### **AI & Services**
+- **Cohere API** - Advanced AI language model integration
+- **Cloudinary** - Cloud-based image and file management
+- **Nodemon** - Development server auto-restart
+
+### **Development Tools**
+- **ESLint** - Code quality and consistency
+- **Environment Variables** - Secure configuration management
+- **CORS** - Cross-origin resource sharing
+- **Rate Limiting** - API protection and throttling
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js (v16 or higher)
+- MongoDB (local or MongoDB Atlas)
+- Git
+
+### Installation
+
+1. **Clone the repository**
+```bash
+git clone https://github.com/Arpit21345/UnityBoard.git
+cd UnityBoard/projectUnityBoard
 ```
 
-API runs at http://localhost:5000
-
-2. Frontend
-   - Create `frontend/.env` if needed, e.g.:
-
+2. **Backend Setup**
+```bash
+cd backend
+npm install
 ```
+
+Create `.env` file in backend directory:
+```env
+NODE_ENV=development
+PORT=5000
+MONGO_URI=mongodb://127.0.0.1:27017
+MONGO_DB_NAME=unityboard
+JWT_SECRET=your-jwt-secret
+JWT_EXPIRES_IN=7d
+CLIENT_URL=http://localhost:5173
+COHERE_API_KEY=your-cohere-api-key
+ADMIN_EMAIL=admin@unityboard.com
+ADMIN_PASSWORD=admin123
+```
+
+3. **Frontend Setup**
+```bash
+cd ../frontend
+npm install
+```
+
+Create `.env` file in frontend directory:
+```env
 VITE_API_URL=http://localhost:5000
+VITE_ENABLE_AI_ASSISTANT=true
+VITE_ENABLE_SOCKET=true
 ```
 
-   - Install and run:
-
-```powershell
-cd ../frontend; npm install; npm run dev
+4. **Admin Panel Setup**
+```bash
+cd ../admin
+npm install
+npm run build
 ```
 
-App at http://localhost:5173
+5. **Start the Application**
 
-### Asset / Upload Verification (Optional)
-Run a quick check that every `/api/assets/*` reference has a corresponding file:
-
-```powershell
-node scripts/verify-assets.js
+Backend:
+```bash
+cd backend
+npm run dev
 ```
 
-See `docs/assets-and-uploads.md` for structure and recommended future filename normalizations.
+Frontend:
+```bash
+cd frontend
+npm run dev
+```
 
-## Project structure
+Access the application:
+- **Main App**: http://localhost:5173
+- **Admin Panel**: http://localhost:5000/admin
+- **API**: http://localhost:5000/api
+
+## 📱 Application Structure
 
 ```
 projectUnityBoard/
-  backend/
-    src/
-      config/db.js
-      routes/health.route.js
-      server.js
-    package.json
-    .env.example
-  frontend/
-    src/
-      components/Navbar/
-        Navbar.jsx
-        Navbar.css
-      pages/
-        Home/
-          Home.jsx
-          Home.css
-        Login/
-          Login.jsx
-          Login.css
-      services/api.js
-      styles/global.css
-    index.html
-    vite.config.js
-    package.json
-  .gitignore
-  README.md
+├── backend/                 # Node.js/Express API
+│   ├── src/
+│   │   ├── config/         # Database and environment config
+│   │   ├── controllers/    # Route handlers
+│   │   ├── middleware/     # Authentication, validation
+│   │   ├── models/         # MongoDB schemas
+│   │   ├── routes/         # API endpoints
+│   │   ├── services/       # Business logic
+│   │   └── utils/          # Helper functions
+│   └── dist/admin/         # Built admin panel
+├── frontend/               # React application
+│   ├── src/
+│   │   ├── components/     # Reusable UI components
+│   │   ├── pages/          # Page components
+│   │   ├── services/       # API integration
+│   │   ├── context/        # React context providers
+│   │   └── styles/         # CSS stylesheets
+├── admin/                  # Admin panel (React)
+│   └── src/
+│       ├── components/     # Admin-specific components
+│       └── styles/         # Admin panel styles
+└── docs/                   # Documentation
 ```
 
-## Notes
-- Keep each page/component in its own folder with matching `.jsx` and `.css` files.
-- Use env variables only; avoid hardcoding URLs.
-- We will refine structure after you share detailed requirements.
+## 🎯 Core Workflows
 
-## Demo Walkthrough (Current Polished Flow)
-1. Landing (Explore): Public marketing + list of public projects (unauth navbar: Sign in / Get started).
-2. Register → Redirects to Dashboard (owned projects empty states visible).
-3. Create Public Project (Dashboard) → Toast: "Project created".
-4. Logout → Returns to Explore.
-5. From Explore join a public project while logged out → Forced to Login → After login auto-redirects into project.
-6. Visit a private project URL as non-member → Redirect to Dashboard with toast "Access denied to project".
-7. Generate invite (Settings) → Use invite code on Dashboard (other user) to join private project.
-8. Add task & resource inside project → Toast confirmations (Task created / Uploaded 1 file(s)).
-9. Archive a project (owner only) → Appears in Past Projects; Unarchive restores it.
-10. Permission guard: Non-owner attempting archive or settings save sees toast "Owner role required".
+### **Project Creation Flow**
+1. User creates account or logs in
+2. Navigate to Dashboard
+3. Click "Create Project" 
+4. Fill project details (name, description, visibility)
+5. Set up project structure and invite team members
+6. Start collaborating with real-time features
 
-## Accessibility & UX Polishing
-- Unified toast system for all feedback (no native alert dialogs).
-- Consistent empty states on Dashboard, Explore public projects, Notifications, Past Projects.
-- Role & project visibility surfaced in navbar user menu when inside a project.
-- Membership gate for public projects instead of error page.
-- Discussion advanced features deferred (banner explains scope limit).
+### **Team Collaboration Flow**
+1. Join project via invite or public discovery
+2. Access project workspace with role-based permissions
+3. Create and assign tasks to team members
+4. Use real-time chat for communication
+5. Share resources and files in Resource Vault
+6. Track progress through project analytics
 
-## Multi-User Manual QA Script
-See `docs/qa-multi-user-script.md` for a 12-scenario checklist to validate the above flow end-to-end.
+### **AI-Assisted Development**
+1. Access AI Assistant from any project context
+2. Ask questions or request code help
+3. Receive contextual suggestions and solutions
+4. Save useful snippets to project library
+5. Get automated recommendations for project improvement
 
-## Recent Polishing (Auth / Navbar / Projects)
-- Global user context & retry removed stale navbar sign-in state.
-- Theme toggle restored with persistence.
-- Event-driven dashboard updates on project mutations.
-- Consistent mini action button styling prevents hover invisibility.
-- Join flows improved: loading states, better duplicate membership handling.
-- See `CHANGELOG.md` for dated summary.
+## 🔐 Authentication & Security
 
-## Realtime chat (optional)
-- Backend env: `ENABLE_SOCKET=true`, ensure `CLIENT_URL=http://localhost:5173` is set.
-- Frontend env: `VITE_ENABLE_SOCKET=true` and `VITE_API_URL=http://localhost:5000`.
-- Start both with the usual commands:
+- **JWT-based Authentication** with 7-day token expiration
+- **Role-based Access Control** (Owner, Admin, Member)
+- **Secure Password Hashing** with bcrypt
+- **Rate Limiting** to prevent API abuse
+- **CORS Protection** for cross-origin requests
+- **Environment-based Configuration** for sensitive data
 
-```powershell
-cd backend; npm run dev
-```
+## 📊 Admin Panel Features
 
-```powershell
-cd frontend; npm run dev
-```
+[PLACEHOLDER - Admin Dashboard Screenshot]
+
+- **User Management** - View and manage all registered users
+- **Project Oversight** - Monitor all projects and activities
+- **System Analytics** - Track platform usage and performance
+- **Content Moderation** - Manage reported content and users
+- **Configuration** - System-wide settings and maintenance
+
+Access admin panel at: `http://localhost:5000/admin`
+Default credentials: `admin@unityboard.com` / `admin123`
+
+## 🌟 Advanced Features
+
+### **Real-Time Collaboration**
+- Live cursor tracking in shared documents
+- Instant message delivery and notifications
+- Real-time project updates across all connected clients
+- Collaborative editing capabilities
+
+### **AI Integration**
+- Intelligent code completion and suggestions
+- Automated task prioritization
+- Smart project timeline recommendations
+- Context-aware help and documentation
+
+### **File Management**
+- Drag-and-drop file uploads
+- Cloud storage integration (Cloudinary)
+- Version control for shared documents
+- Organized file categorization
+
+## 🚀 Deployment
+
+### **Production Environment**
+- Backend: Deploy to Render, Railway, or similar Node.js hosting
+- Frontend: Deploy to Vercel, Netlify, or similar static hosting
+- Database: Use MongoDB Atlas for production database
+- File Storage: Configure Cloudinary for production file handling
+
+### **Environment Variables**
+Ensure all production environment variables are properly configured:
+- Database connection strings
+- JWT secrets (use strong, unique values)
+- API keys for external services
+- CORS origins for production domains
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📜 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- MongoDB for flexible data storage
+- React community for excellent documentation
+- Cohere for AI capabilities
+- Socket.io for real-time features
+- All contributors and users of UnityBoard
+
+---
+
+**Built with ❤️ by the UnityBoard Team**
+
+For support or questions, please open an issue or contact us at support@unityboard.com

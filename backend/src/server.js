@@ -22,6 +22,7 @@ import threadsRouter from './routes/threads.route.js';
 import dashboardRouter from './routes/dashboard.route.js';
 import notificationsRouter from './routes/notifications.route.js';
 import usersRouter from './routes/users.route.js';
+import adminRouter from './routes/admin.route.js';
 import Project from './models/Project.js';
 import { setIo } from './socketHub.js';
 import { startTaskScheduler } from './services/taskScheduler.js';
@@ -75,6 +76,13 @@ app.use('/api', threadsRouter);
 app.use('/api', dashboardRouter);
 app.use('/api/notifications', notificationsRouter);
 app.use('/api', usersRouter);
+app.use('/api/admin', adminRouter);
+
+// Serve admin panel (built from admin folder)
+app.use('/admin', express.static(path.resolve(process.cwd(), 'dist/admin')));
+app.get('/admin/*', (_req, res) => {
+  res.sendFile(path.resolve(process.cwd(), 'dist/admin/index.html'));
+});
 
 app.get('/', (_req, res) => {
   res.json({ ok: true, service: 'UnityBoard API' });

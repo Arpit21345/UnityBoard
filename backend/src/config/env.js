@@ -6,7 +6,9 @@ dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 const env = {
   nodeEnv: process.env.NODE_ENV || 'development',
   port: Number(process.env.PORT || 5000),
-  clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',
+  frontendPort: Number(process.env.FRONTEND_PORT || 5173),
+  adminPort: Number(process.env.ADMIN_PORT || 5176),
+  clientUrl: process.env.CLIENT_URL || `http://localhost:${process.env.FRONTEND_PORT || 5173},http://localhost:${process.env.ADMIN_PORT || 5176}`,
   logLevel: process.env.LOG_LEVEL || 'info',
   rateLimitWindowMs: Number(process.env.RATE_LIMIT_WINDOW_MS || 60000),
   rateLimitMax: Number(process.env.RATE_LIMIT_MAX || 100),
@@ -28,7 +30,9 @@ const env = {
     model: process.env.COHERE_MODEL || 'command-light',
     maxTokens: Number(process.env.AI_MAX_TOKENS || 512)
   },
-  enableSocket: String(process.env.ENABLE_SOCKET || 'false') === 'true'
+  enableSocket: String(process.env.ENABLE_SOCKET || 'false') === 'true',
+  adminEmail: process.env.ADMIN_EMAIL || 'admin@unityboard.com',
+  adminPassword: process.env.ADMIN_PASSWORD || 'admin123'
 };
 
 export default env;
