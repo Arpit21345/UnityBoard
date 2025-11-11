@@ -6,6 +6,18 @@ export default defineConfig(({ mode }) => {
   const adminPort = parseInt(env.VITE_ADMIN_PORT) || 5176
   const backendPort = parseInt(env.VITE_BACKEND_PORT) || 5000
   
+  // Use different config for production (Vercel)
+  if (mode === 'production') {
+    return {
+      plugins: [react()],
+      build: {
+        outDir: 'dist',
+        emptyOutDir: true
+      }
+    }
+  }
+  
+  // Development configuration
   return {
     plugins: [react()],
     base: '/admin/',
