@@ -149,7 +149,7 @@ export default function GlobalNavbar({ compact=false }) {
     <nav className={"global-navbar" + (compact? ' compact':'' )} ref={navRef}>
       <div className="gn-left">
         <Link to="/" className="brand" aria-label="UnityBoard home">
-          <img src="/api/assets/logo.png" alt="UnityBoard logo" className="brand-logo" onError={(e)=>{ e.currentTarget.style.display='none'; }} />
+          <img src="/logo.png" alt="UnityBoard logo" className="brand-logo" onError={(e)=>{ e.currentTarget.style.display='none'; }} />
           <span>UnityBoard</span>
         </Link>
       </div>

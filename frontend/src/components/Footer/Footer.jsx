@@ -7,7 +7,7 @@ export default function Footer() {
       <div className="container footer-inner">
         <div className="footer-brand">
           <a className="brand" href="/">
-            <img className="brand-logo" src="/api/assets/logo.png" alt="UnityBoard logo" onError={(e)=>{ e.currentTarget.style.display='none'; }} />
+            <img className="brand-logo" src="/logo.png" alt="UnityBoard logo" onError={(e)=>{ e.currentTarget.style.display='none'; }} />
             <span>UnityBoard</span>
           </a>
           <p className="footer-tag">Organize projects, tasks, and resources with a little AI help.</p>

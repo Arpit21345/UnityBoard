@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import './AdminDashboard.css'
 
 const AdminDashboard = ({ onLogout }) => {
-  const BACKEND_URL = `http://localhost:${import.meta.env.VITE_BACKEND_PORT || 5000}`
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
   const [users, setUsers] = useState([])
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
@@ -26,12 +26,12 @@ const AdminDashboard = ({ onLogout }) => {
       console.log('🔄 Loading admin data...')
 
       // Fetch users
-      const usersResponse = await fetch('/api/admin/users', { headers })
+      const usersResponse = await fetch(`${API_URL}/api/admin/users`, { headers })
       const usersData = await usersResponse.json()
       console.log('👥 Users response:', usersData)
       
       // Fetch projects  
-      const projectsResponse = await fetch('/api/admin/projects', { headers })
+      const projectsResponse = await fetch(`${API_URL}/api/admin/projects`, { headers })
       const projectsData = await projectsResponse.json()
       console.log('📁 Projects response:', projectsData)
 
@@ -150,7 +150,7 @@ const AdminDashboard = ({ onLogout }) => {
                         <div className="user-avatar-container">
                           {user.avatar ? (
                             <img 
-                              src={user.avatar.startsWith('http') ? user.avatar : `${BACKEND_URL}${user.avatar}`} 
+                              src={user.avatar.startsWith('http') ? user.avatar : `${API_URL}${user.avatar}`} 
                               alt={user.name} 
                               className="user-avatar"
                               onError={(e) => {

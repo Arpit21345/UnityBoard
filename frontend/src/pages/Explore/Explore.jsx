@@ -5,6 +5,7 @@ import { apiJoinPublicProject } from '../../services/invites.js';
 import { categorizeJoinError } from '../../utils/joinErrors.js';
 import Footer from '../../components/Footer/Footer.jsx';
 import { useToast } from '../../components/Toast/ToastContext.jsx';
+import { useUser } from '../../context/UserContext.jsx';
 
 export default function Explore() {
   const [projects, setProjects] = useState([]);
@@ -14,6 +15,11 @@ export default function Explore() {
   const [error, setError] = useState('');
   const [joiningId, setJoiningId] = useState(null);
   const { notify } = useToast();
+  const { user: me } = useUser();
+  
+  // Check if user is authenticated
+  const tokenPresent = typeof window !== 'undefined' ? !!localStorage.getItem('token') : false;
+  const isAuthed = tokenPresent && !!me;
 
   useEffect(() => {
     (async () => {
@@ -53,10 +59,12 @@ export default function Explore() {
       <div className="hero-content">
               <h1 className="hero-title">Build together, faster</h1>
               <p className="hero-subtitle">Plan tasks, share resources, and discuss work—with an AI helper and public projects to explore.</p>
-              <div className="hero-actions">
-        <a className="btn btn-secondary" href="/login">Sign in</a>
-        <a className="btn btn-primary" href="/register">Get started</a>
-              </div>
+              {!isAuthed && (
+                <div className="hero-actions">
+                  <a className="btn btn-secondary" href="/login">Sign in</a>
+                  <a className="btn btn-primary" href="/register">Get started</a>
+                </div>
+              )}
             </div>
             <div className="hero-visual">
               <img src="/api/assets/hero illustration.png" alt="Platform illustration" onError={(e)=>{ e.currentTarget.src='/api/assets/mainLogo.png'; }} />
@@ -269,26 +277,28 @@ export default function Explore() {
         </div>
       </section>
 
-      {/* Improved CTA Section */}
-      <section className="cta-section">
-        <div className="container">
-          <div className="cta-content">
-            <div className="cta-text">
-              <h2 className="cta-title">Ready to streamline your project workflow?</h2>
-              <p className="cta-subtitle">Join developers and teams who are already using UnityBoard to organize projects, collaborate effectively, and build amazing things together.</p>
-              <div className="cta-features">
-                <div className="cta-feature">✅ Free to get started</div>
-                <div className="cta-feature">✅ No setup complexity</div>
-                <div className="cta-feature">✅ Start collaborating immediately</div>
+      {/* Improved CTA Section - Only show for non-authenticated users */}
+      {!isAuthed && (
+        <section className="cta-section">
+          <div className="container">
+            <div className="cta-content">
+              <div className="cta-text">
+                <h2 className="cta-title">Ready to streamline your project workflow?</h2>
+                <p className="cta-subtitle">Join developers and teams who are already using UnityBoard to organize projects, collaborate effectively, and build amazing things together.</p>
+                <div className="cta-features">
+                  <div className="cta-feature">✅ Free to get started</div>
+                  <div className="cta-feature">✅ No setup complexity</div>
+                  <div className="cta-feature">✅ Start collaborating immediately</div>
+                </div>
+              </div>
+              <div className="cta-actions">
+                <a className="btn btn-cta-primary" href="/register">Get Started Now</a>
+                <a className="btn btn-cta-secondary" href="mailto:arpit21345j@gmail.com">Contact Us</a>
               </div>
             </div>
-            <div className="cta-actions">
-              <a className="btn btn-cta-primary" href="/register">Get Started Now</a>
-              <a className="btn btn-cta-secondary" href="mailto:arpit21345j@gmail.com">Contact Us</a>
-            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Final Features & Public Projects - Text Left, Content Right */}
       <section className="final-section">

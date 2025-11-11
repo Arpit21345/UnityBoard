@@ -7,7 +7,7 @@ export default function Navbar() {
     <nav className="navbar" role="navigation" aria-label="Main">
       <div className="nav-inner">
         <a className="brand" href="/">
-          <img className="brand-logo" src="/api/assets/logo.png" alt="UnityBoard logo" onError={(e)=>{ e.currentTarget.style.display='none'; }} />
+          <img className="brand-logo" src="/logo.png" alt="UnityBoard logo" onError={(e)=>{ e.currentTarget.style.display='none'; }} />
           <span>UnityBoard</span>
         </a>
         <div className="spacer" />
