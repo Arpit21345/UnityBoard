@@ -35,19 +35,23 @@ export function AiContextProvider({ children }) {
     
     // Add project context if available
     if (routeInfo.isProject && projectContext) {
-      const projectInfo = [
-        `Project: ${projectContext.name}`,
-        projectContext.description ? `Description: ${projectContext.description}` : '',
-        projectContext.tasks?.length ? `Tasks (${projectContext.tasks.length}): ${projectContext.tasks.slice(0, 5).map(t => t.title || t.name).join(', ')}${projectContext.tasks.length > 5 ? '...' : ''}` : '',
-        projectContext.members?.length ? `Team members: ${projectContext.members.length}` : '',
-        projectContext.status ? `Status: ${projectContext.status}` : ''
-      ].filter(Boolean).join('. ');
-      
-      baseContext = projectInfo;
+      try {
+        const projectInfo = [
+          `Project: ${projectContext.name || 'Unnamed Project'}`,
+          projectContext.description ? `Description: ${projectContext.description}` : '',
+          projectContext.tasks?.length ? `Active tasks: ${projectContext.tasks.length}` : '',
+          projectContext.members?.length ? `Team members: ${projectContext.members.length}` : ''
+        ].filter(Boolean).join('. ');
+        
+        baseContext = projectInfo;
+      } catch (error) {
+        console.warn('Error building project context:', error);
+        baseContext = `Project page (ID: ${routeInfo.projectId})`;
+      }
     }
     
     return extra ? `${baseContext} | ${extra}` : baseContext;
-  }, [routeInfo, projectContext, extra]);
+  }, [routeInfo.route, routeInfo.isProject, routeInfo.projectId, projectContext?.name, projectContext?.description, projectContext?.tasks?.length, projectContext?.members?.length, extra]);
 
   const value = useMemo(() => ({ 
     ctx, 

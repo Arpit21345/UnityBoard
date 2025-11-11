@@ -6,8 +6,17 @@ function authHeaders() {
 }
 
 export async function apiAiQnA(question, context = '') {
-  const res = await fetch(`${API}/api/ai/qna`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...authHeaders() }, body: JSON.stringify({ question, context }) });
+  console.log('AI Request:', { question: question.substring(0, 50), context: context.substring(0, 100) });
+  
+  const res = await fetch(`${API}/api/ai/qna`, { 
+    method: 'POST', 
+    headers: { 'Content-Type': 'application/json', ...authHeaders() }, 
+    body: JSON.stringify({ question, context }) 
+  });
+  
   const data = await res.json();
+  console.log('AI Response:', { ok: data.ok, textLength: data.text?.length || 0 });
+  
   if (!res.ok || !data.ok) throw new Error(data.error || 'AI error');
   return data.text;
 }

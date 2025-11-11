@@ -95,10 +95,15 @@ const FALLBACK_RESPONSES = {
   ].join('\n'),
   
   qna: {
-    organize: "Try organizing tasks by priority, deadline, or project category. Break large tasks into smaller actionable steps.",
-    collaborate: "Use clear communication, assign specific roles, set regular check-ins, and document decisions.",
-    planning: "Start with defining clear goals, break them into milestones, estimate time needed, and build in buffer time.",
-    default: "I'm here to help with your project questions. You can ask about task organization, team collaboration, or project planning."
+    default: `Hi! I'm your UnityBoard Assistant working on your project. I'm currently learning more about your specific needs and will be back with better assistance soon. 
+
+In the meantime, I can help with:
+• Creating and managing projects
+• Adding team members (share project name & password)
+• Task management and organization
+• Using current UnityBoard features
+
+Feel free to ask about any UnityBoard functionality!`
   }
 };
 
@@ -130,17 +135,154 @@ export async function aiSummarize(text) {
   }, 'default', null);
 }
 
+// Direct answers for common UnityBoard questions
+const DIRECT_ANSWERS = {
+  'how do i create a new project': `To create a new project in UnityBoard:
+1. Go to your Dashboard
+2. Click the "Create Project" button
+3. Fill in project name and description
+4. Choose visibility: Public (discoverable by others) or Private
+5. Click "Create" to set up your project
+6. You can then invite team members and start adding tasks!`,
+
+  'create new project': `To create a new project in UnityBoard:
+1. Go to your Dashboard
+2. Click the "Create Project" button
+3. Fill in project name and description
+4. Choose visibility: Public (discoverable by others) or Private
+5. Click "Create" to set up your project`,
+
+  'how can i invite team members': `To add team members to your UnityBoard project:
+1. Create your project and note the project name
+2. Share the project name and password with your team members
+3. Team members can then join using the shared credentials
+4. Once they join, they can collaborate on tasks and project activities
+
+Note: Email invitation feature is coming soon!`,
+
+  'invite team members': `To add team members:
+1. Share your project name and password with them
+2. Team members can join using these credentials
+3. They'll then have access to collaborate on your project
+
+Note: Direct email invitations are coming soon!`,
+
+  'what are the best project management practices': `Best practices for UnityBoard project management:
+• Break large goals into smaller, manageable tasks
+• Set clear deadlines and priorities for each task
+• Assign specific team members to tasks for accountability
+• Use the Team Chat for regular communication
+• Store important files in the Resource Vault
+• Track progress regularly on your project dashboard
+• Hold regular team check-ins and updates
+• Use task comments for detailed discussions`,
+
+  'project management practices': `Best UnityBoard practices:
+• Break work into manageable tasks
+• Set clear deadlines and priorities
+• Use Team Chat for communication
+• Store files in Resource Vault
+• Track progress on dashboard
+• Hold regular team check-ins`,
+
+  'show me unityboard features': `UnityBoard Key Features:
+🎯 Project Management - Create public/private projects with team collaboration
+📋 Task Management - Create, assign, and track tasks with priorities and deadlines
+💬 Team Chat - Real-time messaging and communication
+🌐 Explore Page - Discover and join public community projects
+📚 Resource Vault - File storage and document sharing
+💡 Solution Database - Best practices and knowledge sharing
+⚡ Smart Snippets - Code snippet library
+📊 Learning Tracker - Track progress and milestones
+👤 User Profiles - Detailed contribution history
+🔧 Admin Panel - Platform management and analytics`,
+
+  'unityboard features': `UnityBoard Features:
+• Project & Task Management
+• Team Chat & Collaboration
+• Explore Public Projects
+• Resource Vault & File Storage
+• Solution Database
+• Smart Snippets Library
+• Learning Tracker
+• User Profiles & Analytics`,
+
+  'features': `Main UnityBoard features:
+• Create and manage projects
+• Task assignment and tracking
+• Real-time team chat
+• File storage and sharing
+• Discover public projects
+• Track learning progress`,
+
+  'how do i join a project': `To join projects in UnityBoard:
+• For Public Projects: Go to Explore page → Browse projects → Click "Join Project"
+• For Private Projects: Get the project name and password from the project owner, then use those credentials to join
+• Once joined, you can participate in tasks, chat, and access project resources
+• You'll have access based on your assigned role in the project`,
+
+  'how do i manage tasks': `Task management in UnityBoard:
+1. Open your project dashboard
+2. Click "Add Task" or "Create Task"
+3. Fill in task details: title, description, due date, priority
+4. Assign to team members
+5. Track status: To-Do → In Progress → In Review → Completed
+6. Use task comments for discussions and updates
+7. Monitor progress on your project dashboard`,
+
+  'manage tasks': `To manage tasks:
+1. Go to project dashboard
+2. Click "Add Task"
+3. Fill details and assign members
+4. Track progress (To-Do → In Progress → Completed)  
+5. Use comments for discussions`,
+
+  'add team members': `To add team members to your project:
+1. Share your project name and password with them
+2. Team members can join using these shared credentials
+3. Once they join, they can collaborate on tasks and project activities
+Note: Email invitation system is coming soon!`,
+
+  'team collaboration': `Current team collaboration in UnityBoard:
+• Share project name and password for members to join
+• Real-time team chat for communication
+• Task assignment and tracking
+• File sharing in Resource Vault
+• Collaborative project dashboard
+Note: Direct email invitations are being developed!`
+};
+
 export async function aiQnA(question, context = '') {
+  // Check for direct answers first
+  const normalizedQuestion = question.toLowerCase().trim();
+  for (const [key, answer] of Object.entries(DIRECT_ANSWERS)) {
+    if (normalizedQuestion.includes(key)) {
+      return answer;
+    }
+  }
+  
+  // For other questions, use AI with simple context
   return safeAiCall(async () => {
-    const prompt = `Answer briefly and helpfully. Question: ${question}\nContext: ${context}`;
-    return callCohere(prompt, { max_tokens: Math.min(env.cohere.maxTokens, 256) });
-  }, 'qna', getQnAFallbackKey(question));
+    const prompt = `You are the UnityBoard Assistant helping users with UnityBoard project management platform.
+
+UnityBoard is a collaborative platform with these main features:
+- Project Management (create/manage projects, invite teams)
+- Task Management (create/assign/track tasks)
+- Team Chat (real-time messaging)
+- Explore Page (discover public projects)
+- Resource Vault (file storage)
+- Solution Database (knowledge sharing)
+- User Profiles and Analytics
+
+Current context: ${context}
+User question: ${question}
+
+Provide a helpful answer about UnityBoard functionality. Keep it concise and accurate.`;
+    
+    return callCohere(prompt, { max_tokens: Math.min(env.cohere.maxTokens, 300) });
+  }, 'qna', 'default');
 }
 
 function getQnAFallbackKey(question) {
-  const q = question.toLowerCase();
-  if (q.includes('organiz') || q.includes('task') || q.includes('manage')) return 'organize';
-  if (q.includes('collaborat') || q.includes('team') || q.includes('work together')) return 'collaborate';
-  if (q.includes('plan') || q.includes('schedule') || q.includes('timeline')) return 'planning';
-  return 'default';
+  return 'default'; // Always use the friendly default fallback
 }

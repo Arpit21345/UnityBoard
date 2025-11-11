@@ -23,9 +23,19 @@ export default function AiHelper() {
     scrollToBottom();
   }, [messages]);
 
+  const lastRequestTime = useRef(0);
+  
   async function ask() {
     const q = input.trim();
-    if (!q) return;
+    if (!q || loading) return;
+    
+    // Prevent rapid requests (debounce for 1 second)
+    const now = Date.now();
+    if (now - lastRequestTime.current < 1000) {
+      console.log('Request throttled - too many requests');
+      return;
+    }
+    lastRequestTime.current = now;
     
     setMessages(m => [...m, { role: 'user', text: q }]);
     setInput('');
@@ -46,7 +56,7 @@ export default function AiHelper() {
       } else if (q.toLowerCase().includes('team') || q.toLowerCase().includes('member')) {
         errorMessage += ' You can manage team members in the project settings.';
       } else if (isInProject && projectContext) {
-        errorMessage += ` I can see you're working on "${projectContext.name}". Try checking the project dashboard for more information.`;
+        errorMessage += ` I can see you're working on "${projectContext?.name}". Try checking the project dashboard for more information.`;
       }
       
       setMessages(m => [...m, { role: 'assistant', text: errorMessage }]);
@@ -89,9 +99,14 @@ export default function AiHelper() {
   }, [location?.pathname]);
 
   // Show welcome message when opening for the first time
+  const welcomeMessageSet = useRef(false);
   useEffect(() => {
-    if (open && messages.length === 0) {
+    if (open && messages.length === 0 && !welcomeMessageSet.current) {
+      welcomeMessageSet.current = true;
       setMessages([{ role: 'assistant', text: getWelcomeMessage() }]);
+    }
+    if (!open) {
+      welcomeMessageSet.current = false;
     }
   }, [open]);
 
