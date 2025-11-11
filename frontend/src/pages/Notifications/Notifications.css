@@ -116,9 +116,11 @@
 }
 
 .btn-danger:hover:not(:disabled) {
-  background: #b91c1c;
+  background: #dc2626;
+  border-color: #dc2626;
+  opacity: 0.9;
   transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(220, 38, 38, 0.25);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
 }
 
 .btn:disabled {

@@ -10,3 +10,25 @@
 .kpi .card{padding:var(--sp-4)}
 .ub-spinner{display:inline-block;border:3px solid var(--gray-200);border-top-color:var(--primary-500);border-radius:50%;animation:ubspin 0.8s linear infinite}
 @keyframes ubspin{to{transform:rotate(360deg)}}
+
+/* Dark Mode Components */
+[data-theme='dark'] .ub-spinner {
+  border-color: #374151;
+  border-top-color: #6366f1;
+}
+
+[data-theme='dark'] .search input {
+  background: #1e293b;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+[data-theme='dark'] .kpi .card {
+  background: #1e293b;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+[data-theme='dark'] .layout-main {
+  background: #0f172a;
+}

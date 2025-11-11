@@ -20,6 +20,11 @@ a { color: inherit; text-decoration: none; }
 [data-theme='dark'] input, [data-theme='dark'] select, [data-theme='dark'] textarea { background:#1e293b; color:#e2e8f0; border-color:#334155; }
 [data-theme='dark'] .sidebar { background:#1e293b; border-color:#334155; }
 
+/* Dark mode: Sidebar navigation */
+[data-theme='dark'] .side-link { color: #cbd5e1; }
+[data-theme='dark'] .side-link:hover { background: #334155; color: #e2e8f0; }
+[data-theme='dark'] .side-link.active { background: #475569; color: #e2e8f0; }
+
 /* Dark mode logo handling - removed filter for transparent logo */
 /* [data-theme='dark'] .brand-logo { filter: brightness(0) invert(1); } */
 [data-theme='dark'] .global-navbar { background:#0f172a; border-color:#334155; }
@@ -50,6 +55,7 @@ a { color: inherit; text-decoration: none; }
 [data-theme='dark'] .gn-user-block{border-color:#374151}
 .gn-user-name{font-size:13px;font-weight:600}
 .gn-user-email{font-size:11px;color:var(--gray-500)}
+[data-theme='dark'] .gn-user-email{color:#94a3b8}
 .gn-logout{color:var(--danger-500)}
 
 /* Auth link/button styling in navbar */
@@ -124,6 +130,24 @@ a { color: inherit; text-decoration: none; }
 
 /* Remove old badge-dot styles */
 .badge-dot{display:none}
+
+/* Dark mode: General text elements */
+[data-theme='dark'] h1, [data-theme='dark'] h2, [data-theme='dark'] h3, [data-theme='dark'] h4, [data-theme='dark'] h5, [data-theme='dark'] h6 {
+  color: #e2e8f0;
+}
+
+[data-theme='dark'] p {
+  color: #cbd5e1;
+}
+
+[data-theme='dark'] .container {
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+[data-theme='dark'] .dash-title {
+  color: #e2e8f0;
+}
 
 @media (max-width:780px){
 	.global-navbar{padding:0 10px;height:50px}

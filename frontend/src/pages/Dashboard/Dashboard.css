@@ -62,6 +62,170 @@
 .create-form .cf-row{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
 .checkbox-inline{display:flex;align-items:center;gap:6px;font-size:13px}
 
+/* Dark Mode Styles */
+[data-theme='dark'] .list a { color: #e2e8f0; }
+
+[data-theme='dark'] .kpi-card {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 1px 3px rgba(0,0,0,.2);
+}
+
+[data-theme='dark'] .kpi-card:hover {
+  box-shadow: 0 4px 14px rgba(0,0,0,.4);
+}
+
+[data-theme='dark'] .kpi-label {
+  color: #94a3b8;
+}
+
+[data-theme='dark'] .kpi-value {
+  color: #e2e8f0;
+}
+
+[data-theme='dark'] .dash-filters input {
+  background: #1e293b;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+[data-theme='dark'] .project-card {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 1px 3px rgba(0,0,0,.2);
+}
+
+[data-theme='dark'] .project-card:hover {
+  box-shadow: 0 4px 14px rgba(0,0,0,.4);
+  border-color: #475569;
+}
+
+[data-theme='dark'] .pc-name-btn {
+  color: #e2e8f0;
+}
+
+[data-theme='dark'] .pc-name {
+  color: #e2e8f0;
+}
+
+[data-theme='dark'] .pc-meta {
+  color: #94a3b8;
+}
+
+[data-theme='dark'] .vis-tag {
+  background: #374151;
+  color: #cbd5e1;
+}
+
+[data-theme='dark'] .role-badge {
+  background: #312e81;
+  color: #c7d2fe;
+}
+
+[data-theme='dark'] .role-admin {
+  background: #164e63;
+  color: #67e8f9;
+}
+
+[data-theme='dark'] .role-member {
+  background: #374151;
+  color: #d1d5db;
+}
+
+[data-theme='dark'] .mini-btn {
+  background: #374151;
+  border-color: #4b5563;
+  color: #d1d5db;
+}
+
+[data-theme='dark'] .mini-btn:hover {
+  background: #4b5563;
+}
+
+[data-theme='dark'] .invite-box {
+  background: #374151;
+  border-color: #4b5563;
+}
+
+[data-theme='dark'] .danger-text {
+  color: #f87171;
+}
+
+/* Dark mode: My Tasks */
+[data-theme='dark'] .mytasks-list li {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme='dark'] .mytasks-list li:hover {
+  background: #334155;
+}
+
+[data-theme='dark'] .mt-title {
+  color: #e2e8f0;
+}
+
+[data-theme='dark'] .mt-due {
+  color: #94a3b8;
+}
+
+[data-theme='dark'] .mt-status {
+  background: #312e81;
+  color: #c7d2fe;
+}
+
+[data-theme='dark'] .status-in-progress {
+  background: #164e63;
+  color: #67e8f9;
+}
+
+[data-theme='dark'] .status-done {
+  background: #166534;
+  color: #86efac;
+}
+
+[data-theme='dark'] .mt-priority {
+  background: #374151;
+  color: #d1d5db;
+}
+
+[data-theme='dark'] .pri-high {
+  background: #991b1b;
+  color: #fca5a5;
+}
+
+[data-theme='dark'] .pri-urgent {
+  background: #92400e;
+  color: #fcd34d;
+}
+
+/* Dark mode: Activity Feed */
+[data-theme='dark'] .af-day-label {
+  color: #94a3b8;
+}
+
+[data-theme='dark'] .af-item {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme='dark'] .af-item:hover {
+  background: #334155;
+}
+
+[data-theme='dark'] .af-msg {
+  color: #e2e8f0;
+}
+
+[data-theme='dark'] .af-time {
+  color: #94a3b8;
+}
+
+/* Dark mode: Create Form */
+[data-theme='dark'] .create-form label {
+  color: #e2e8f0;
+}
+
 @media (max-width: 720px){
 	.project-grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
 	.create-form .cf-grid{grid-template-columns:1fr}

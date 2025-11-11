@@ -1,3 +1,17 @@
 .container { max-width: 960px; margin: 40px auto; padding: 0 16px; }
 h1 { font-size: 28px; margin-bottom: 8px; }
 p { color: #444; }
+
+/* Dark Mode */
+[data-theme='dark'] .container {
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+[data-theme='dark'] h1 {
+  color: #e2e8f0;
+}
+
+[data-theme='dark'] p {
+  color: #cbd5e1;
+}

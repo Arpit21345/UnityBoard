@@ -27,3 +27,21 @@
   --font-sans: system-ui, -apple-system, Segoe UI, Roboto, Arial, Noto Sans, "Apple Color Emoji", "Segoe UI Emoji";
   --text-sm: 12.5px; --text-md: 14.5px; --text-lg: 18px; --text-xl: 24px; --text-2xl: 32px;
 }
+
+/* Dark mode color tokens */
+[data-theme='dark'] {
+  /* Dark mode gradients - more subtle */
+  --gradient-brand: linear-gradient(135deg, #4f46e5, #6366f1);
+  --gradient-soft: linear-gradient(135deg, rgba(79, 70, 229, 0.1), rgba(99, 102, 241, 0.1));
+  
+  /* Dark mode shadows */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.3);
+  --shadow-md: 0 4px 14px rgba(0,0,0,.4);
+  --shadow-lg: 0 10px 25px rgba(0,0,0,.5);
+  
+  /* Dark mode text colors for better readability */
+  --success-text: #86efac;
+  --warning-text: #fcd34d;
+  --danger-text: #fca5a5;
+  --info-text: #67e8f9;
+}

@@ -90,6 +90,61 @@
   gap: var(--sp-2);
 }
 
+/* Dark Mode Button Styles */
+[data-theme='dark'] .btn {
+  background: #1e293b;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+[data-theme='dark'] .btn:hover {
+  background: #334155;
+  border-color: #475569;
+}
+
+[data-theme='dark'] .btn-ghost {
+  background: transparent;
+  border-color: transparent;
+  color: #e2e8f0;
+}
+
+[data-theme='dark'] .btn-ghost:hover {
+  background: #334155;
+}
+
+[data-theme='dark'] .btn-danger {
+  background: #991b1b;
+  border-color: #b91c1c;
+  color: #fca5a5;
+}
+
+[data-theme='dark'] .btn-danger:hover {
+  background: #b91c1c;
+  border-color: #dc2626;
+  color: #fecaca;
+}
+
+[data-theme='dark'] .btn-primary,
+[data-theme='dark'] .btn.primary {
+  background: #1f2937;
+  color: #e2e8f0;
+  border-color: #374151;
+}
+
+[data-theme='dark'] .btn-primary:hover,
+[data-theme='dark'] .btn.primary:hover,
+[data-theme='dark'] .btn-primary:focus,
+[data-theme='dark'] .btn.primary:focus {
+  background: #374151;
+  color: #f3f4f6;
+}
+
+[data-theme='dark'] .btn-primary:active,
+[data-theme='dark'] .btn.primary:active {
+  background: #4b5563;
+  color: #f9fafb;
+}
+
 /* Mini action buttons (project cards) */
 .mini-btn {
   background:#fff;

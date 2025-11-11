@@ -36,8 +36,27 @@ export async function uploadResource(req, res) {
     if (env.fileStorage === 'local') {
       record = makeFileRecord(req.file);
     } else {
-      const result = await uploadToCloudinary(req.file.buffer, req.file.originalname);
-      record = { provider: 'cloudinary', url: result.secure_url, mime: req.file.mimetype, size: req.file.size, name: req.file.originalname };
+      // Validate Cloudinary configuration
+      if (!env.cloudinary.cloudName || !env.cloudinary.apiKey || !env.cloudinary.apiSecret) {
+        console.error('Resource upload failed: Cloudinary configuration missing');
+        return res.status(500).json({ ok: false, error: 'File storage not configured' });
+      }
+      
+      const timestamp = Date.now();
+      const filename = `resource_${id}_${timestamp}`;
+      
+      const result = await uploadToCloudinary(
+        req.file.buffer, 
+        filename,
+        `${env.cloudinary.folder}/resources`
+      );
+      record = { 
+        provider: 'cloudinary', 
+        url: result.secure_url, 
+        mime: req.file.mimetype, 
+        size: req.file.size, 
+        name: req.file.originalname 
+      };
     }
 
     const resource = await Resource.create({
@@ -54,6 +73,7 @@ export async function uploadResource(req, res) {
 
     res.status(201).json({ ok: true, resource });
   } catch (e) {
+    console.error('Resource upload error:', e.message);
     res.status(500).json({ ok: false, error: 'Upload failed' });
   }
 }

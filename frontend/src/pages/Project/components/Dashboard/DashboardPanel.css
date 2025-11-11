@@ -643,4 +643,145 @@
   }
 }
 
+/* Dark Mode Styles */
+[data-theme='dark'] .project-dashboard {
+  background: #0f172a;
+}
+
+[data-theme='dark'] .kpi-card {
+  background: #1e293b;
+  color: #e2e8f0;
+  border: 1px solid #334155;
+}
+
+[data-theme='dark'] .kpi-card:before {
+  background: radial-gradient(circle at 85% 15%, rgba(255,255,255,.08), transparent 60%);
+}
+
+[data-theme='dark'] .kpi-card:hover {
+  box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+  border-color: #475569;
+}
+
+[data-theme='dark'] .progress-bar {
+  background: #374151;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,.3);
+}
+
+[data-theme='dark'] .progress-fill:after {
+  background: linear-gradient(90deg, rgba(255,255,255,.15), transparent);
+}
+
+[data-theme='dark'] .section-card {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 1px 3px rgba(0,0,0,.2);
+}
+
+[data-theme='dark'] .section-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,.3);
+}
+
+[data-theme='dark'] .section-title {
+  color: #e2e8f0;
+}
+
+[data-theme='dark'] .team-member-row {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme='dark'] .team-member-row:hover {
+  background: #334155;
+}
+
+[data-theme='dark'] .member-name {
+  color: #e2e8f0;
+}
+
+[data-theme='dark'] .member-role {
+  color: #94a3b8;
+}
+
+[data-theme='dark'] .member-email {
+  color: #64748b;
+}
+
+[data-theme='dark'] .mini-table {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme='dark'] .mini-table th {
+  background: #334155;
+  color: #e2e8f0;
+  border-color: #475569;
+}
+
+[data-theme='dark'] .mini-table td {
+  background: #1e293b;
+  color: #cbd5e1;
+  border-color: #334155;
+}
+
+[data-theme='dark'] .mini-table tr:hover td {
+  background: #334155;
+}
+
+[data-theme='dark'] .load-summary {
+  color: #94a3b8;
+}
+
+[data-theme='dark'] .task-row {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme='dark'] .task-row:hover {
+  background: #334155;
+}
+
+[data-theme='dark'] .task-title {
+  color: #e2e8f0;
+}
+
+[data-theme='dark'] .task-meta {
+  color: #94a3b8;
+}
+
+[data-theme='dark'] .priority-badge {
+  background: #374151;
+  color: #d1d5db;
+}
+
+[data-theme='dark'] .priority-badge.urgent {
+  background: #92400e;
+  color: #fcd34d;
+}
+
+[data-theme='dark'] .priority-badge.high {
+  background: #991b1b;
+  color: #fca5a5;
+}
+
+[data-theme='dark'] .status-badge {
+  background: #374151;
+  color: #d1d5db;
+}
+
+[data-theme='dark'] .status-badge.todo {
+  background: #374151;
+  color: #9ca3af;
+}
+
+[data-theme='dark'] .status-badge.in-progress {
+  background: #164e63;
+  color: #67e8f9;
+}
+
+[data-theme='dark'] .status-badge.done {
+  background: #166534;
+  color: #86efac;
+}
+
 /* End consolidated */
