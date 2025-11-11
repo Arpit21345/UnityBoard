@@ -1,5 +1,16 @@
 {
   "rewrites": [
-    { "source": "/((?!api|_next/static|_next/image|favicon.ico|logo.png|mainLogo.png|.*\\.(png|jpg|jpeg|gif|svg|ico|css|js)).*)", "destination": "/index.html" }
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    }
   ]
 }

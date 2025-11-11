@@ -1,5 +1,9 @@
 {
   "rewrites": [
-    { "source": "/((?!api|_next/static|_next/image|favicon.ico|logo.png|mainLogo.png|.*\\.(png|jpg|jpeg|gif|svg|ico|css|js)).*)", "destination": "/index.html" }
+    { "source": "/logo.png", "destination": "/logo.png" },
+    { "source": "/mainLogo.png", "destination": "/mainLogo.png" },
+    { "source": "/favicon.ico", "destination": "/favicon.ico" },
+    { "source": "/(.*\\.(png|jpg|jpeg|gif|svg|ico|css|js|json|woff|woff2|ttf|eot))", "destination": "/$1" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
