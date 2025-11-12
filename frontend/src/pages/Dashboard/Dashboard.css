@@ -231,3 +231,150 @@
 	.create-form .cf-grid{grid-template-columns:1fr}
 	.dash-header{align-items:flex-start}
 }
+
+/* Enhanced Mobile Responsiveness */
+@media (max-width: 768px) {
+  /* Dashboard header */
+  .dash-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+  
+  .dash-title {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+  
+  .dash-actions {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  /* KPI cards */
+  .kpi-row {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 8px;
+    margin-top: 12px;
+  }
+  
+  .kpi-card {
+    padding: 10px 12px;
+  }
+  
+  .kpi-value {
+    font-size: 18px;
+  }
+  
+  /* Dashboard filters */
+  .dash-filters {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .dash-filters .input {
+    min-width: auto;
+    width: 100%;
+  }
+  
+  /* Project grid */
+  .project-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .project-card {
+    padding: 12px 14px;
+  }
+  
+  .pc-name, .pc-name-btn {
+    font-size: 14px;
+  }
+  
+  .role-badge {
+    font-size: 10px;
+    padding: 3px 6px;
+  }
+  
+  .pc-meta {
+    font-size: 11px;
+  }
+  
+  .pc-actions {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  
+  .mini-btn {
+    font-size: 10px;
+    padding: 3px 6px;
+  }
+  
+  /* Tasks list */
+  .mytasks-list li {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    padding: 10px;
+  }
+  
+  .mt-title {
+    font-size: 13px;
+    white-space: normal;
+    text-overflow: initial;
+    overflow: visible;
+  }
+  
+  .mt-due, .mt-status, .mt-priority {
+    font-size: 10px;
+    align-self: flex-start;
+  }
+  
+  /* Activity feed */
+  .activity-feed {
+    gap: 8px;
+  }
+  
+  .af-item {
+    padding: 10px 12px;
+  }
+  
+  .af-msg {
+    font-size: 13px;
+  }
+  
+  .af-time {
+    font-size: 11px;
+  }
+  
+  /* Join inline form */
+  .join-inline {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .join-inline input {
+    min-width: auto;
+    width: 100%;
+  }
+}
+
+/* Small mobile screens */
+@media (max-width: 480px) {
+  .kpi-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .dash-title {
+    font-size: 1.3rem;
+  }
+  
+  .kpi-value {
+    font-size: 16px;
+  }
+  
+  .project-card {
+    padding: 10px 12px;
+  }
+}
