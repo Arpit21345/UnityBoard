@@ -2,7 +2,8 @@
 
 **UnityBoard** is a comprehensive project management and collaboration platform built with the MERN stack. It empowers teams to organize, track, and deliver projects efficiently with real-time collaboration features, AI assistance, and intuitive project workflows.
 
-[PLACEHOLDER - Main Homepage Screenshot]
+<img width="1919" height="944" alt="image" src="https://github.com/user-attachments/assets/b61ca4db-aba6-41a7-aaf8-7d4948844558" />
+
 
 ## ✨ Key Features
 
@@ -13,7 +14,7 @@
 - **Task Management** - Create, assign, and track tasks with due dates and priorities
 - **Project Archives** - Archive completed projects and restore when needed
 
-[PLACEHOLDER - Project Dashboard Screenshot]
+<img width="1919" height="947" alt="image" src="https://github.com/user-attachments/assets/13951fdc-7aa8-4913-91b5-f2eb17467de7" />
 
 ### 🌐 **Explore & Discovery**
 - **Public Project Gallery** - Discover and join public projects from the community
@@ -21,7 +22,8 @@
 - **One-Click Joining** - Seamlessly join public projects with instant access
 - **Project Previews** - View project details before joining
 
-[PLACEHOLDER - Explore Page Screenshot]
+<img width="1919" height="942" alt="image" src="https://github.com/user-attachments/assets/51d0b086-0bb6-4478-9c94-d1840c23ba1b" />
+
 
 ### 💬 **Real-Time Communication**
 - **Team Chat** - Built-in messaging system for project discussions
@@ -29,7 +31,8 @@
 - **Discussion Threads** - Organized conversations around specific topics
 - **Message History** - Complete chat history with search capabilities
 
-[PLACEHOLDER - Team Chat Screenshot]
+<img width="1919" height="948" alt="image" src="https://github.com/user-attachments/assets/63ae8158-c5f9-49c1-8d3d-4de805755d9b" />
+
 
 ### 🤖 **AI-Powered Assistant**
 - **Smart Suggestions** - AI-powered recommendations for project planning
@@ -37,7 +40,8 @@
 - **Problem Solving** - Get instant help with technical challenges
 - **Context-Aware Help** - AI understands your project context for relevant assistance
 
-[PLACEHOLDER - AI Assistant Screenshot]
+<img width="1913" height="943" alt="image" src="https://github.com/user-attachments/assets/e0cf87d1-bb41-4bd8-966a-159ce0cbfbd7" />
+
 
 ### 📚 **Knowledge Management**
 - **Resource Vault** - Centralized file storage and sharing
@@ -45,7 +49,8 @@
 - **Smart Snippets** - Code snippets library with categorization
 - **Learning Tracker** - Track progress and learning milestones
 
-[PLACEHOLDER - Resource Management Screenshot]
+<img width="1919" height="944" alt="image" src="https://github.com/user-attachments/assets/1617e93d-6b7a-4683-81d2-18fc706b1064" />
+
 
 ### 🔒 **Security & Administration**
 - **User Authentication** - Secure JWT-based authentication system
@@ -53,7 +58,8 @@
 - **Admin Panel** - Comprehensive administration dashboard
 - **User Management** - Monitor users, projects, and system analytics
 
-[PLACEHOLDER - Admin Panel Screenshot]
+<img width="1919" height="947" alt="image" src="https://github.com/user-attachments/assets/c856a0ed-dd66-4b4d-850c-2404e17b2b2f" />
+
 
 ### 📊 **Analytics & Insights**
 - **Project Analytics** - Track project progress and team performance
@@ -227,7 +233,7 @@ projectUnityBoard/
 
 ## 📊 Admin Panel Features
 
-[PLACEHOLDER - Admin Dashboard Screenshot]
+
 
 - **User Management** - View and manage all registered users
 - **Project Oversight** - Monitor all projects and activities
